@@ -1,4 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { useCustomerAuth } from '@/lib/customer-auth'
+import { supabase } from '@/lib/supabase'
 
 export type CartItem = { name: string; price: number; qty: number }
 
@@ -26,22 +28,50 @@ function loadCart(): CartItem[] {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { user, loading } = useCustomerAuth()
   const [items, setItems] = useState<CartItem[]>([])
-  const [hydrated, setHydrated] = useState(false)
+  const [readyFor, setReadyFor] = useState<string | null>(null)
 
   useEffect(() => {
-    setItems(loadCart())
-    setHydrated(true)
-  }, [])
+    if (loading) return
+    let active = true
+    setReadyFor(null)
+    if (!user) {
+      setItems(loadCart())
+      setReadyFor('guest')
+      return
+    }
+    void supabase.from('cart_items').select('name,price,qty').eq('user_id', user.id).then(({ data, error }) => {
+      if (!active) return
+      if (error) { setItems(loadCart()); setReadyFor('guest'); return }
+      const guest = loadCart()
+      const merged = new Map<string, CartItem>()
+      for (const row of data ?? []) merged.set(row.name, { name: row.name, price: row.price, qty: row.qty })
+      for (const row of guest) {
+        const old = merged.get(row.name)
+        merged.set(row.name, { ...row, qty: Math.min(20, row.qty + (old?.qty ?? 0)) })
+      }
+      window.localStorage.removeItem(STORAGE_KEY)
+      setItems([...merged.values()])
+      setReadyFor(user.id)
+    })
+    return () => { active = false }
+  }, [user?.id, loading])
 
   useEffect(() => {
-    if (!hydrated) return
+    if (!readyFor) return
+    if (readyFor !== 'guest') {
+      const timer = window.setTimeout(() => {
+        void supabase.rpc('set_cart', { p_items: items.map(({ name, qty }) => ({ name, qty })) })
+      }, 250)
+      return () => window.clearTimeout(timer)
+    }
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
     } catch {
       /* ignore storage failures */
     }
-  }, [items, hydrated])
+  }, [items, readyFor])
 
   const addItem = (item: CartItem) => {
     setItems((prev) => {

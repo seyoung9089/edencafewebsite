@@ -1,4 +1,4 @@
-import { useRouter } from '@tanstack/react-router'
+import { useRouter, type ErrorComponentProps } from '@tanstack/react-router'
 
 // Wired as router-level `defaultErrorComponent` (see ../router.tsx). Receives
 // `{ error, info, reset }` — we only use `error` here.
@@ -7,13 +7,13 @@ import { useRouter } from '@tanstack/react-router'
 // clears the error boundary without re-running the failed loader, so the same
 // error fires again on the next render. `router.invalidate()` re-runs loaders
 // AND resets the boundary, which is what you actually want for a retry button.
-export function ErrorBoundary({ error }: { error: Error }) {
+export function ErrorBoundary({ error }: ErrorComponentProps) {
   const router = useRouter()
   return (
     <div className="flex flex-col items-center justify-center h-screen gap-4 p-6 text-center">
       <h1 className="text-4xl font-semibold">Something went wrong</h1>
       <p className="text-muted-foreground max-w-md break-words">
-        {error.message}
+        {error instanceof Error ? error.message : String(error)}
       </p>
       <button
         onClick={() => router.invalidate()}

@@ -13,10 +13,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as CustomerManagementRouteImport } from './routes/customer-management'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as AuthGoogleCallbackRouteImport } from './routes/auth/google/callback'
 import { Route as AuthGooglePopupRouteImport } from './routes/auth/google/popup'
@@ -41,9 +44,19 @@ const CartRoute = CartRouteImport.update({
   path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CustomerManagementRoute = CustomerManagementRouteImport.update({
+  id: '/customer-management',
+  path: '/customer-management',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MenuRoute = MenuRouteImport.update({
@@ -59,6 +72,11 @@ const NewsRoute = NewsRouteImport.update({
 const OrdersRoute = OrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SupportRoute = SupportRouteImport.update({
@@ -82,10 +100,13 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/cart': typeof CartRoute
+  '/customer-management': typeof CustomerManagementRoute
   '/history': typeof HistoryRoute
+  '/login': typeof LoginRoute
   '/menu': typeof MenuRoute
   '/news': typeof NewsRoute
   '/orders': typeof OrdersRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/auth/google/popup': typeof AuthGooglePopupRoute
@@ -95,10 +116,13 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/cart': typeof CartRoute
+  '/customer-management': typeof CustomerManagementRoute
   '/history': typeof HistoryRoute
+  '/login': typeof LoginRoute
   '/menu': typeof MenuRoute
   '/news': typeof NewsRoute
   '/orders': typeof OrdersRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/auth/google/popup': typeof AuthGooglePopupRoute
@@ -109,10 +133,13 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/cart': typeof CartRoute
+  '/customer-management': typeof CustomerManagementRoute
   '/history': typeof HistoryRoute
+  '/login': typeof LoginRoute
   '/menu': typeof MenuRoute
   '/news': typeof NewsRoute
   '/orders': typeof OrdersRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/auth/google/popup': typeof AuthGooglePopupRoute
@@ -124,10 +151,13 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/cart'
+    | '/customer-management'
     | '/history'
+    | '/login'
     | '/menu'
     | '/news'
     | '/orders'
+    | '/reset-password'
     | '/support'
     | '/auth/google/callback'
     | '/auth/google/popup'
@@ -137,10 +167,13 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/cart'
+    | '/customer-management'
     | '/history'
+    | '/login'
     | '/menu'
     | '/news'
     | '/orders'
+    | '/reset-password'
     | '/support'
     | '/auth/google/callback'
     | '/auth/google/popup'
@@ -150,10 +183,13 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/cart'
+    | '/customer-management'
     | '/history'
+    | '/login'
     | '/menu'
     | '/news'
     | '/orders'
+    | '/reset-password'
     | '/support'
     | '/auth/google/callback'
     | '/auth/google/popup'
@@ -164,10 +200,13 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
   CartRoute: typeof CartRoute
+  CustomerManagementRoute: typeof CustomerManagementRoute
   HistoryRoute: typeof HistoryRoute
+  LoginRoute: typeof LoginRoute
   MenuRoute: typeof MenuRoute
   NewsRoute: typeof NewsRoute
   OrdersRoute: typeof OrdersRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SupportRoute: typeof SupportRoute
   AuthGoogleCallbackRoute: typeof AuthGoogleCallbackRoute
   AuthGooglePopupRoute: typeof AuthGooglePopupRoute
@@ -203,11 +242,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/customer-management': {
+      id: '/customer-management'
+      path: '/customer-management'
+      fullPath: '/customer-management'
+      preLoaderRoute: typeof CustomerManagementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/history': {
       id: '/history'
       path: '/history'
       fullPath: '/history'
       preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/menu': {
@@ -229,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/orders'
       preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/support': {
@@ -260,10 +320,13 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
   CartRoute: CartRoute,
+  CustomerManagementRoute: CustomerManagementRoute,
   HistoryRoute: HistoryRoute,
+  LoginRoute: LoginRoute,
   MenuRoute: MenuRoute,
   NewsRoute: NewsRoute,
   OrdersRoute: OrdersRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SupportRoute: SupportRoute,
   AuthGoogleCallbackRoute: AuthGoogleCallbackRoute,
   AuthGooglePopupRoute: AuthGooglePopupRoute,

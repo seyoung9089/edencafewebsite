@@ -6,7 +6,8 @@ import { SiteFooter } from '@/components/site-footer'
 import { PickupNotice } from '@/components/pickup-notice'
 import { useCart } from '@/lib/cart'
 import { pageMeta } from '@/lib/seo'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Minus, Plus, Croissant, Coffee } from 'lucide-react'
 import { toast } from 'sonner'
@@ -28,6 +29,12 @@ function MenuPage() {
   const { addItem } = useCart()
   const [active, setActive] = useState<MenuItem | null>(null)
   const [qty, setQty] = useState(1)
+  const [catalog, setCatalog] = useState<Map<string, { price: number; sold_out: boolean }> | null>(null)
+  useEffect(() => {
+    void supabase.from('menu_catalog').select('name,price,sold_out').then(({ data }) => {
+      if (data) setCatalog(new Map(data.map(row => [row.name, { price: row.price, sold_out: row.sold_out }])))
+    })
+  }, [])
 
   const openModal = (item: MenuItem) => {
     setActive(item)
@@ -41,8 +48,12 @@ function MenuPage() {
     setActive(null)
   }
 
-  const bakery = items?.filter((i) => i.category === 'bakery') ?? []
-  const drinks = items?.filter((i) => i.category === 'drink') ?? []
+  const displayItems = items?.map(i => {
+    const current = catalog?.get(i.name)
+    return { ...i, price: current?.price ?? i.price, soldOut: Boolean(i.soldOut || current?.sold_out), orderReady: !catalog || Boolean(current) }
+  }) ?? []
+  const bakery = displayItems.filter((i) => i.category === 'bakery')
+  const drinks = displayItems.filter((i) => i.category === 'drink')
 
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
@@ -82,9 +93,9 @@ function MenuPage() {
                 <div className="mb-4 font-serif text-base font-semibold text-eden-sand">
                   {item.price.toLocaleString('ko-KR')}원
                 </div>
-                {item.soldOut ? (
+                {item.soldOut || !item.orderReady ? (
                   <span className="block w-full border border-eden-line py-2 text-center text-xs text-eden-sage-dim">
-                    품절
+                    {item.soldOut ? '품절' : '주문 준비 중'}
                   </span>
                 ) : (
                   <button

@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useMutation, useQuery } from 'convex/react'
 import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react'
 import { api } from '@/convex/_generated/api'
@@ -64,9 +64,9 @@ function AdminClaimGate() {
 
 type Tab = 'menu' | 'orders' | 'inquiries' | 'content' | 'members'
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'orders', label: '주문 · 입금확인' },
+  { id: 'orders', label: '이전 주문' },
   { id: 'menu', label: '메뉴 관리' },
-  { id: 'inquiries', label: '문의 관리' },
+  { id: 'inquiries', label: '이전 문의' },
   { id: 'content', label: '콘텐츠 관리' },
   { id: 'members', label: '회원 관리' },
 ]
@@ -131,6 +131,7 @@ function AdminPage() {
       <section className="px-6 pb-24 pt-14 md:px-8">
         <h1 className="mb-3 font-serif text-3xl font-semibold">관리자 페이지</h1>
         <p className="mb-10 text-[15px] text-eden-sage-dim">메뉴 · 주문 · 콘텐츠 · 회원을 관리자가 직접 관리합니다.</p>
+        <Link to="/customer-management" className="mb-8 inline-block bg-eden-ink px-5 py-3 text-sm text-eden-paper">이메일 고객 주문 · 입금 · 문의 관리 →</Link>
 
         <AuthLoading>
           <div className="h-24 w-full max-w-3xl animate-pulse bg-eden-line" />

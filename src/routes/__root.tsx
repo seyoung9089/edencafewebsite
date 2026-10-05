@@ -19,6 +19,7 @@ import '../styles.css'
 import siteMetadata from '../metadata.json'
 import AppConvexProvider from '@/components/convex-client-provider'
 import { CartProvider } from '@/lib/cart'
+import { CustomerAuthProvider } from '@/lib/customer-auth'
 import { Toaster } from '@/components/ui/sonner'
 import { BackToTop } from '@/components/back-to-top'
 
@@ -55,11 +56,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <MacalyBridge>
         <body>
           <AppConvexProvider>
-            <CartProvider>
+            <CustomerAuthProvider><CartProvider>
               {children}
               <BackToTop />
               <Toaster />
-            </CartProvider>
+            </CartProvider></CustomerAuthProvider>
           </AppConvexProvider>
           <Scripts />
         </body>

@@ -1,7 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useMutation } from 'convex/react'
-import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { Link } from '@tanstack/react-router'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { useCart } from '@/lib/cart'
@@ -10,7 +8,8 @@ import { getErrorMessage } from '@/lib/errors'
 import { pageMeta } from '@/lib/seo'
 import { useState } from 'react'
 import { Minus, Plus, X } from 'lucide-react'
-import { GoogleAuthButton } from '@/components/google-auth-button'
+import { useCustomerAuth } from '@/lib/customer-auth'
+import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/cart')({ component: CartPage, head: () => pageMeta('/cart') })
@@ -18,7 +17,7 @@ export const Route = createFileRoute('/cart')({ component: CartPage, head: () =>
 function CartPage() {
   const { items, updateQty, removeItem, clear, totalPrice } = useCart()
   const slot = useCurrentPickupSlot()
-  const createOrder = useMutation(api.orders.create)
+  const { user, loading } = useCustomerAuth()
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
 
@@ -26,13 +25,14 @@ function CartPage() {
     if (!items.length || !slot) return
     setSubmitting(true)
     try {
-      const result = await createOrder({
-        items: items.map((it) => ({ name: it.name, qty: it.qty })),
-        expectedPickupIso: slot.iso,
+      const { error } = await supabase.rpc('place_order', {
+        p_items: items.map((it) => ({ name: it.name, qty: it.qty })),
+        p_pickup_date: slot.iso,
       })
+      if (error) throw error
       clear()
       toast.success(
-        `${result.pickupDateLabel} ${result.pickupLabel} 픽업으로 주문이 접수되었습니다. 무통장입금 계좌는 내 주문에서 확인해주세요.`,
+        `${slot.dateLabel} 픽업으로 주문이 접수되었습니다. 무통장입금 계좌는 내 주문에서 확인해주세요.`,
       )
       navigate({ to: '/orders' })
     } catch (e) {
@@ -105,7 +105,7 @@ function CartPage() {
                 <span className="font-serif text-xl text-eden-sand">{totalPrice.toLocaleString('ko-KR')}원</span>
               </div>
 
-              <Authenticated>
+              {user ? (
                 <button
                   onClick={() => void checkout()}
                   disabled={submitting || !slot}
@@ -113,14 +113,13 @@ function CartPage() {
                 >
                   {submitting ? '주문 처리 중…' : '주문하기 (무통장입금)'}
                 </button>
-              </Authenticated>
-              <Unauthenticated>
+              ) : !loading ? (
                 <p className="mb-3 text-xs text-eden-sage-dim">로그인 후 주문할 수 있어요.</p>
-                <GoogleAuthButton label="Google로 로그인하고 주문하기" className="w-full" />
-              </Unauthenticated>
-              <AuthLoading>
+              ) : null}
+              {!user && !loading ? <Link to="/login" className="block w-full bg-eden-ink py-3 text-center text-sm text-eden-paper">이메일로 로그인하고 주문하기</Link> : null}
+              {loading ? (
                 <div className="h-11 w-full animate-pulse bg-eden-line" />
-              </AuthLoading>
+              ) : null}
             </div>
           </div>
         )}

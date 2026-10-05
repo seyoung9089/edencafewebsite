@@ -1,0 +1,24 @@
+# 이든카페 (Eden Cafe)
+
+> A student-cooperative café in Geumsan, Chungnam, Korea, started in 2021 by high school students. Sells bakery items and drinks for pickup, ordered online. Pickup is Tuesday or Thursday only, assigned automatically by order time — customers do not choose the day.
+
+이든카페는 별무리고등학교 학생들의 창업 프로젝트로 2021년 시작해, 지금은 졸업생과 교사가 함께 운영하는 협동조합 카페입니다. 이익보다 가치를 우선하는 정직한 재료와 가격을 지향합니다.
+
+## 주문 안내 (Ordering)
+- 픽업은 화요일과 목요일에만 가능합니다. 고객이 요일을 선택하지 않고, 주문한 시각에 따라 서버가 자동으로 정합니다.
+- 수요일 19:00 ~ 월요일 19:00 사이 주문 → 다음 화요일 픽업
+- 월요일 19:00 ~ 수요일 19:00 사이 주문 → 그 주 목요일 픽업
+- 주문하려면 Google 계정 로그인이 필요하고, 결제는 무통장입금입니다.
+
+## 주요 페이지 (Pages)
+- [홈](/): 카페 소개, 핵심가치, 메뉴·히스토리·새소식 미리보기
+- [카페소개](/about): 이름의 의미, 지키는 가치, 오시는 길
+- [전체 메뉴](/menu): 베이커리·음료 전체 목록과 가격
+- [히스토리](/history): 2021년부터의 연혁
+- [새소식](/news): 공지사항
+- [문의하기](/support): 카테고리별 문의 등록 (픽업·결제·시스템·이용·기타)
+
+## 참고 (Notes)
+- 전화번호와 정확한 매장 주소는 아직 실제 정보로 교체되지 않은 자리표시자(placeholder)입니다. 연락처가 필요하면 /support의 문의하기를 이용해주세요.
+- /cart, /orders, /admin은 로그인 또는 관리자 권한이 필요한 개인/운영용 페이지로, 공개 콘텐츠가 아닙니다.
+- 이 사이트는 정적으로 미리 렌더링되어 제공되므로, 자바스크립트를 실행하지 않는 크롤러도 각 페이지의 핵심 텍스트를 읽을 수 있습니다.

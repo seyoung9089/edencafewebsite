@@ -1,0 +1,57 @@
+# https://www.robotstxt.org/robotstxt.html
+#
+# Open to all crawlers, including AI assistants and AI training bots.
+# /admin is excluded everywhere since it's an internal management page,
+# not site content (it also carries its own noindex meta tag).
+
+User-agent: *
+Disallow: /admin
+
+# --- AI assistants that browse on a user's behalf ---
+User-agent: ChatGPT-User
+Disallow: /admin
+
+User-agent: OAI-SearchBot
+Disallow: /admin
+
+User-agent: Claude-User
+Disallow: /admin
+
+User-agent: Claude-SearchBot
+Disallow: /admin
+
+User-agent: PerplexityBot
+Disallow: /admin
+
+User-agent: Perplexity-User
+Disallow: /admin
+
+# --- AI training crawlers ---
+User-agent: GPTBot
+Disallow: /admin
+
+User-agent: ClaudeBot
+Disallow: /admin
+
+User-agent: anthropic-ai
+Disallow: /admin
+
+User-agent: Google-Extended
+Disallow: /admin
+
+User-agent: Applebot-Extended
+Disallow: /admin
+
+User-agent: Amazonbot
+Disallow: /admin
+
+User-agent: Bytespider
+Disallow: /admin
+
+User-agent: CCBot
+Disallow: /admin
+
+User-agent: Meta-ExternalAgent
+Disallow: /admin
+
+Sitemap: https://oumz0w976pn35bwhrv8eksy5.macaly.app/sitemap.xml

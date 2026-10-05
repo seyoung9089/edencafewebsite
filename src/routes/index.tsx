@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery } from 'convex/react'
 import { ConvexHttpClient } from 'convex/browser'
+import { CONVEX_URL } from '@/lib/convex-url'
 import { api } from '@/convex/_generated/api'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
@@ -20,7 +21,7 @@ export const Route = createFileRoute('/')({
   head: () => pageMeta('/'),
   loader: async () => {
     try {
-      const url = (import.meta as any).env.VITE_CONVEX_URL
+      const url = CONVEX_URL
       if (!url) return { menuItems: [] as { name: string; price: number; category: string; soldOut?: boolean }[] }
       const client = new ConvexHttpClient(url)
       const items = await client.query(api.menu.list, {})

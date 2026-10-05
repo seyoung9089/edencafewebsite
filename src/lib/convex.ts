@@ -1,5 +1,6 @@
 import { preloadQuery as convexPreloadQuery } from "convex/nextjs"
 import { FunctionReference, FunctionArgs } from "convex/server"
+import { CONVEX_URL } from "@/lib/convex-url"
 
 /**
  * Convex SSR helper for TanStack Start / Vite environments.
@@ -51,6 +52,6 @@ export async function preloadQuery<Query extends FunctionReference<"query">>(
   args?: FunctionArgs<Query>,
   options?: { url?: string }
 ) {
-  const url = options?.url ?? import.meta.env.VITE_CONVEX_URL
+  const url = options?.url ?? CONVEX_URL
   return convexPreloadQuery(query, args ?? ({} as any), { url })
 }

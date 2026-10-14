@@ -61,7 +61,7 @@ function AboutPage() {
 
       <section className="mx-auto max-w-6xl px-6 pb-24 md:px-8">
         <h2 className="mb-14 font-serif text-3xl font-semibold">오시는 길</h2>
-        <div className="grid grid-cols-1 border border-eden-line md:grid-cols-[1.2fr_1fr]">
+        <div className="grid grid-cols-1 overflow-hidden rounded-card shadow-soft md:grid-cols-[1.2fr_1fr]">
           <div className="flex min-h-[280px] items-center justify-center overflow-hidden bg-eden-sage-dim">
             {locationPhoto ? (
               <img src={locationPhoto} alt="" className="h-full w-full object-cover" />

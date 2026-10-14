@@ -42,17 +42,17 @@ export function SiteHeader() {
   return (
     <header
       className={`sticky top-0 z-40 border-b bg-eden-paper backdrop-blur transition-all duration-300 ${
-        scrolled ? 'border-eden-line shadow-[0_2px_16px_-4px_rgba(14,27,22,0.18)]' : 'border-transparent'
+        scrolled ? 'border-transparent shadow-soft' : 'border-transparent'
       }`}
     >
       <div className="mx-auto flex h-[78px] max-w-6xl items-center justify-between px-6 md:px-8">
-        <Link to="/" className="flex items-baseline gap-2 font-serif text-xl font-semibold text-eden-ink" onClick={() => setMobileOpen(false)}>
+        <Link to="/" className="flex items-baseline gap-2 font-serif text-xl font-bold text-eden-ink" onClick={() => setMobileOpen(false)}>
           이든카페
           <span className="font-sans text-[10px] font-normal tracking-[0.16em] text-eden-sage-dim">EDEN CAFE</span>
         </Link>
-        <nav className="hidden items-center gap-7 text-sm text-eden-ink md:flex">
+        <nav className="hidden items-center gap-1 text-sm font-medium text-eden-ink md:flex">
           {NAV_LINKS.map((l) => (
-            <Link key={l.to} to={l.to} className="hover:text-eden-sand">{l.label}</Link>
+            <Link key={l.to} to={l.to} className="rounded-full px-4 py-2 hover:bg-eden-paper-dim" activeProps={{ className: 'bg-eden-paper-dim' }}>{l.label}</Link>
           ))}
         </nav>
         <div className="flex items-center gap-4">

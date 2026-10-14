@@ -23,7 +23,7 @@ export function NotFound() {
       </div>
       <Link
         to="/"
-        className="mt-2 inline-block bg-eden-ink px-8 py-3 text-sm font-medium text-eden-paper hover:bg-eden-ink-2"
+        className="mt-2 inline-block rounded-full bg-eden-ink px-9 py-3 text-sm font-semibold text-eden-paper hover:bg-eden-ink-2"
       >
         메인으로 돌아가기
       </Link>

@@ -144,7 +144,7 @@ function HomePage() {
           <p className="mb-10 text-[15px] text-eden-sage">{cv('menuHome.subtitle')}</p>
           <Link
             to="/menu"
-            className="inline-block border border-[rgba(237,236,227,0.45)] px-8 py-3 text-sm font-medium hover:bg-[rgba(237,236,227,0.08)]"
+            className="inline-block rounded-full border border-[rgba(237,236,227,0.45)] px-9 py-3 text-sm font-semibold hover:border-eden-sand hover:bg-eden-sand hover:text-eden-ink-2"
           >
             전체 메뉴 보기
           </Link>
@@ -158,7 +158,7 @@ function HomePage() {
             <h2 className="mb-3 font-serif text-3xl font-semibold">{cv('history.title')}</h2>
             <p className="text-[15px] text-eden-sage-dim">{cv('history.subtitle')}</p>
           </div>
-          <Link to="/history" className="text-sm text-eden-sand underline">전체 히스토리 보기</Link>
+          <Link to="/history" className="rounded-full border border-eden-line px-4 py-2 text-sm font-medium hover:border-eden-sand hover:text-eden-sand">전체 히스토리 보기</Link>
         </Reveal>
         <div className="flex flex-col gap-10 md:flex-row md:items-start">
           <div className="relative flex-1 border-l border-eden-sage-dim/30 pl-9">
@@ -174,7 +174,7 @@ function HomePage() {
               </Reveal>
             ))}
           </div>
-          <Reveal delay={150} className="h-[220px] w-full flex-shrink-0 overflow-hidden bg-eden-sage-dim md:w-[280px]">
+          <Reveal delay={150} className="h-[220px] w-full flex-shrink-0 overflow-hidden rounded-card bg-eden-sage-dim shadow-soft md:w-[280px]">
             {historyPhoto ? (
               <img src={historyPhoto} alt="" className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
             ) : (
@@ -189,7 +189,7 @@ function HomePage() {
         <Reveal className="mb-14">
           <h2 className="font-serif text-3xl font-semibold">오시는 길</h2>
         </Reveal>
-        <Reveal delay={100} className="grid grid-cols-1 border border-eden-line md:grid-cols-[1.2fr_1fr]">
+        <Reveal delay={100} className="grid grid-cols-1 overflow-hidden rounded-card shadow-soft md:grid-cols-[1.2fr_1fr]">
           <div className="flex min-h-[280px] items-center justify-center overflow-hidden bg-eden-sage-dim">
             {locationPhoto ? (
               <img src={locationPhoto} alt="" className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
@@ -212,12 +212,12 @@ function HomePage() {
       <section id="news" className="mx-auto max-w-6xl px-6 pb-24 md:px-8">
         <Reveal className="mb-14 flex flex-wrap items-end justify-between gap-6">
           <h2 className="font-serif text-3xl font-semibold">새소식</h2>
-          <Link to="/news" className="text-sm text-eden-sand underline">전체 새소식 보기</Link>
+          <Link to="/news" className="rounded-full border border-eden-line px-4 py-2 text-sm font-medium hover:border-eden-sand hover:text-eden-sand">전체 새소식 보기</Link>
         </Reveal>
         <div className="max-w-3xl">
           {newsItems.map((n, i) => (
-            <Reveal key={n.key} delay={i * 80} className="flex items-baseline gap-6 border-t border-eden-line py-5 last:border-b">
-              <span className="rounded-sm border border-eden-sand px-2.5 py-1 text-xs text-eden-sand">{cv(`news.${n.key}.tag`)}</span>
+            <Reveal key={n.key} delay={i * 80} className="flex items-center gap-6 border-t border-eden-line py-5 last:border-b">
+              <span className="rounded-full bg-eden-sand/15 px-3 py-1 text-xs font-semibold text-eden-ink">{cv(`news.${n.key}.tag`)}</span>
               <span className="flex-1 text-[15px]">{cv(`news.${n.key}.title`)}</span>
               <span className="text-sm text-eden-sage-dim">{cv(`news.${n.key}.date`)}</span>
             </Reveal>
@@ -229,7 +229,7 @@ function HomePage() {
       <section className="bg-eden-ink-2 px-6 py-20 text-center text-eden-paper md:px-8">
         <Reveal>
           <h2 className="mb-8 font-serif text-3xl font-semibold">{cv('cta.title')}</h2>
-          <Link to="/menu" className="inline-block bg-eden-paper px-8 py-3 text-sm font-medium text-eden-ink hover:bg-eden-sand">
+          <Link to="/menu" className="inline-block rounded-full bg-eden-paper px-9 py-3 text-sm font-semibold text-eden-ink hover:-translate-y-0.5 hover:bg-eden-sand">
             메뉴 보기
           </Link>
         </Reveal>

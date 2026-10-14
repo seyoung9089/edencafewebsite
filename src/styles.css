@@ -30,7 +30,7 @@
   --chart-3: 159 24% 11%;
   --chart-4: 138 12% 55%;
   --chart-5: 7 51% 47%;
-  --radius: 0.125rem;
+  --radius: 0.625rem;
   --sidebar: 157 32% 8%;
   --sidebar-foreground: 54 22% 91%;
   --sidebar-primary: 40 44% 61%;
@@ -87,8 +87,17 @@
 }
 
 @theme inline {
-  --font-serif: 'Noto Serif KR', serif;
-  --font-sans: 'Noto Sans KR', sans-serif;
+  /* Montserrat draws the Latin letters and numbers; Korean falls through
+     to Noto Sans KR. "font-serif" is kept as the class name for headings
+     across the site, but now points at the same display pairing. */
+  --font-serif: 'Montserrat', 'Noto Sans KR', sans-serif;
+  --font-sans: 'Montserrat', 'Noto Sans KR', sans-serif;
+
+  /* Soft, rounded surface language (radius 10–15px, pill buttons,
+     diffuse shadows instead of hard borders). */
+  --radius-card: 15px;
+  --shadow-soft: 0 0 20px 0 rgba(14, 27, 22, 0.08);
+  --shadow-lift: 0 6px 24px -2px rgba(14, 27, 22, 0.16);
 
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -158,6 +167,14 @@ html {
 
 h1, h2, h3, .font-display {
   font-family: var(--font-serif);
+  letter-spacing: -0.01em;
+}
+
+/* Interactive elements share one calm transition (0.3s ease). */
+a, button {
+  transition-property: color, background-color, border-color, box-shadow, transform;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
 }
 
 @layer base {

@@ -6,7 +6,7 @@ export function PickupNotice() {
   if (!slot) return null
 
   return (
-    <div className="border border-eden-sand/60 bg-eden-sand/10 px-5 py-4">
+    <div className="rounded-card bg-eden-sand/15 px-5 py-4">
       <div className="font-serif text-base font-semibold">
         지금 주문하시면{' '}
         <span className="text-eden-sand">

@@ -77,12 +77,12 @@ function MenuPage() {
           ) : null}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {group.list.map((item) => (
-              <div key={item._id} className="border border-eden-line bg-eden-paper-dim p-6">
+              <div key={item._id} className="rounded-card bg-eden-paper-dim shadow-soft p-6 hover:-translate-y-1 hover:shadow-lift">
                 {item.imageUrl ? (
                   <img
                     src={item.imageUrl}
                     alt={item.name}
-                    className="mb-4 aspect-[4/3] w-full object-cover"
+                    className="mb-4 aspect-[4/3] w-full rounded-[10px] object-cover"
                     loading="lazy"
                   />
                 ) : (
@@ -94,13 +94,13 @@ function MenuPage() {
                   {item.price.toLocaleString('ko-KR')}원
                 </div>
                 {item.soldOut || !item.orderReady ? (
-                  <span className="block w-full border border-eden-line py-2 text-center text-xs text-eden-sage-dim">
+                  <span className="block w-full rounded-full border border-eden-line py-2 text-center text-xs text-eden-sage-dim">
                     {item.soldOut ? '품절' : '주문 준비 중'}
                   </span>
                 ) : (
                   <button
                     onClick={() => openModal(item)}
-                    className="w-full border border-eden-sand py-2 text-xs font-semibold text-eden-sand hover:bg-eden-sand hover:text-eden-ink-2"
+                    className="w-full rounded-full bg-eden-ink py-2 text-xs font-semibold text-eden-paper hover:bg-eden-sand hover:text-eden-ink-2"
                   >
                     담기 +
                   </button>
@@ -114,20 +114,20 @@ function MenuPage() {
       <SiteFooter />
 
       <Dialog open={!!active} onOpenChange={(open) => !open && setActive(null)}>
-        <DialogContent className="max-w-[360px] bg-eden-paper">
+        <DialogContent className="max-w-[360px] rounded-card bg-eden-paper">
           <DialogTitle className="font-serif text-lg">{active?.name}</DialogTitle>
           <p className="text-sm text-eden-sage-dim">{active ? `${active.price.toLocaleString('ko-KR')}원 / 1개` : ''}</p>
           <div className="my-4 flex items-center gap-6">
             <button
               onClick={() => setQty((q) => Math.max(1, q - 1))}
-              className="flex h-9 w-9 items-center justify-center border border-eden-line"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim"
             >
               <Minus size={14} />
             </button>
             <span className="min-w-6 text-center text-base font-semibold">{qty}</span>
             <button
               onClick={() => setQty((q) => Math.min(20, q + 1))}
-              className="flex h-9 w-9 items-center justify-center border border-eden-line"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim"
             >
               <Plus size={14} />
             </button>
@@ -135,7 +135,7 @@ function MenuPage() {
           <div className="mb-5 font-serif text-base font-semibold">
             합계 <span className="text-eden-sand">{active ? (active.price * qty).toLocaleString('ko-KR') : 0}원</span>
           </div>
-          <button onClick={confirmAdd} className="w-full bg-eden-ink py-3 text-sm font-medium text-eden-paper">
+          <button onClick={confirmAdd} className="w-full bg-eden-ink py-3 text-sm font-semibold text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2">
             장바구니에 담기
           </button>
         </DialogContent>

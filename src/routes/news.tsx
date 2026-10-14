@@ -19,8 +19,8 @@ function NewsPage() {
 
         <div className="max-w-3xl">
           {ALL_NEWS_KEYS.map((k) => (
-            <div key={k} className="flex items-baseline gap-6 border-t border-eden-line py-5 last:border-b">
-              <span className="rounded-sm border border-eden-sand px-2.5 py-1 text-xs text-eden-sand">{cv(`news.${k}.tag`)}</span>
+            <div key={k} className="flex items-center gap-6 border-t border-eden-line py-5 last:border-b">
+              <span className="rounded-full bg-eden-sand/15 px-3 py-1 text-xs font-semibold text-eden-ink">{cv(`news.${k}.tag`)}</span>
               <span className="flex-1 text-[15px]">{cv(`news.${k}.title`)}</span>
               <span className="text-sm text-eden-sage-dim">{cv(`news.${k}.date`)}</span>
             </div>

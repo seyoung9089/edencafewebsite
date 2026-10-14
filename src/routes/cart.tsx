@@ -63,11 +63,11 @@ function CartPage() {
                     <div className="text-xs text-eden-sage-dim">{it.price.toLocaleString('ko-KR')}원 / 1개</div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => updateQty(it.name, it.qty - 1)} className="flex h-7 w-7 items-center justify-center border border-eden-line">
+                    <button onClick={() => updateQty(it.name, it.qty - 1)} className="flex h-7 w-7 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim">
                       <Minus size={12} />
                     </button>
                     <span className="min-w-5 text-center">{it.qty}</span>
-                    <button onClick={() => updateQty(it.name, it.qty + 1)} className="flex h-7 w-7 items-center justify-center border border-eden-line">
+                    <button onClick={() => updateQty(it.name, it.qty + 1)} className="flex h-7 w-7 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim">
                       <Plus size={12} />
                     </button>
                   </div>
@@ -81,11 +81,11 @@ function CartPage() {
               ))}
             </div>
 
-            <div className="mt-6 border border-eden-line bg-eden-paper-dim p-6">
+            <div className="mt-6 rounded-card bg-eden-paper-dim shadow-soft p-6">
               <div className="mb-5 border-b border-eden-line pb-5">
                 <div className="mb-3 text-xs text-eden-sage-dim">픽업 안내</div>
                 {slot ? (
-                  <div className="border border-eden-sand bg-eden-sand/10 px-4 py-3">
+                  <div className="rounded-[10px] bg-eden-sand/15 px-4 py-3">
                     <div className="font-serif text-lg font-semibold text-eden-sand">
                       {slot.dateLabel} {slot.label} 픽업
                     </div>
@@ -109,14 +109,14 @@ function CartPage() {
                 <button
                   onClick={() => void checkout()}
                   disabled={submitting || !slot}
-                  className="w-full bg-eden-ink py-3 text-sm font-medium text-eden-paper disabled:opacity-50"
+                  className="w-full bg-eden-ink py-3 text-sm font-semibold text-eden-paper disabled:opacity-50 rounded-full transition-colors hover:bg-eden-ink-2"
                 >
                   {submitting ? '주문 처리 중…' : '주문하기 (무통장입금)'}
                 </button>
               ) : !loading ? (
                 <p className="mb-3 text-xs text-eden-sage-dim">로그인 후 주문할 수 있어요.</p>
               ) : null}
-              {!user && !loading ? <Link to="/login" className="block w-full bg-eden-ink py-3 text-center text-sm text-eden-paper">이메일로 로그인하고 주문하기</Link> : null}
+              {!user && !loading ? <Link to="/login" className="block w-full bg-eden-ink py-3 text-center text-sm font-semibold text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2">이메일로 로그인하고 주문하기</Link> : null}
               {loading ? (
                 <div className="h-11 w-full animate-pulse bg-eden-line" />
               ) : null}

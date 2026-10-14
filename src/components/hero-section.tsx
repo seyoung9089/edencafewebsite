@@ -87,7 +87,7 @@ export function HeroSection() {
         )}
       </div>
 
-      <div className="relative mx-auto max-w-3xl border border-eden-line bg-eden-paper px-6 pb-14 pt-10 shadow-[0_40px_90px_-30px_rgba(14,27,22,0.35)] md:px-14 md:pt-12">
+      <div className="relative mx-auto max-w-3xl rounded-card bg-eden-paper px-6 pb-14 pt-10 shadow-[0_0_40px_0_rgba(14,27,22,0.18)] md:px-14 md:pt-12">
         <p className="mb-8 text-center text-xs tracking-[0.1em] text-eden-sage-dim">
           별무리고등학교에서 시작된 카페 협동조합 · Since 2021
         </p>
@@ -99,7 +99,7 @@ export function HeroSection() {
                 key={i}
                 className={`hero-line ${
                   line.featured
-                    ? 'font-serif text-2xl font-semibold text-eden-sand md:text-4xl'
+                    ? 'font-serif text-2xl font-bold text-eden-sand md:text-4xl'
                     : 'font-serif text-2xl font-semibold text-eden-ink md:text-4xl'
                 }`}
                 style={{ animationDelay: `${i * 90}ms` }}
@@ -108,7 +108,7 @@ export function HeroSection() {
               </p>
             ))}
           </div>
-          <div className="absolute left-1/2 top-1/2 z-10 aspect-[3/3.7] w-[46%] -translate-x-1/2 -translate-y-1/2 overflow-hidden shadow-[0_26px_50px_-18px_rgba(14,27,22,0.5)]">
+          <div className="absolute left-1/2 top-1/2 z-10 aspect-[3/3.7] w-[46%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-card shadow-[0_0_30px_0_rgba(14,27,22,0.3)]">
             {heroImage ? (
               <img src={heroImage} alt="" className="h-full w-full object-cover" />
             ) : (
@@ -118,7 +118,7 @@ export function HeroSection() {
         </div>
 
         <div className="mt-10 flex flex-col items-center gap-3">
-          <Link to="/menu" className="bg-eden-ink px-8 py-3 text-sm font-medium text-eden-paper hover:bg-eden-ink-2">
+          <Link to="/menu" className="rounded-full bg-eden-ink px-9 py-3 text-sm font-semibold text-eden-paper shadow-soft hover:-translate-y-0.5 hover:bg-eden-ink-2">
             메뉴 보기
           </Link>
           <span className="text-[11px] tracking-[0.2em] text-eden-sage-dim">SCROLL</span>

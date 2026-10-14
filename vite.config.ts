@@ -13,6 +13,7 @@ import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import errorOverlay from "@visulima/vite-overlay"
 import { macalyTagger } from '@macaly/static-tagger'
+import { localDesignModePlugin } from './tools/local-design-mode-plugin'
 
 const config = defineConfig({
   server: {
@@ -31,6 +32,7 @@ const config = defineConfig({
     },
   }),
   plugins: [
+    localDesignModePlugin(),
     devtools({ injectSource: { enabled: false } }),
     // Macaly Tagger is crucial for proper functionality of Visual Edits in Macaly
     !!process.env.DEV_BUILD && macalyTagger({

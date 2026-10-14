@@ -1,4 +1,4 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import { HeadContent, Scripts, createRootRoute, useRouterState } from '@tanstack/react-router'
 import { MacalyBridge } from '@macaly/bridge'
 
 // CSS imported as a side effect — do NOT add `?url` or `?inline`.
@@ -22,6 +22,8 @@ import { CartProvider } from '@/lib/cart'
 import { CustomerAuthProvider } from '@/lib/customer-auth'
 import { Toaster } from '@/components/ui/sonner'
 import { BackToTop } from '@/components/back-to-top'
+import { LocalDesignMode } from '@/components/local-design-mode'
+import { designFont, initialDesignOverrides, renderDesignCss } from '@/lib/design-overrides'
 
 const rootMeta = siteMetadata['/']
 
@@ -48,10 +50,14 @@ export const Route = createRootRoute({
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const fontUrls = Array.from(new Set(initialDesignOverrides.map((entry) => designFont(entry.font).url).filter(Boolean)))
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="ko" data-design-path={pathname} suppressHydrationWarning>
       <head>
         <HeadContent />
+        {fontUrls.map((url) => <link key={url} rel="stylesheet" href={url} />)}
+        <style id="design-overrides-style" dangerouslySetInnerHTML={{ __html: renderDesignCss(initialDesignOverrides) }} />
       </head>
       <MacalyBridge>
         <body>
@@ -62,6 +68,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               <Toaster />
             </CartProvider></CustomerAuthProvider>
           </AppConvexProvider>
+          <LocalDesignMode />
           <Scripts />
         </body>
       </MacalyBridge>

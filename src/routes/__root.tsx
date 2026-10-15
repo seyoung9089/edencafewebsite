@@ -21,7 +21,6 @@ import { CartProvider } from '@/lib/cart'
 import { CustomerAuthProvider } from '@/lib/customer-auth'
 import { Toaster } from '@/components/ui/sonner'
 import { BackToTop } from '@/components/back-to-top'
-import { LocalDesignMode } from '@/components/local-design-mode'
 import { designFont, initialDesignOverrides, renderDesignCss } from '@/lib/design-overrides'
 
 const rootMeta = siteMetadata['/']
@@ -65,7 +64,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             <BackToTop />
             <Toaster />
           </CartProvider></CustomerAuthProvider>
-          <LocalDesignMode />
           <Scripts />
         </body>
       </MacalyBridge>

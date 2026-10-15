@@ -1,8 +1,40 @@
-import { useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { useEffect, useReducer } from 'react'
+import { supabase } from '@/lib/supabase'
+
+// Site text and image links live in the Supabase `site_content` table
+// (key -> value). Loaded once per page visit and shared by every component;
+// the admin page calls refreshSiteContent() after saving.
+let cache: Record<string, string> | undefined
+let inflight: Promise<void> | null = null
+const listeners = new Set<() => void>()
+
+async function load() {
+  const { data, error } = await supabase.from('site_content').select('key,value')
+  // On error (e.g. table not created yet) fall back to the built-in defaults.
+  cache = !error && data ? Object.fromEntries(data.map((row) => [row.key, row.value])) : (cache ?? {})
+  listeners.forEach((notify) => notify())
+}
+
+export function refreshSiteContent(): Promise<void> {
+  inflight = load()
+  return inflight
+}
 
 export function useSiteContent(): Record<string, string> | undefined {
-  return useQuery(api.siteContent.getAll)
+  const [, rerender] = useReducer((n: number) => n + 1, 0)
+  useEffect(() => {
+    listeners.add(rerender)
+    if (!inflight) void refreshSiteContent()
+    return () => {
+      listeners.delete(rerender)
+    }
+  }, [])
+  return cache
+}
+
+/** Public URL of an admin-uploaded site image (e.g. 'hero.photo'), or null. */
+export function useContentImage(key: string): string | null {
+  return useSiteContent()?.[key] || null
 }
 
 export type ContentFieldType = 'input' | 'textarea'

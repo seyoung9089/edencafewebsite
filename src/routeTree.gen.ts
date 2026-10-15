@@ -22,8 +22,6 @@ import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as NewsIdRouteImport } from './routes/news_.$id'
-import { Route as AuthGoogleCallbackRouteImport } from './routes/auth/google/callback'
-import { Route as AuthGooglePopupRouteImport } from './routes/auth/google/popup'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -90,16 +88,6 @@ const NewsIdRoute = NewsIdRouteImport.update({
   path: '/news/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthGoogleCallbackRoute = AuthGoogleCallbackRouteImport.update({
-  id: '/auth/google/callback',
-  path: '/auth/google/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthGooglePopupRoute = AuthGooglePopupRouteImport.update({
-  id: '/auth/google/popup',
-  path: '/auth/google/popup',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -115,8 +103,6 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/news/$id': typeof NewsIdRoute
-  '/auth/google/callback': typeof AuthGoogleCallbackRoute
-  '/auth/google/popup': typeof AuthGooglePopupRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -132,8 +118,6 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/news/$id': typeof NewsIdRoute
-  '/auth/google/callback': typeof AuthGoogleCallbackRoute
-  '/auth/google/popup': typeof AuthGooglePopupRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,8 +134,6 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/news_/$id': typeof NewsIdRoute
-  '/auth/google/callback': typeof AuthGoogleCallbackRoute
-  '/auth/google/popup': typeof AuthGooglePopupRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -169,8 +151,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/support'
     | '/news/$id'
-    | '/auth/google/callback'
-    | '/auth/google/popup'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -186,8 +166,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/support'
     | '/news/$id'
-    | '/auth/google/callback'
-    | '/auth/google/popup'
   id:
     | '__root__'
     | '/'
@@ -203,8 +181,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/support'
     | '/news_/$id'
-    | '/auth/google/callback'
-    | '/auth/google/popup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -221,8 +197,6 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SupportRoute: typeof SupportRoute
   NewsIdRoute: typeof NewsIdRoute
-  AuthGoogleCallbackRoute: typeof AuthGoogleCallbackRoute
-  AuthGooglePopupRoute: typeof AuthGooglePopupRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -318,20 +292,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/google/callback': {
-      id: '/auth/google/callback'
-      path: '/auth/google/callback'
-      fullPath: '/auth/google/callback'
-      preLoaderRoute: typeof AuthGoogleCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/google/popup': {
-      id: '/auth/google/popup'
-      path: '/auth/google/popup'
-      fullPath: '/auth/google/popup'
-      preLoaderRoute: typeof AuthGooglePopupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -349,8 +309,6 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SupportRoute: SupportRoute,
   NewsIdRoute: NewsIdRoute,
-  AuthGoogleCallbackRoute: AuthGoogleCallbackRoute,
-  AuthGooglePopupRoute: AuthGooglePopupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

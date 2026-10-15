@@ -1,9 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { useSiteContent, useContentValue } from '@/lib/site-content'
+import { useSiteContent, useContentValue, useContentImage } from '@/lib/site-content'
 import { pageMeta } from '@/lib/seo'
 import { Leaf, MessageCircle, Tag, Sunrise, MapPin } from 'lucide-react'
 
@@ -19,7 +17,7 @@ const valueMeta = [
 function AboutPage() {
   const content = useSiteContent()
   const cv = (key: string) => useContentValue(content, key)
-  const locationPhoto = useQuery(api.siteContent.getImage, { key: 'location.photo' })
+  const locationPhoto = useContentImage('location.photo')
 
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">

@@ -1,13 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useQuery } from 'convex/react'
-import { ConvexHttpClient } from 'convex/browser'
-import { CONVEX_URL } from '@/lib/convex-url'
-import { api } from '@/convex/_generated/api'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { HeroSection } from '@/components/hero-section'
 import { Reveal } from '@/components/reveal'
-import { useSiteContent, useContentValue } from '@/lib/site-content'
+import { useSiteContent, useContentValue, useContentImage } from '@/lib/site-content'
+import { fetchMenu, isSoldOut } from '@/lib/menu'
 import { pageMeta } from '@/lib/seo'
 import { Leaf, MessageCircle, Tag, Sunrise, MapPin } from 'lucide-react'
 
@@ -21,11 +18,8 @@ export const Route = createFileRoute('/')({
   head: () => pageMeta('/'),
   loader: async () => {
     try {
-      const url = CONVEX_URL
-      if (!url) return { menuItems: [] as { name: string; price: number; category: string; soldOut?: boolean }[] }
-      const client = new ConvexHttpClient(url)
-      const items = await client.query(api.menu.list, {})
-      return { menuItems: items.map((i) => ({ name: i.name, price: i.price, category: i.category, soldOut: i.soldOut })) }
+      const items = await fetchMenu()
+      return { menuItems: items.map((i) => ({ name: i.name, price: i.price, category: i.category, soldOut: isSoldOut(i) })) }
     } catch {
       return { menuItems: [] as { name: string; price: number; category: string; soldOut?: boolean }[] }
     }
@@ -70,7 +64,7 @@ function StructuredData({ menuItems }: { menuItems: { name: string; price: numbe
     name: '이든카페',
     alternateName: 'Eden Cafe',
     description:
-      '별무리고등학교에서 시작된 학생 협동조합 카페. 화요일과 목요일에만 픽업을 운영합니다.',
+      '별무리고등학교에서 시작된 학생 협동조합 카페. 오늘 주문하면 다음 날 픽업할 수 있습니다.',
     areaServed: '충청남도 금산군',
     foundingDate: '2021',
     hasMenu: {
@@ -100,8 +94,8 @@ function HomePage() {
   const { menuItems } = Route.useLoaderData()
   const content = useSiteContent()
   const cv = (key: string) => useContentValue(content, key)
-  const locationPhoto = useQuery(api.siteContent.getImage, { key: 'location.photo' })
-  const historyPhoto = useQuery(api.siteContent.getImage, { key: 'history.photo' })
+  const locationPhoto = useContentImage('location.photo')
+  const historyPhoto = useContentImage('history.photo')
 
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">

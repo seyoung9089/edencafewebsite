@@ -17,7 +17,6 @@ import { MacalyBridge } from '@macaly/bridge'
 // the CSS into every HTML file).
 import '../styles.css'
 import siteMetadata from '../metadata.json'
-import AppConvexProvider from '@/components/convex-client-provider'
 import { CartProvider } from '@/lib/cart'
 import { CustomerAuthProvider } from '@/lib/customer-auth'
 import { Toaster } from '@/components/ui/sonner'
@@ -61,13 +60,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <MacalyBridge>
         <body>
-          <AppConvexProvider>
-            <CustomerAuthProvider><CartProvider>
-              {children}
-              <BackToTop />
-              <Toaster />
-            </CartProvider></CustomerAuthProvider>
-          </AppConvexProvider>
+          <CustomerAuthProvider><CartProvider>
+            {children}
+            <BackToTop />
+            <Toaster />
+          </CartProvider></CustomerAuthProvider>
           <LocalDesignMode />
           <Scripts />
         </body>

@@ -1,4 +1,4 @@
--- Step 2 of 2. Run at the same time the new site goes live (requires step 1).
+-- Step 2 of 2. Run at the same time the new site goes live (after 20261016_move_to_supabase.sql).
 -- Once this runs, orders from the old Tue/Thu site are rejected, and vice versa.
 --
 -- Daily pickup: an order placed any time today (Korea time, until midnight)

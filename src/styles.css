@@ -87,11 +87,11 @@
 }
 
 @theme inline {
-  /* Montserrat draws the Latin letters and numbers; Korean falls through
-     to Noto Sans KR. "font-serif" is kept as the class name for headings
-     across the site, but now points at the same display pairing. */
+  /* Headings ("font-serif" and h1–h3): Montserrat draws the Latin letters
+     and numbers; Korean falls through to Noto Sans KR. Everything else
+     (body text, buttons, labels, inputs) uses Gowun Dodum. */
   --font-serif: 'Montserrat', 'Noto Sans KR', sans-serif;
-  --font-sans: 'Montserrat', 'Noto Sans KR', sans-serif;
+  --font-sans: 'Gowun Dodum', 'Noto Sans KR', sans-serif;
 
   /* Soft, rounded surface language (radius 10–15px, pill buttons,
      diffuse shadows instead of hard borders). */

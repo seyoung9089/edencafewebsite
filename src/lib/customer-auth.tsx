@@ -24,3 +24,9 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
 }
 
 export function useCustomerAuth() { return useContext(AuthContext) }
+
+/** The name the customer gave (sign-up or 내 주문), or '' if none yet. */
+export function customerName(user: User | null): string {
+  const name = user?.user_metadata?.name
+  return typeof name === 'string' ? name.trim() : ''
+}

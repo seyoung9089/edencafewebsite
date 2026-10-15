@@ -13,6 +13,7 @@ function LoginPage() {
   const [mode, setMode] = useState<'login' | 'signup' | 'reset'>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
@@ -26,7 +27,7 @@ function LoginPage() {
         if (error) throw error
         setMessage('비밀번호 재설정 메일을 보냈습니다. 메일함을 확인해주세요.')
       } else if (mode === 'signup') {
-        const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/orders` } })
+        const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/orders`, data: { name: name.trim() } } })
         if (error) throw error
         if (data.session) navigate({ to: '/orders' })
         else setMessage('확인 메일을 보냈습니다. 메일의 링크를 누른 뒤 로그인해주세요.')
@@ -44,6 +45,7 @@ function LoginPage() {
     <p className="mb-8 text-sm text-eden-sage-dim">내 주문과 문의를 한 계정에서 확인할 수 있어요.</p>
     {loading ? <p>로그인 상태를 확인하는 중…</p> : user ? <div className="rounded-card bg-eden-paper-dim shadow-soft p-6"><p className="mb-4">{user.email} 계정으로 로그인되어 있습니다.</p><Link to="/orders" className="underline">내 주문 보기 →</Link><button type="button" onClick={() => void supabase.auth.signOut()} className="ml-5 underline">로그아웃</button></div> :
       <form onSubmit={(event) => void submit(event)} className="rounded-card bg-eden-paper-dim shadow-soft p-6">
+        {mode === 'signup' && <><label className="mb-2 block text-sm" htmlFor="name">이름</label><input id="name" autoComplete="name" required maxLength={30} value={name} onChange={(e) => setName(e.target.value)} placeholder="픽업할 때 확인할 이름" className="mb-5 w-full rounded-[10px] border border-eden-line bg-eden-paper px-4 py-3" /></>}
         <label className="mb-2 block text-sm" htmlFor="email">이메일</label><input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="mb-5 w-full rounded-[10px] border border-eden-line bg-eden-paper px-4 py-3" />
         {mode !== 'reset' && <><label className="mb-2 block text-sm" htmlFor="password">비밀번호</label><input id="password" type="password" autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} className="mb-6 w-full rounded-[10px] border border-eden-line bg-eden-paper px-4 py-3" /></>}
         {error && <p role="alert" className="mb-4 text-sm text-destructive">{error}</p>}{message && <p role="status" className="mb-4 text-sm text-eden-sage-dim">{message}</p>}

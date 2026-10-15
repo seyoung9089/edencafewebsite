@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
-import { buttonClass, fetchEmails } from './use-staff'
+import { buttonClass, fetchCustomerLabels } from './use-staff'
 
 type Inquiry = {
   id: string
@@ -16,17 +16,17 @@ type Inquiry = {
 
 export function InquiriesPanel() {
   const [inquiries, setInquiries] = useState<Inquiry[] | null>(null)
-  const [emails, setEmails] = useState<Map<string, string>>(new Map())
+  const [customers, setCustomers] = useState<Map<string, string>>(new Map())
 
   const refresh = async () => {
     const [{ data, error }, map] = await Promise.all([
       supabase.from('inquiries').select('id,user_id,title,content,category,status,reply,created_at').order('created_at', { ascending: false }),
-      fetchEmails(),
+      fetchCustomerLabels(),
     ])
     if (error) toast.error(error.message)
     // Unanswered first, newest first within each.
     setInquiries(((data ?? []) as Inquiry[]).sort((a, b) => Number(a.status === 'done') - Number(b.status === 'done')))
-    setEmails(map)
+    setCustomers(map)
   }
   useEffect(() => {
     void refresh()
@@ -46,7 +46,7 @@ export function InquiriesPanel() {
   return (
     <div className="space-y-3">
       {inquiries.map((q) => (
-        <InquiryCard key={q.id} inquiry={q} email={emails.get(q.user_id) ?? q.user_id.slice(0, 8)} onSave={saveReply} />
+        <InquiryCard key={q.id} inquiry={q} email={customers.get(q.user_id) ?? q.user_id.slice(0, 8)} onSave={saveReply} />
       ))}
     </div>
   )

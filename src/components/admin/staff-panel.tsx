@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
-import { buttonClass, fetchEmails, inputClass } from './use-staff'
+import { buttonClass, fetchCustomerLabels, inputClass } from './use-staff'
 
 export function StaffPanel({ currentUserId }: { currentUserId: string }) {
   const [staff, setStaff] = useState<{ id: string; email: string }[] | null>(null)
@@ -9,9 +9,9 @@ export function StaffPanel({ currentUserId }: { currentUserId: string }) {
   const [busy, setBusy] = useState(false)
 
   const refresh = async () => {
-    const [{ data, error }, emails] = await Promise.all([supabase.from('staff_users').select('user_id'), fetchEmails()])
+    const [{ data, error }, labels] = await Promise.all([supabase.from('staff_users').select('user_id'), fetchCustomerLabels()])
     if (error) toast.error(error.message)
-    setStaff((data ?? []).map((row) => ({ id: row.user_id as string, email: emails.get(row.user_id as string) ?? '(이메일 없음)' })))
+    setStaff((data ?? []).map((row) => ({ id: row.user_id as string, email: labels.get(row.user_id as string) ?? '(이메일 없음)' })))
   }
   useEffect(() => {
     void refresh()

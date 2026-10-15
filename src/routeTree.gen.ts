@@ -21,6 +21,7 @@ import { Route as NewsRouteImport } from './routes/news'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SupportRouteImport } from './routes/support'
+import { Route as NewsIdRouteImport } from './routes/news_.$id'
 import { Route as AuthGoogleCallbackRouteImport } from './routes/auth/google/callback'
 import { Route as AuthGooglePopupRouteImport } from './routes/auth/google/popup'
 
@@ -84,6 +85,11 @@ const SupportRoute = SupportRouteImport.update({
   path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NewsIdRoute = NewsIdRouteImport.update({
+  id: '/news_/$id',
+  path: '/news/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthGoogleCallbackRoute = AuthGoogleCallbackRouteImport.update({
   id: '/auth/google/callback',
   path: '/auth/google/callback',
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/orders': typeof OrdersRoute
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
+  '/news/$id': typeof NewsIdRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/auth/google/popup': typeof AuthGooglePopupRoute
 }
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/orders': typeof OrdersRoute
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
+  '/news/$id': typeof NewsIdRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/auth/google/popup': typeof AuthGooglePopupRoute
 }
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/orders': typeof OrdersRoute
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
+  '/news_/$id': typeof NewsIdRoute
   '/auth/google/callback': typeof AuthGoogleCallbackRoute
   '/auth/google/popup': typeof AuthGooglePopupRoute
 }
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/reset-password'
     | '/support'
+    | '/news/$id'
     | '/auth/google/callback'
     | '/auth/google/popup'
   fileRoutesByTo: FileRoutesByTo
@@ -175,6 +185,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/reset-password'
     | '/support'
+    | '/news/$id'
     | '/auth/google/callback'
     | '/auth/google/popup'
   id:
@@ -191,6 +202,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/reset-password'
     | '/support'
+    | '/news_/$id'
     | '/auth/google/callback'
     | '/auth/google/popup'
   fileRoutesById: FileRoutesById
@@ -208,6 +220,7 @@ export interface RootRouteChildren {
   OrdersRoute: typeof OrdersRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SupportRoute: typeof SupportRoute
+  NewsIdRoute: typeof NewsIdRoute
   AuthGoogleCallbackRoute: typeof AuthGoogleCallbackRoute
   AuthGooglePopupRoute: typeof AuthGooglePopupRoute
 }
@@ -298,6 +311,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/news_/$id': {
+      id: '/news_/$id'
+      path: '/news/$id'
+      fullPath: '/news/$id'
+      preLoaderRoute: typeof NewsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/google/callback': {
       id: '/auth/google/callback'
       path: '/auth/google/callback'
@@ -328,6 +348,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrdersRoute: OrdersRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SupportRoute: SupportRoute,
+  NewsIdRoute: NewsIdRoute,
   AuthGoogleCallbackRoute: AuthGoogleCallbackRoute,
   AuthGooglePopupRoute: AuthGooglePopupRoute,
 }

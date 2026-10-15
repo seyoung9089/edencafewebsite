@@ -9,13 +9,14 @@ interface RevealProps {
 }
 
 export function Reveal({ children, className = '', delay = 0 }: RevealProps) {
-  const { ref, visible } = useReveal<HTMLDivElement>()
+  const { ref, state } = useReveal<HTMLDivElement>()
 
   return (
     <div
       ref={ref}
-      className={`reveal ${visible ? 'is-visible' : ''} ${className}`}
-      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
+      className={`reveal ${state === 'visible' ? 'is-visible' : state === 'above' ? 'is-above' : ''} ${className}`}
+      // Stagger only on the way in; leaving happens all at once.
+      style={delay && state === 'visible' ? { transitionDelay: `${delay}ms` } : undefined}
     >
       {children}
     </div>

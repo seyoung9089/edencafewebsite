@@ -53,10 +53,10 @@ const newsItems = [
   { key: 'n3' },
 ]
 
-/** 문의 → 문의하기 page; 공지·소식 → that item on the news page. */
+/** 문의 → 문의하기 page; 공지·소식 → that item's own page. */
 function NewsLink({ tag, newsKey, className, children }: { tag: string; newsKey: string; className: string; children: React.ReactNode }) {
   if (tag.includes('문의')) return <Link to="/support" className={className}>{children}</Link>
-  return <Link to="/news" hash={`news-${newsKey}`} className={className}>{children}</Link>
+  return <Link to="/news/$id" params={{ id: newsKey }} className={className}>{children}</Link>
 }
 
 function StructuredData({ menuItems }: { menuItems: { name: string; price: number; category: string; soldOut?: boolean }[] }) {

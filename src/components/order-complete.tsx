@@ -1,5 +1,5 @@
-import { Check, Copy } from 'lucide-react'
-import { usePayment } from '@/components/payment-info'
+import { Check } from 'lucide-react'
+import { CopyLabel, usePayment } from '@/components/payment-info'
 
 export type PlacedOrder = {
   id: string
@@ -51,8 +51,9 @@ export function OrderCompleteBody({ order, onClose, onOrders }: BodyProps) {
         <div className="mt-1 font-serif text-3xl font-bold">{won(order.total)}</div>
         <button
           type="button"
-          onClick={() => void pay.copy()}
-          className="mt-4 flex w-full items-center justify-between rounded-[10px] bg-eden-paper px-4 py-3 text-left text-sm shadow-soft"
+          onClick={(e) => void pay.copy(e.currentTarget)}
+          aria-label="계좌번호 복사"
+          className="mt-4 flex w-full items-center justify-between gap-3 rounded-[10px] bg-eden-paper px-4 py-3 text-left text-sm shadow-soft transition-transform active:scale-[0.98]"
         >
           <span>
             <span className="block text-xs text-eden-sage-dim">
@@ -60,10 +61,7 @@ export function OrderCompleteBody({ order, onClose, onOrders }: BodyProps) {
             </span>
             <strong>{pay.account}</strong>
           </span>
-          <span className="flex items-center gap-1 text-xs font-semibold text-eden-sand">
-            <Copy size={14} />
-            복사
-          </span>
+          <CopyLabel copied={pay.copied} />
         </button>
         <p className="mt-3 text-xs text-eden-sage-dim">{pay.note}</p>
       </div>

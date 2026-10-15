@@ -3,25 +3,17 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { MY_ORDERS_VARIANTS, MyOrdersBody, type CustomerOrder, type MyOrdersVariant } from '@/components/my-orders'
+import { MyOrdersBody, type CustomerOrder } from '@/components/my-orders'
 import { customerName, useCustomerAuth } from '@/lib/customer-auth'
 import { supabase } from '@/lib/supabase'
 import { pageMeta } from '@/lib/seo'
 
-// Design choice in progress: /orders?v=progress etc. shows each option with real data.
-const DEFAULT_VARIANT: MyOrdersVariant = 'cards'
-
 export const Route = createFileRoute('/orders')({
   component: OrdersPage,
   head: () => pageMeta('/orders'),
-  validateSearch: (search: Record<string, unknown>): { v?: MyOrdersVariant } => {
-    const v = MY_ORDERS_VARIANTS.find((x) => x.id === search.v)?.id
-    return v ? { v } : {}
-  },
 })
 
 function OrdersPage() {
-  const { v } = Route.useSearch()
   const { user, loading } = useCustomerAuth()
   const [orders, setOrders] = useState<CustomerOrder[]>([])
   const [busy, setBusy] = useState(true)
@@ -45,6 +37,6 @@ function OrdersPage() {
     <h1 className="mb-8 font-serif text-3xl font-semibold">내 주문</h1>
     {loading ? <p>로그인 상태 확인 중…</p> : !user ? <div><p className="mb-4">로그인 후 주문 내역을 확인할 수 있어요.</p><Link to="/login" className="inline-block bg-eden-ink px-7 py-3 text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2">이메일 로그인</Link></div>
       : busy ? <p>불러오는 중…</p> : error ? <p role="alert">주문 내역을 불러오지 못했습니다: {error}</p>
-      : <MyOrdersBody variant={v ?? DEFAULT_VARIANT} name={customerName(user)} email={user.email ?? ''} orders={orders} onSaveName={saveName} onSignOut={() => void supabase.auth.signOut()} />}
+      : <MyOrdersBody name={customerName(user)} email={user.email ?? ''} orders={orders} onSaveName={saveName} onSignOut={() => void supabase.auth.signOut()} />}
   </main><SiteFooter /></div>
 }

@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react'
 export type PickupSlot = {
   /** Pickup date as YYYY-MM-DD (Korea calendar date) */
   iso: string
+  /** Today as YYYY-MM-DD (Korea calendar date) */
+  todayIso: string
   /** e.g. "10월 15일(목)" */
   todayLabel: string
   /** e.g. "10월 16일(금)" */
@@ -31,6 +33,7 @@ export function getCurrentPickupSlot(nowMs: number): PickupSlot {
 
   return {
     iso: pickup.toISOString().slice(0, 10),
+    todayIso: today.toISOString().slice(0, 10),
     todayLabel: dayLabel(today),
     dateLabel: dayLabel(pickup),
   }

@@ -14,8 +14,8 @@ export function Reveal({ children, className = '', delay = 0 }: RevealProps) {
   return (
     <div
       ref={ref}
-      className={`reveal ${state === 'visible' ? 'is-visible' : state === 'above' ? 'is-above' : ''} ${className}`}
-      // Stagger only on the way in; leaving happens all at once.
+      className={`reveal ${state === 'visible' ? 'is-visible' : ''} ${className}`}
+      // Optional delay so a row of cards appears one after another.
       style={delay && state === 'visible' ? { transitionDelay: `${delay}ms` } : undefined}
     >
       {children}

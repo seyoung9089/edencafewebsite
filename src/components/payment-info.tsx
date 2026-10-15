@@ -48,33 +48,44 @@ export function usePayment() {
 }
 
 /** Small "복사" pill that turns into "복사됨" for a moment after copying. */
-export function CopyLabel({ copied, className = '' }: { copied: boolean; className?: string }) {
+export function CopyLabel({ copied, onDark = false, className = '' }: { copied: boolean; onDark?: boolean; className?: string }) {
+  const idle = onDark ? 'bg-eden-sand/20 text-eden-sand' : 'bg-eden-sand/20 text-eden-sand-ink'
   return (
-    <span className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${copied ? 'bg-eden-sand text-eden-ink-2' : 'bg-eden-sand/15 text-eden-sand'} ${className}`}>
+    <span className={`inline-flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-sm font-semibold ${copied ? 'bg-eden-sand text-eden-ink-2' : idle} ${className}`}>
       {copied ? <Check size={13} strokeWidth={3} /> : <Copy size={13} />}
       {copied ? '복사됨' : '복사'}
     </span>
   )
 }
 
-export function PaymentInfo({ total, className = '' }: { total: number; className?: string }) {
+/** Bank transfer box. `depositor` is the name the transfer should be sent under. */
+export function PaymentInfo({ total, depositor, className = '' }: { total: number; depositor?: string; className?: string }) {
   const { bank, account, holder, note, copy, copied } = usePayment()
 
   return (
-    <div className={`rounded-[10px] bg-eden-sage-dim px-4 py-3 text-sm leading-relaxed text-eden-paper ${className}`}>
+    <div className={`rounded-[10px] bg-eden-sage-dim px-4 py-3 text-base leading-relaxed text-eden-paper ${className}`}>
       <div className="flex flex-wrap items-center gap-x-2">
         <span>
           {bank} <strong>{account}</strong>
         </span>
         <button type="button" onClick={(e) => void copy(e.currentTarget)} aria-label="계좌번호 복사">
-          <CopyLabel copied={copied} />
+          <CopyLabel copied={copied} onDark />
         </button>
       </div>
       <div>예금주 {holder}</div>
       <div>
         입금금액 <strong>{total.toLocaleString('ko-KR')}원</strong>
       </div>
-      <div className="mt-1 text-xs opacity-80">{note}</div>
+      <div className="mt-2 border-t border-eden-paper/20 pt-2">
+        {depositor ? (
+          <>
+            입금자명은 <strong>{depositor}</strong>(으)로 해주세요.
+          </>
+        ) : (
+          '입금자명은 주문하신 분 이름으로 해주세요.'
+        )}
+      </div>
+      <div className="mt-1 text-sm opacity-80">{note}</div>
     </div>
   )
 }

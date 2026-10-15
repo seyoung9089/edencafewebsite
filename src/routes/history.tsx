@@ -24,7 +24,7 @@ function HistoryPage() {
       <SiteHeader />
       <section className="px-6 pb-24 pt-14 md:px-8">
         <h1 className="mb-3 font-serif text-3xl font-semibold">이든의 히스토리</h1>
-        <p className="mb-14 text-[15px] text-eden-sage-dim">작은 교실 프로젝트에서 시작해, 지금의 이든이 되기까지.</p>
+        <p className="mb-14 text-base text-eden-sage-dim">작은 교실 프로젝트에서 시작해, 지금의 이든이 되기까지.</p>
 
         <div className="flex flex-col gap-12 md:flex-row md:items-start">
           <div className="relative max-w-2xl flex-1 border-l border-eden-sage-dim/30 pl-9">
@@ -35,8 +35,8 @@ function HistoryPage() {
                     h.latest ? 'border-eden-sand bg-eden-sand' : 'border-eden-sage-dim bg-eden-paper'
                   }`}
                 />
-                <div className="mb-2 font-serif text-2xl font-semibold text-eden-sand">{h.year}</div>
-                <p className="max-w-[48ch] text-[16px] leading-relaxed">{cv(`history.${h.key}`)}</p>
+                <div className="mb-2 font-serif text-2xl font-semibold text-eden-sand-ink">{h.year}</div>
+                <p className="max-w-[48ch] text-base leading-relaxed">{cv(`history.${h.key}`)}</p>
               </div>
             ))}
           </div>

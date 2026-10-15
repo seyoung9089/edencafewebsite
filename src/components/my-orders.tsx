@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Pencil } from 'lucide-react'
 import { PaymentInfo } from '@/components/payment-info'
+import { CallButton } from '@/components/phone-link'
 import { getCurrentPickupSlot } from '@/lib/pickup'
 
 export type CustomerOrder = {
@@ -109,11 +110,11 @@ const Empty = () => (
 // Pickup is daily, so the top of the page is what matters today: orders to
 // pick up today (ordered yesterday) and the order placed today for tomorrow.
 
-function OrderCard({ order, highlight = false }: { order: CustomerOrder; highlight?: boolean }) {
+function OrderCard({ order, depositor, highlight = false }: { order: CustomerOrder; depositor: string; highlight?: boolean }) {
   return (
     <article className={`rounded-card bg-eden-paper-dim p-5 shadow-soft ${highlight ? 'border border-eden-sand/60' : ''}`}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <strong className={order.status === 'wait' ? 'text-eden-sand' : ''}>{STATUS[order.status].label}</strong>
+        <strong className={order.status === 'wait' ? 'text-eden-sand-ink' : ''}>{STATUS[order.status].label}</strong>
         <span className="text-sm text-eden-sage-dim">
           {orderedOn(order.created_at)} 주문 · {pickupLabel(order.pickup_date)} 픽업
         </span>
@@ -130,12 +131,12 @@ function OrderCard({ order, highlight = false }: { order: CustomerOrder; highlig
         <span>합계</span>
         <span>{won(order.total)}</span>
       </div>
-      {order.status === 'wait' ? <PaymentInfo total={order.total} className="mt-3" /> : null}
+      {order.status === 'wait' ? <PaymentInfo total={order.total} depositor={depositor} className="mt-3" /> : null}
     </article>
   )
 }
 
-function TodaySection({ title, subtitle, orders, empty }: { title: string; subtitle: string; orders: CustomerOrder[]; empty: React.ReactNode }) {
+function TodaySection({ title, subtitle, orders, empty, depositor }: { title: string; subtitle: string; orders: CustomerOrder[]; empty: React.ReactNode; depositor: string }) {
   return (
     <section>
       <div className="mb-3 flex flex-wrap items-baseline gap-x-3">
@@ -145,7 +146,7 @@ function TodaySection({ title, subtitle, orders, empty }: { title: string; subti
       {orders.length ? (
         <div className="space-y-3">
           {orders.map((o) => (
-            <OrderCard key={o.id} order={o} highlight />
+            <OrderCard key={o.id} order={o} depositor={depositor} highlight />
           ))}
         </div>
       ) : (
@@ -174,15 +175,21 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut }: MyO
         </div>
         <QuickLinks onSignOut={onSignOut} />
       </div>
+      <div className="-mt-4 mb-8 flex flex-wrap items-center gap-3 text-sm text-eden-sage-dim">
+        주문 취소 · 변경은 전화로 알려주세요.
+        <CallButton />
+      </div>
 
       <div className="mb-12 grid gap-8 md:grid-cols-2">
         <TodaySection
+          depositor={name}
           title="오늘 픽업"
           subtitle={`${slot.todayLabel} · 오늘 챙겨야 할 주문`}
           orders={pickupToday}
           empty="오늘 픽업할 주문이 없어요."
         />
         <TodaySection
+          depositor={name}
           title="내일 픽업"
           subtitle={`${slot.dateLabel} · 오늘 주문한 메뉴`}
           orders={pickupTomorrow}
@@ -217,7 +224,7 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut }: MyO
               <h4 className="mb-3 text-sm font-semibold text-eden-sage-dim">{day} 주문</h4>
               <div className="space-y-3">
                 {list.map((o) => (
-                  <OrderCard key={o.id} order={o} />
+                  <OrderCard key={o.id} order={o} depositor={name} />
                 ))}
               </div>
             </section>

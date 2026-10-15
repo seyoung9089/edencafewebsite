@@ -66,7 +66,7 @@ export function OrdersPanel() {
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         {slot ? (
           <p className="rounded-full bg-eden-sand/15 px-4 py-2 text-sm">
-            지금 주문하면 <strong className="text-eden-sand">{slot.dateLabel}</strong> 픽업
+            지금 주문하면 <strong className="text-eden-sand-ink">{slot.dateLabel}</strong> 픽업
           </p>
         ) : (
           <span />

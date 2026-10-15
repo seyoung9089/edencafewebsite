@@ -15,9 +15,9 @@ export function NotFound() {
         <Leaf size={32} strokeWidth={1.6} className="text-eden-paper" />
       </div>
       <div>
-        <div className="mb-2 font-serif text-sm tracking-[0.2em] text-eden-sand">404</div>
+        <div className="mb-2 font-serif text-sm tracking-[0.2em] text-eden-sand-ink">404</div>
         <h1 className="mb-3 font-serif text-2xl font-semibold md:text-3xl">페이지를 찾을 수 없어요</h1>
-        <p className="max-w-[38ch] text-[15px] text-eden-sage-dim">
+        <p className="max-w-[38ch] text-base text-eden-sage-dim">
           주소가 바뀌었거나 존재하지 않는 페이지예요. 이든카페 메인으로 돌아가 다시 둘러보세요.
         </p>
       </div>

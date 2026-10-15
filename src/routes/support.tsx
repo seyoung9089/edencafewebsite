@@ -33,7 +33,7 @@ function SupportPage() {
     setTitle(''); setContent(''); toast.success('문의가 접수되었습니다.'); void load(user.id)
   }
   return <div className="min-h-screen bg-eden-paper text-eden-ink"><SiteHeader /><main className="mx-auto max-w-5xl px-6 pb-24 pt-14">
-    <h1 className="mb-3 font-serif text-3xl font-semibold">문의하기</h1><p className="mb-8 text-[15px] text-eden-sage-dim">궁금한 점을 남겨주시면 빠르게 답변드릴게요.</p>
+    <h1 className="mb-3 font-serif text-3xl font-semibold">문의하기</h1><p className="mb-8 text-base text-eden-sage-dim">궁금한 점을 남겨주시면 빠르게 답변드릴게요.</p>
     {loading ? <p>로그인 상태 확인 중…</p> : !user ? <div><p className="mb-4">로그인 후 문의를 남길 수 있어요.</p><Link to="/login" className="inline-block bg-eden-ink px-7 py-3 text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2">이메일 로그인</Link></div> : <div className="grid gap-7 lg:grid-cols-[1.3fr_1fr]">
       <div className="rounded-card bg-eden-paper-dim shadow-soft p-7"><label htmlFor="category" className="mb-2 block text-sm">문의 종류</label><select id="category" value={category} onChange={e => setCategory(e.target.value)} className="mb-5 w-full rounded-[10px] border border-eden-line bg-eden-paper p-3">{categories.map(c => <option key={c}>{c}</option>)}</select>
         <label htmlFor="title" className="mb-2 block text-sm">제목</label><input id="title" maxLength={100} value={title} onChange={e => setTitle(e.target.value)} className="mb-5 w-full rounded-[10px] border border-eden-line bg-eden-paper p-3" />

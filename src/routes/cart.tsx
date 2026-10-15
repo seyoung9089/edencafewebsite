@@ -8,7 +8,7 @@ import { getErrorMessage } from '@/lib/errors'
 import { pageMeta } from '@/lib/seo'
 import { useState } from 'react'
 import { Minus, Plus, X } from 'lucide-react'
-import { useCustomerAuth } from '@/lib/customer-auth'
+import { customerName, useCustomerAuth } from '@/lib/customer-auth'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
@@ -33,7 +33,7 @@ function CartPage() {
   const { user, loading } = useCustomerAuth()
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
-  const [placed, setPlaced] = useState<Omit<PlacedOrder, 'pickupTime'> | null>(null)
+  const [placed, setPlaced] = useState<Omit<PlacedOrder, 'pickupTime' | 'depositor'> | null>(null)
   const content = useSiteContent()
   const pickupTime = useContentValue(content, 'pickup.time')
 
@@ -68,7 +68,7 @@ function CartPage() {
       <SiteHeader />
       <section className="px-6 pb-24 pt-14 md:px-8">
         <h1 className="mb-3 font-serif text-3xl font-semibold">장바구니</h1>
-        <p className="mb-10 text-[15px] text-eden-sage-dim">담은 메뉴를 확인하고 수량을 조정한 뒤 주문해주세요.</p>
+        <p className="mb-10 text-base text-eden-sage-dim">담은 메뉴를 확인하고 수량을 조정한 뒤 주문해주세요.</p>
 
         {!items.length ? (
           <div className="max-w-xl py-16 text-center text-eden-sage-dim">
@@ -84,15 +84,15 @@ function CartPage() {
                     <div className="text-xs text-eden-sage-dim">{it.price.toLocaleString('ko-KR')}원 / 1개</div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => updateQty(it.name, it.qty - 1)} className="flex h-7 w-7 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim">
-                      <Minus size={12} />
+                    <button onClick={() => updateQty(it.name, it.qty - 1)} className="flex h-11 w-11 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim">
+                      <Minus size={18} />
                     </button>
-                    <span className="min-w-5 text-center">{it.qty}</span>
-                    <button onClick={() => updateQty(it.name, it.qty + 1)} className="flex h-7 w-7 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim">
-                      <Plus size={12} />
+                    <span className="min-w-8 text-center text-lg font-semibold">{it.qty}</span>
+                    <button onClick={() => updateQty(it.name, it.qty + 1)} className="flex h-11 w-11 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim">
+                      <Plus size={18} />
                     </button>
                   </div>
-                  <div className="w-24 text-right font-serif font-semibold text-eden-sand">
+                  <div className="w-24 text-right font-serif font-semibold text-eden-sand-ink">
                     {(it.price * it.qty).toLocaleString('ko-KR')}원
                   </div>
                   <button onClick={() => removeItem(it.name)} aria-label="삭제" className="text-eden-sage-dim hover:text-destructive">
@@ -107,7 +107,7 @@ function CartPage() {
                 <div className="mb-3 text-xs text-eden-sage-dim">픽업 안내</div>
                 {slot ? (
                   <div className="rounded-[10px] bg-eden-sand/15 px-4 py-3">
-                    <div className="font-serif text-lg font-semibold text-eden-sand">
+                    <div className="font-serif text-lg font-semibold text-eden-sand-ink">
                       {slot.dateLabel} 픽업
                     </div>
                     <div className="mt-1 text-xs text-eden-sage-dim">오늘 {slot.todayLabel} 주문</div>
@@ -115,27 +115,27 @@ function CartPage() {
                 ) : (
                   <div className="h-[62px] animate-pulse bg-eden-line" />
                 )}
-                <p className="mt-2.5 text-[11px] leading-relaxed text-eden-sage-dim">
+                <p className="mt-2.5 text-xs leading-relaxed text-eden-sage-dim">
                   오늘 자정까지 주문하시면 다음 날 픽업이에요.
                 </p>
               </div>
               <div className="mb-4 flex items-center justify-between text-base font-semibold">
                 <span>합계</span>
-                <span className="font-serif text-xl text-eden-sand">{totalPrice.toLocaleString('ko-KR')}원</span>
+                <span className="font-serif text-xl text-eden-sand-ink">{totalPrice.toLocaleString('ko-KR')}원</span>
               </div>
 
               {user ? (
                 <button
                   onClick={() => void checkout()}
                   disabled={submitting || !slot}
-                  className="w-full bg-eden-ink py-3 text-sm font-semibold text-eden-paper disabled:opacity-50 rounded-full transition-colors hover:bg-eden-ink-2"
+                  className="w-full bg-eden-ink py-4 text-lg font-semibold text-eden-paper disabled:opacity-50 rounded-full transition-colors hover:bg-eden-ink-2"
                 >
                   {submitting ? '주문 처리 중…' : '주문하기 (무통장입금)'}
                 </button>
               ) : !loading ? (
                 <p className="mb-3 text-xs text-eden-sage-dim">로그인 후 주문할 수 있어요.</p>
               ) : null}
-              {!user && !loading ? <Link to="/login" className="block w-full bg-eden-ink py-3 text-center text-sm font-semibold text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2">이메일로 로그인하고 주문하기</Link> : null}
+              {!user && !loading ? <Link to="/login" className="block w-full bg-eden-ink py-4 text-center text-base font-semibold text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2">이메일로 로그인하고 주문하기</Link> : null}
               {loading ? (
                 <div className="h-11 w-full animate-pulse bg-eden-line" />
               ) : null}
@@ -146,12 +146,12 @@ function CartPage() {
       <SiteFooter />
 
       <Dialog open={!!placed} onOpenChange={(open) => !open && setPlaced(null)}>
-        <DialogContent className="max-w-[400px] rounded-card bg-eden-paper">
+        <DialogContent className="max-h-[92vh] max-w-[400px] overflow-y-auto rounded-card bg-eden-paper">
           <DialogTitle className="sr-only">주문 완료</DialogTitle>
           <DialogDescription className="sr-only">무통장 입금 안내와 픽업 정보</DialogDescription>
           {placed ? (
             <OrderCompleteBody
-              order={{ ...placed, pickupTime }}
+              order={{ ...placed, pickupTime, depositor: customerName(user) }}
               onClose={() => setPlaced(null)}
               onOrders={() => navigate({ to: '/orders' })}
             />

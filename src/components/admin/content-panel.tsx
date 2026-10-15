@@ -58,7 +58,7 @@ export function ContentPanel() {
       <div className="space-y-8 rounded-[10px] border border-eden-line bg-eden-paper p-5">
         {[...groups].map(([group, fields]) => (
           <div key={group}>
-            <div className="mb-3 border-b border-eden-line pb-1.5 font-serif text-sm font-semibold text-eden-sand">{group}</div>
+            <div className="mb-3 border-b border-eden-line pb-1.5 font-serif text-sm font-semibold text-eden-sand-ink">{group}</div>
             {fields.map((f) => (
               <label key={f.key} className="mb-3 block">
                 <span className="mb-1 block text-xs text-eden-sage-dim">{f.label}</span>

@@ -56,10 +56,10 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-4">
-          <Link to="/orders" aria-label="내 주문" className="text-eden-ink hover:text-eden-sand">
+          <Link to="/orders" aria-label="내 주문" className="text-eden-ink hover:text-eden-sand-ink">
             <User size={19} strokeWidth={1.6} />
           </Link>
-          <Link to="/cart" aria-label="장바구니" className="relative text-eden-ink hover:text-eden-sand">
+          <Link to="/cart" aria-label="장바구니" className="relative text-eden-ink hover:text-eden-sand-ink">
             <ShoppingBag size={19} strokeWidth={1.6} />
             {totalQty > 0 ? (
               <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-eden-sand px-1 text-[10px] font-bold text-eden-ink-2">
@@ -72,7 +72,7 @@ export function SiteHeader() {
             aria-label={mobileOpen ? '메뉴 닫기' : '메뉴 열기'}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((v) => !v)}
-            className="text-eden-ink hover:text-eden-sand md:hidden"
+            className="text-eden-ink hover:text-eden-sand-ink md:hidden"
           >
             {mobileOpen ? <X size={22} strokeWidth={1.6} /> : <Menu size={22} strokeWidth={1.6} />}
           </button>
@@ -91,7 +91,7 @@ export function SiteHeader() {
               key={l.to}
               to={l.to}
               onClick={() => setMobileOpen(false)}
-              className="border-b border-eden-line py-3.5 text-[15px] text-eden-ink last:border-b-0 hover:text-eden-sand"
+              className="border-b border-eden-line py-3.5 text-base text-eden-ink last:border-b-0 hover:text-eden-sand-ink"
             >
               {l.label}
             </Link>

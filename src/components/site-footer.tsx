@@ -1,4 +1,6 @@
 import { Link } from '@tanstack/react-router'
+import { useCafePhone } from '@/components/phone-link'
+import { useContentValue, useSiteContent } from '@/lib/site-content'
 
 export function SiteFooter() {
   return (
@@ -28,9 +30,7 @@ export function SiteFooter() {
           </div>
           <div>
             <h4 className="mb-4 text-sm font-medium text-eden-paper">연락처</h4>
-            <p className="py-1 text-sm">010-XXXX-XXXX</p>
-            <p className="py-1 text-sm">충청남도 금산군 ○○○</p>
-            <p className="py-1 text-sm">평일 09:00 – 18:00</p>
+            <FooterContact />
           </div>
         </div>
         <div className="flex flex-col gap-2 pt-6 text-xs text-[rgba(237,236,227,0.4)] md:flex-row md:items-center md:justify-between">
@@ -41,5 +41,23 @@ export function SiteFooter() {
         </div>
       </div>
     </footer>
+  )
+}
+
+function FooterContact() {
+  const content = useSiteContent()
+  const { label, href } = useCafePhone()
+  return (
+    <>
+      {href ? (
+        <a href={href} className="block py-1 text-sm underline underline-offset-4 hover:text-eden-sand">
+          {label}
+        </a>
+      ) : (
+        <p className="py-1 text-sm">{label}</p>
+      )}
+      <p className="py-1 text-sm">{useContentValue(content, 'location.addr')}</p>
+      <p className="py-1 text-sm">{useContentValue(content, 'contact.hours')}</p>
+    </>
   )
 }

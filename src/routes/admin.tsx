@@ -89,7 +89,7 @@ function AdminPage() {
       <SiteHeader />
       <section className="px-6 pb-24 pt-14 md:px-8">
         <h1 className="mb-3 font-serif text-3xl font-semibold">관리자 페이지</h1>
-        <p className="mb-10 text-[15px] text-eden-sage-dim">주문 · 고객 · 문의 · 메뉴 · 글귀 · 관리자를 한곳에서 관리해요.</p>
+        <p className="mb-10 text-base text-eden-sage-dim">주문 · 고객 · 문의 · 메뉴 · 글귀 · 관리자를 한곳에서 관리해요.</p>
 
         {loading ? (
           <div className="h-24 w-full max-w-3xl animate-pulse rounded-card bg-eden-line" />

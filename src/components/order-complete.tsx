@@ -1,11 +1,14 @@
 import { Check } from 'lucide-react'
 import { CopyLabel, usePayment } from '@/components/payment-info'
+import { CallButton } from '@/components/phone-link'
 
 export type PlacedOrder = {
   id: string
   total: number
   pickupLabel: string
   pickupTime: string
+  /** Name the bank transfer should be sent under ('' if unknown). */
+  depositor: string
   items: { name: string; qty: number }[]
 }
 
@@ -63,12 +66,19 @@ export function OrderCompleteBody({ order, onClose, onOrders }: BodyProps) {
           </span>
           <CopyLabel copied={pay.copied} />
         </button>
-        <p className="mt-3 text-xs text-eden-sage-dim">{pay.note}</p>
+        <p className="mt-3 text-base">
+          입금자명은 <strong>{order.depositor || '주문하신 분 이름'}</strong>(으)로 해주세요.
+        </p>
+        <p className="mt-1 text-sm text-eden-sage-dim">{pay.note}</p>
       </div>
       <p className="text-xs text-eden-sage-dim">
         {itemsText(order)} · 주문번호 {order.id.slice(0, 8)}
       </p>
       <StatusNote />
+      <div className="rounded-[10px] border border-eden-line px-4 py-3 text-sm">
+        <p className="mb-2">주문을 취소하거나 바꾸고 싶으시면 전화 주세요.</p>
+        <CallButton className="w-full bg-eden-paper" />
+      </div>
       <Buttons onClose={onClose} onOrders={onOrders} />
     </div>
   )

@@ -42,14 +42,8 @@ export type ContentField = { group: string; key: string; label: string; type: Co
 
 export const CONTENT_SCHEMA: ContentField[] = [
   { group: '히어로', key: 'hero.eyebrow', label: '상단 안내 문구', type: 'input', default: '별무리고등학교에서 시작된 카페 협동조합 · Since 2021' },
-  { group: '히어로', key: 'hero.l1', label: '첫 줄 (강조)', type: 'input', default: 'Eden Cafe' },
-  { group: '히어로', key: 'hero.l2', label: '둘째 줄', type: 'input', default: 'Honest & Comfortable' },
-  { group: '히어로', key: 'hero.l3', label: '셋째 줄', type: 'input', default: 'Started in 2021' },
-  { group: '히어로', key: 'hero.l4', label: '넷째 줄', type: 'input', default: 'as a School Project' },
-  { group: '히어로', key: 'hero.l5', label: '다섯째 줄', type: 'input', default: 'Baked Fresh Every Morning' },
-  { group: '히어로', key: 'hero.l6', label: '여섯째 줄', type: 'input', default: 'Brewed with Honest Hearts' },
-  { group: '히어로', key: 'hero.l7', label: '일곱째 줄', type: 'input', default: 'A Small Rest, Like Eden' },
-  { group: '히어로', key: 'hero.l8', label: '여덟째 줄', type: 'input', default: 'Chungnam, Geumsan' },
+  { group: '히어로', key: 'hero.title', label: '큰 제목', type: 'input', default: '매일 아침 직접 굽는 빵과 커피' },
+  { group: '히어로', key: 'hero.subtitle', label: '작은 설명', type: 'input', default: '오늘 주문하시면 내일 카페에서 찾아가실 수 있어요.' },
 
   { group: '카페소개', key: 'phil.label1', label: '첫 번째 소제목', type: 'input', default: '이든이라는 이름' },
   { group: '카페소개', key: 'phil.text1', label: '첫 번째 본문', type: 'textarea', default: '에덴, 순수했던 처음의 자리. 별무리고등학교 학생들의 작은 창업 프로젝트에서 시작해, 지금은 졸업생과 교사가 함께 꾸려가는 협동조합 카페가 되었습니다.' },
@@ -81,7 +75,8 @@ export const CONTENT_SCHEMA: ContentField[] = [
 
   { group: '오시는 길', key: 'location.addr', label: '주소', type: 'input', default: '충청남도 금산군 ○○○ 이든카페 (별드림관 1층)' },
   { group: '오시는 길', key: 'location.quote', label: '안내 문구', type: 'textarea', default: '"궁금하신 점이 있으면 편하게 문의해주세요!"' },
-  { group: '오시는 길', key: 'location.phone', label: '연락처', type: 'input', default: '담당 연락처 · 010-XXXX-XXXX' },
+  { group: '연락처 · 운영시간', key: 'contact.phone', label: '전화번호 (누르면 전화가 걸려요)', type: 'input', default: '010-XXXX-XXXX' },
+  { group: '연락처 · 운영시간', key: 'contact.hours', label: '운영 시간', type: 'input', default: '평일 09:00 – 18:00' },
 
   { group: '새소식', key: 'news.n1.tag', label: '공지1 태그', type: 'input', default: '공지' },
   { group: '새소식', key: 'news.n1.title', label: '공지1 제목', type: 'input', default: '추석 연휴 픽업 운영 안내' },
@@ -112,7 +107,7 @@ export const CONTENT_SCHEMA: ContentField[] = [
   { group: '입금 계좌', key: 'payment.bank', label: '은행', type: 'input', default: '새마을금고' },
   { group: '입금 계좌', key: 'payment.account', label: '계좌번호', type: 'input', default: '000-0000-0000-00' },
   { group: '입금 계좌', key: 'payment.holder', label: '예금주', type: 'input', default: '이든협동조합' },
-  { group: '입금 계좌', key: 'payment.note', label: '입금 안내', type: 'input', default: '주문 후 30분 이내에 입금해주세요.' },
+  { group: '입금 계좌', key: 'payment.note', label: '입금 안내', type: 'input', default: '입금이 확인되면 메뉴를 준비해요.' },
 
   { group: '푸터 · 기타', key: 'footer.blurb', label: '푸터 소개문', type: 'textarea', default: '학생들의 작은 시작이 협동조합으로 자란 카페. 정직한 재료와 편안한 쉼을 나눕니다.' },
   { group: '푸터 · 기타', key: 'cta.title', label: '하단 CTA 제목', type: 'input', default: '이든에서 오늘의 첫 잔을 시작하세요' },

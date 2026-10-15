@@ -58,7 +58,7 @@ function InquiryCard({ inquiry, email, onSave }: { inquiry: Inquiry; email: stri
     <article className="rounded-[10px] border border-eden-line bg-eden-paper p-5">
       <p className="mb-1 text-xs text-eden-sage-dim">
         {email} · {inquiry.category} · {new Date(inquiry.created_at).toLocaleDateString('ko-KR')} ·{' '}
-        <span className={inquiry.status === 'done' ? '' : 'font-semibold text-eden-sand'}>{inquiry.status === 'done' ? '답변완료' : '답변대기'}</span>
+        <span className={inquiry.status === 'done' ? '' : 'font-semibold text-eden-sand-ink'}>{inquiry.status === 'done' ? '답변완료' : '답변대기'}</span>
       </p>
       <strong>{inquiry.title}</strong>
       <p className="mt-3 whitespace-pre-wrap text-sm">{inquiry.content}</p>

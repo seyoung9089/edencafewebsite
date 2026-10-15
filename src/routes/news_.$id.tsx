@@ -24,7 +24,7 @@ function NewsDetailPage() {
       <SiteHeader />
       <article className="px-6 pb-24 pt-14 md:px-8">
         <div className="max-w-3xl">
-          <Link to="/news" className="mb-8 inline-flex items-center gap-1 text-sm text-eden-sage-dim hover:text-eden-sand">
+          <Link to="/news" className="mb-8 inline-flex items-center gap-1 text-sm text-eden-sage-dim hover:text-eden-sand-ink">
             <ChevronLeft size={16} />
             새소식 목록
           </Link>
@@ -34,9 +34,9 @@ function NewsDetailPage() {
           </div>
           <h1 className="mb-8 border-b border-eden-line pb-8 font-serif text-3xl font-semibold">{cv(`news.${id}.title`)}</h1>
           {body ? (
-            <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{body}</p>
+            <p className="whitespace-pre-wrap text-base leading-relaxed">{body}</p>
           ) : (
-            <p className="text-[15px] text-eden-sage-dim">자세한 내용은 준비 중이에요.</p>
+            <p className="text-base text-eden-sage-dim">자세한 내용은 준비 중이에요.</p>
           )}
         </div>
       </article>

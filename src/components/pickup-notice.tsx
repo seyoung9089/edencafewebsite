@@ -10,7 +10,7 @@ export function PickupNotice() {
       <span>오늘 {slot.todayLabel}</span>
       <span aria-hidden className="text-eden-line">|</span>
       <span>
-        픽업 <strong className="text-eden-sand">{slot.dateLabel}</strong>
+        픽업 <strong className="text-eden-sand-ink">{slot.dateLabel}</strong>
       </span>
     </p>
   )

@@ -38,7 +38,7 @@ function MenuPage() {
       <SiteHeader />
       <section className="px-6 pb-6 pt-14 md:px-8">
         <h1 className="mb-3 font-serif text-3xl font-semibold">전체 메뉴</h1>
-        <p className="mb-6 text-[15px] text-eden-sage-dim">이든의 베이커리실과 바에서 만나는 모든 메뉴입니다.</p>
+        <p className="mb-6 text-base text-eden-sage-dim">이든의 베이커리실과 바에서 만나는 모든 메뉴입니다.</p>
         <div className="max-w-xl">
           <PickupNotice />
         </div>
@@ -69,7 +69,7 @@ function MenuPage() {
                 <h3 className="mb-1 font-serif text-base font-semibold">{item.name}</h3>
                 <p className="mb-4 min-h-[36px] text-xs text-eden-sage-dim">{item.description}</p>
                 <div className="mb-4 flex items-baseline justify-between gap-2">
-                  <span className="font-serif text-base font-semibold text-eden-sand">{item.price.toLocaleString('ko-KR')}원</span>
+                  <span className="font-serif text-base font-semibold text-eden-sand-ink">{item.price.toLocaleString('ko-KR')}원</span>
                   {item.stock !== null && item.stock > 0 ? (
                     <span className="text-xs text-eden-sage-dim">남은 수량 {item.stock}개</span>
                   ) : null}
@@ -81,9 +81,9 @@ function MenuPage() {
                 ) : (
                   <button
                     onClick={() => openModal(item)}
-                    className="w-full rounded-full bg-eden-ink py-2 text-xs font-semibold text-eden-paper hover:bg-eden-sand hover:text-eden-ink-2"
+                    className="w-full rounded-full bg-eden-ink py-3 text-base font-semibold text-eden-paper hover:bg-eden-sand hover:text-eden-ink-2"
                   >
-                    담기 +
+                    장바구니에 담기
                   </button>
                 )}
               </div>
@@ -101,22 +101,22 @@ function MenuPage() {
           <div className="my-4 flex items-center gap-6">
             <button
               onClick={() => setQty((q) => Math.max(1, q - 1))}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim"
             >
-              <Minus size={14} />
+              <Minus size={20} />
             </button>
-            <span className="min-w-6 text-center text-base font-semibold">{qty}</span>
+            <span className="min-w-8 text-center text-2xl font-semibold">{qty}</span>
             <button
               onClick={() => setQty((q) => Math.min(active?.stock ?? 20, 20, q + 1))}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim"
             >
-              <Plus size={14} />
+              <Plus size={20} />
             </button>
           </div>
           <div className="mb-5 font-serif text-base font-semibold">
-            합계 <span className="text-eden-sand">{active ? (active.price * qty).toLocaleString('ko-KR') : 0}원</span>
+            합계 <span className="text-eden-sand-ink">{active ? (active.price * qty).toLocaleString('ko-KR') : 0}원</span>
           </div>
-          <button onClick={confirmAdd} className="w-full bg-eden-ink py-3 text-sm font-semibold text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2">
+          <button onClick={confirmAdd} className="w-full bg-eden-ink py-4 text-base font-semibold text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2">
             장바구니에 담기
           </button>
         </DialogContent>

@@ -13,6 +13,7 @@ import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { PaymentInfo } from '@/components/payment-info'
+import { useContentValue, useSiteContent } from '@/lib/site-content'
 
 type PlacedOrder = { id: string; total: number; pickupLabel: string; items: { name: string; qty: number }[] }
 
@@ -34,6 +35,8 @@ function CartPage() {
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
   const [placed, setPlaced] = useState<PlacedOrder | null>(null)
+  const content = useSiteContent()
+  const pickupTime = useContentValue(content, 'pickup.time')
 
   const checkout = async () => {
     if (!items.length || !slot) return
@@ -147,16 +150,24 @@ function CartPage() {
         <DialogContent className="max-w-[400px] rounded-card bg-eden-paper">
           <DialogTitle className="font-serif text-xl">주문이 완료됐어요</DialogTitle>
           <DialogDescription className="text-sm text-eden-sage-dim">
-            아래 계좌로 입금해주시면 확인 후 준비할게요.
+            아래 계좌로 무통장 입금해주시면 확인 후 준비할게요.
           </DialogDescription>
           {placed ? (
             <>
               <div className="rounded-[10px] bg-eden-sand/15 px-4 py-3 text-sm">
-                <div className="font-semibold text-eden-sand">{placed.pickupLabel} 픽업</div>
-                <div className="mt-1">{placed.items.map((it) => `${it.name} × ${it.qty}`).join(', ')}</div>
+                <div className="text-xs text-eden-sage-dim">픽업</div>
+                <div className="font-semibold text-eden-sand">
+                  {placed.pickupLabel}
+                  {pickupTime ? ` · ${pickupTime}` : ''}
+                </div>
+                <div className="mt-2">{placed.items.map((it) => `${it.name} × ${it.qty}`).join(', ')}</div>
                 <div className="mt-1 text-xs text-eden-sage-dim">주문번호 {placed.id.slice(0, 8)}</div>
               </div>
-              <PaymentInfo total={placed.total} />
+              <div>
+                <div className="mb-1.5 text-xs text-eden-sage-dim">무통장 입금</div>
+                <PaymentInfo total={placed.total} />
+              </div>
+              <p className="text-xs text-eden-sage-dim">입금 확인, 픽업 준비 같은 주문 상태는 <strong className="text-eden-ink">내 주문</strong>에서 확인할 수 있어요.</p>
               <div className="flex gap-2">
                 <button type="button" onClick={() => setPlaced(null)} className="flex-1 rounded-full border border-eden-line py-3 text-sm">
                   닫기

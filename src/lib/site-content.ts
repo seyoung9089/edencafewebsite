@@ -108,6 +108,7 @@ export const CONTENT_SCHEMA: ContentField[] = [
   { group: '새소식', key: 'news.n6.date', label: '공지6 날짜', type: 'input', default: '2026.03.20' },
   { group: '새소식', key: 'news.n6.body', label: '공지6 내용', type: 'textarea', default: '' },
 
+  { group: '입금 계좌', key: 'pickup.time', label: '픽업 시간 (주문 완료 창에 표시)', type: 'input', default: '09:00 – 18:00' },
   { group: '입금 계좌', key: 'payment.bank', label: '은행', type: 'input', default: '새마을금고' },
   { group: '입금 계좌', key: 'payment.account', label: '계좌번호', type: 'input', default: '000-0000-0000-00' },
   { group: '입금 계좌', key: 'payment.holder', label: '예금주', type: 'input', default: '이든협동조합' },

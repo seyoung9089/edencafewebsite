@@ -17,6 +17,7 @@ import { Route as CustomerManagementRouteImport } from './routes/customer-manage
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MenuRouteImport } from './routes/menu'
+import { Route as MyOrdersPreviewRouteImport } from './routes/my-orders-preview'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -63,6 +64,11 @@ const MenuRoute = MenuRouteImport.update({
   path: '/menu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MyOrdersPreviewRoute = MyOrdersPreviewRouteImport.update({
+  id: '/my-orders-preview',
+  path: '/my-orders-preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NewsRoute = NewsRouteImport.update({
   id: '/news',
   path: '/news',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/menu': typeof MenuRoute
+  '/my-orders-preview': typeof MyOrdersPreviewRoute
   '/news': typeof NewsRoute
   '/orders': typeof OrdersRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/menu': typeof MenuRoute
+  '/my-orders-preview': typeof MyOrdersPreviewRoute
   '/news': typeof NewsRoute
   '/orders': typeof OrdersRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/menu': typeof MenuRoute
+  '/my-orders-preview': typeof MyOrdersPreviewRoute
   '/news': typeof NewsRoute
   '/orders': typeof OrdersRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/login'
     | '/menu'
+    | '/my-orders-preview'
     | '/news'
     | '/orders'
     | '/reset-password'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/login'
     | '/menu'
+    | '/my-orders-preview'
     | '/news'
     | '/orders'
     | '/reset-password'
@@ -176,6 +187,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/login'
     | '/menu'
+    | '/my-orders-preview'
     | '/news'
     | '/orders'
     | '/reset-password'
@@ -192,6 +204,7 @@ export interface RootRouteChildren {
   HistoryRoute: typeof HistoryRoute
   LoginRoute: typeof LoginRoute
   MenuRoute: typeof MenuRoute
+  MyOrdersPreviewRoute: typeof MyOrdersPreviewRoute
   NewsRoute: typeof NewsRoute
   OrdersRoute: typeof OrdersRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -257,6 +270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MenuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/my-orders-preview': {
+      id: '/my-orders-preview'
+      path: '/my-orders-preview'
+      fullPath: '/my-orders-preview'
+      preLoaderRoute: typeof MyOrdersPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/news': {
       id: '/news'
       path: '/news'
@@ -304,6 +324,7 @@ const rootRouteChildren: RootRouteChildren = {
   HistoryRoute: HistoryRoute,
   LoginRoute: LoginRoute,
   MenuRoute: MenuRoute,
+  MyOrdersPreviewRoute: MyOrdersPreviewRoute,
   NewsRoute: NewsRoute,
   OrdersRoute: OrdersRoute,
   ResetPasswordRoute: ResetPasswordRoute,

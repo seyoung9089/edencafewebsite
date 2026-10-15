@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
 import { useCurrentPickupSlot } from '@/lib/pickup'
-import { fetchEmails } from './use-staff'
+import { fetchCustomerLabels } from './use-staff'
 
 type Order = {
   id: string
@@ -25,17 +25,17 @@ function dateLabel(iso: string): string {
 export function OrdersPanel() {
   const slot = useCurrentPickupSlot()
   const [orders, setOrders] = useState<Order[] | null>(null)
-  const [emails, setEmails] = useState<Map<string, string>>(new Map())
+  const [customers, setCustomers] = useState<Map<string, string>>(new Map())
   const [showPast, setShowPast] = useState(false)
 
   const refresh = async () => {
     const [{ data, error }, map] = await Promise.all([
       supabase.from('orders').select('id,user_id,items,total,status,pickup_date,created_at').order('created_at', { ascending: false }),
-      fetchEmails(),
+      fetchCustomerLabels(),
     ])
     if (error) toast.error(error.message)
     setOrders((data ?? []) as Order[])
-    setEmails(map)
+    setCustomers(map)
   }
   useEffect(() => {
     void refresh()
@@ -100,7 +100,7 @@ export function OrdersPanel() {
               {list.map((o) => (
                 <article key={o.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[10px] border border-eden-line bg-eden-paper p-4">
                   <div className="min-w-48 flex-1">
-                    <p className="text-sm font-semibold">{emails.get(o.user_id) ?? o.user_id.slice(0, 8)}</p>
+                    <p className="text-sm font-semibold">{customers.get(o.user_id) ?? o.user_id.slice(0, 8)}</p>
                     <p className="text-sm">{o.items.map((i) => `${i.name} × ${i.qty}`).join(', ')}</p>
                   </div>
                   <span className="font-semibold">{o.total.toLocaleString('ko-KR')}원</span>

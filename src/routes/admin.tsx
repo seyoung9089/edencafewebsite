@@ -8,6 +8,7 @@ import { InquiriesPanel } from '@/components/admin/inquiries-panel'
 import { MenuPanel } from '@/components/admin/menu-panel'
 import { ContentPanel } from '@/components/admin/content-panel'
 import { StaffPanel } from '@/components/admin/staff-panel'
+import { CustomersPanel } from '@/components/admin/customers-panel'
 import { supabase } from '@/lib/supabase'
 import { pageMeta } from '@/lib/seo'
 
@@ -16,9 +17,10 @@ export const Route = createFileRoute('/admin')({
   head: () => pageMeta('/admin', { noindex: true }),
 })
 
-type Tab = 'orders' | 'inquiries' | 'menu' | 'content' | 'staff'
+type Tab = 'orders' | 'customers' | 'inquiries' | 'menu' | 'content' | 'staff'
 const TABS: { id: Tab; label: string }[] = [
   { id: 'orders', label: '주문 · 입금' },
+  { id: 'customers', label: '고객' },
   { id: 'inquiries', label: '문의' },
   { id: 'menu', label: '메뉴' },
   { id: 'content', label: '글귀 · 이미지' },
@@ -63,6 +65,8 @@ function AdminDashboard({ userId }: { userId: string }) {
       <div className="min-w-0 bg-eden-paper-dim p-5 md:p-8">
         {tab === 'orders' ? (
           <OrdersPanel />
+        ) : tab === 'customers' ? (
+          <CustomersPanel />
         ) : tab === 'inquiries' ? (
           <InquiriesPanel />
         ) : tab === 'menu' ? (
@@ -85,7 +89,7 @@ function AdminPage() {
       <SiteHeader />
       <section className="px-6 pb-24 pt-14 md:px-8">
         <h1 className="mb-3 font-serif text-3xl font-semibold">관리자 페이지</h1>
-        <p className="mb-10 text-[15px] text-eden-sage-dim">주문 · 문의 · 메뉴 · 글귀 · 관리자를 한곳에서 관리해요.</p>
+        <p className="mb-10 text-[15px] text-eden-sage-dim">주문 · 고객 · 문의 · 메뉴 · 글귀 · 관리자를 한곳에서 관리해요.</p>
 
         {loading ? (
           <div className="h-24 w-full max-w-3xl animate-pulse rounded-card bg-eden-line" />

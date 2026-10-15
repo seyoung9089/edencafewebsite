@@ -11,6 +11,19 @@ import { Minus, Plus, X } from 'lucide-react'
 import { useCustomerAuth } from '@/lib/customer-auth'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { PaymentInfo } from '@/components/payment-info'
+
+type PlacedOrder = { id: string; total: number; pickupLabel: string; items: { name: string; qty: number }[] }
+
+/** Turns database errors from place_order into something a customer can act on. */
+function orderErrorMessage(e: unknown): string {
+  const message = getErrorMessage(e, '주문에 실패했습니다.')
+  if (message.includes('Pickup schedule changed')) return '픽업 날짜가 바뀌었어요. 새로고침한 뒤 다시 주문해주세요.'
+  if (message.includes('Unavailable menu item')) return `품절되었거나 없는 메뉴가 있어요: ${message.split(':').pop()?.trim()}`
+  if (message.includes('Login required')) return '로그인이 필요해요.'
+  return message
+}
 
 export const Route = createFileRoute('/cart')({ component: CartPage, head: () => pageMeta('/cart') })
 
@@ -20,23 +33,29 @@ function CartPage() {
   const { user, loading } = useCustomerAuth()
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
+  const [placed, setPlaced] = useState<PlacedOrder | null>(null)
 
   const checkout = async () => {
     if (!items.length || !slot) return
     setSubmitting(true)
     try {
-      const { error } = await supabase.rpc('place_order', {
+      const { data, error } = await supabase.rpc('place_order', {
         p_items: items.map((it) => ({ name: it.name, qty: it.qty })),
         p_pickup_date: slot.iso,
       })
       if (error) throw error
+      // The server priced the order; read the saved total back for the transfer amount.
+      const id = String(data)
+      const { data: saved } = await supabase.from('orders').select('total').eq('id', id).maybeSingle()
+      setPlaced({
+        id,
+        total: saved?.total ?? totalPrice,
+        pickupLabel: slot.dateLabel,
+        items: items.map((it) => ({ name: it.name, qty: it.qty })),
+      })
       clear()
-      toast.success(
-        `${slot.dateLabel} 픽업으로 주문이 접수되었습니다. 무통장입금 계좌는 내 주문에서 확인해주세요.`,
-      )
-      navigate({ to: '/orders' })
     } catch (e) {
-      toast.error(getErrorMessage(e, '주문에 실패했습니다.'))
+      toast.error(orderErrorMessage(e))
     } finally {
       setSubmitting(false)
     }
@@ -123,6 +142,37 @@ function CartPage() {
         )}
       </section>
       <SiteFooter />
+
+      <Dialog open={!!placed} onOpenChange={(open) => !open && setPlaced(null)}>
+        <DialogContent className="max-w-[400px] rounded-card bg-eden-paper">
+          <DialogTitle className="font-serif text-xl">주문이 완료됐어요</DialogTitle>
+          <DialogDescription className="text-sm text-eden-sage-dim">
+            아래 계좌로 입금해주시면 확인 후 준비할게요.
+          </DialogDescription>
+          {placed ? (
+            <>
+              <div className="rounded-[10px] bg-eden-sand/15 px-4 py-3 text-sm">
+                <div className="font-semibold text-eden-sand">{placed.pickupLabel} 픽업</div>
+                <div className="mt-1">{placed.items.map((it) => `${it.name} × ${it.qty}`).join(', ')}</div>
+                <div className="mt-1 text-xs text-eden-sage-dim">주문번호 {placed.id.slice(0, 8)}</div>
+              </div>
+              <PaymentInfo total={placed.total} />
+              <div className="flex gap-2">
+                <button type="button" onClick={() => setPlaced(null)} className="flex-1 rounded-full border border-eden-line py-3 text-sm">
+                  닫기
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate({ to: '/orders' })}
+                  className="flex-1 rounded-full bg-eden-ink py-3 text-sm font-semibold text-eden-paper hover:bg-eden-ink-2"
+                >
+                  내 주문 보기
+                </button>
+              </div>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

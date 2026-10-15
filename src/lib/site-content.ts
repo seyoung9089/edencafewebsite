@@ -108,6 +108,11 @@ export const CONTENT_SCHEMA: ContentField[] = [
   { group: '새소식', key: 'news.n6.date', label: '공지6 날짜', type: 'input', default: '2026.03.20' },
   { group: '새소식', key: 'news.n6.body', label: '공지6 내용', type: 'textarea', default: '' },
 
+  { group: '입금 계좌', key: 'payment.bank', label: '은행', type: 'input', default: '새마을금고' },
+  { group: '입금 계좌', key: 'payment.account', label: '계좌번호', type: 'input', default: '000-0000-0000-00' },
+  { group: '입금 계좌', key: 'payment.holder', label: '예금주', type: 'input', default: '이든협동조합' },
+  { group: '입금 계좌', key: 'payment.note', label: '입금 안내', type: 'input', default: '주문 후 30분 이내에 입금해주세요.' },
+
   { group: '푸터 · 기타', key: 'footer.blurb', label: '푸터 소개문', type: 'textarea', default: '학생들의 작은 시작이 협동조합으로 자란 카페. 정직한 재료와 편안한 쉼을 나눕니다.' },
   { group: '푸터 · 기타', key: 'cta.title', label: '하단 CTA 제목', type: 'input', default: '이든에서 오늘의 첫 잔을 시작하세요' },
 ]

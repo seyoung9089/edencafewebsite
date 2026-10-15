@@ -29,11 +29,11 @@ function AboutPage() {
 
       <section className="mx-auto max-w-xl px-6 py-16 md:px-8">
         <div className="border-t border-eden-line py-9">
-          <div className="mb-3 font-serif text-lg font-semibold text-eden-sand">{cv('phil.label1')}</div>
+          <div className="mb-3 font-myeongjo text-lg font-bold text-eden-sand">{cv('phil.label1')}</div>
           <p className="max-w-[46ch] text-[17px] leading-relaxed">{cv('phil.text1')}</p>
         </div>
         <div className="border-t border-b border-eden-line py-9">
-          <div className="mb-3 font-serif text-lg font-semibold text-eden-sand">{cv('phil.label2')}</div>
+          <div className="mb-3 font-myeongjo text-lg font-bold text-eden-sand">{cv('phil.label2')}</div>
           <p className="max-w-[46ch] text-[17px] leading-relaxed">{cv('phil.text2')}</p>
         </div>
       </section>

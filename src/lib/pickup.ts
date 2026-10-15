@@ -1,45 +1,59 @@
-import { useEffect, useRef, useState } from 'react'
-import { useAction } from 'convex/react'
-import { api } from '@/convex/_generated/api'
-import type { PickupSlot } from '@/convex/pickupSchedule'
+import { useEffect, useState } from 'react'
 
-export type { PickupSlot }
+// Daily pickup (Korea time, UTC+9, no DST): an order placed any time on a
+// given day, up to midnight, is picked up the next day. The Supabase
+// place_order function applies the same rule and rejects a stale date, so
+// a wrong device clock can't book the wrong day.
+
+export type PickupSlot = {
+  /** Pickup date as YYYY-MM-DD (Korea calendar date) */
+  iso: string
+  /** e.g. "10월 15일(목)" */
+  todayLabel: string
+  /** e.g. "10월 16일(금)" */
+  dateLabel: string
+}
+
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000
+const DAY_MS = 24 * 60 * 60 * 1000
+const WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토']
+
+function dayLabel(d: Date): string {
+  return `${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일(${WEEKDAY_KO[d.getUTCDay()]})`
+}
+
+export function getCurrentPickupSlot(nowMs: number): PickupSlot {
+  // Shift into Korea time, then read the fields with the UTC getters.
+  const kst = new Date(nowMs + KST_OFFSET_MS)
+  const todayStart = Date.UTC(kst.getUTCFullYear(), kst.getUTCMonth(), kst.getUTCDate())
+  const today = new Date(todayStart)
+  const pickup = new Date(todayStart + DAY_MS)
+
+  return {
+    iso: pickup.toISOString().slice(0, 10),
+    todayLabel: dayLabel(today),
+    dateLabel: dayLabel(pickup),
+  }
+}
 
 /**
- * The pickup slot that a new order would fall into right now, based on the
- * SERVER's clock (so a wrong phone clock can't show the wrong day).
- * Refreshes every minute and when the tab regains focus.
- * Returns null until the first response arrives.
+ * The pickup slot that a new order would fall into right now.
+ * Refreshes every minute and when the tab regains focus, so it rolls over
+ * at midnight. Returns null until mounted (avoids an SSR/client mismatch).
  */
 export function useCurrentPickupSlot(): PickupSlot | null {
-  const fetchSlot = useAction(api.schedule.currentSlot)
-  const fetchRef = useRef(fetchSlot)
-  fetchRef.current = fetchSlot
   const [slot, setSlot] = useState<PickupSlot | null>(null)
 
   useEffect(() => {
-    let cancelled = false
-    const load = () => {
-      fetchRef
-        .current({})
-        .then((s) => {
-          if (!cancelled) setSlot(s)
-        })
-        .catch(() => {})
-    }
+    const load = () => setSlot(getCurrentPickupSlot(Date.now()))
     load()
     const timer = window.setInterval(load, 60_000)
     window.addEventListener('focus', load)
     return () => {
-      cancelled = true
       window.clearInterval(timer)
       window.removeEventListener('focus', load)
     }
   }, [])
 
   return slot
-}
-
-export function otherPickupLabel(slot: PickupSlot): string {
-  return slot.dow === 'tue' ? '목요일' : '화요일'
 }

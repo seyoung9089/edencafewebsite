@@ -90,9 +90,9 @@ export function AdminOrdersPanel() {
       {slot ? (
         <div className="mb-5 border border-eden-sand/60 bg-eden-sand/10 px-4 py-3 text-xs">
           <span className="font-semibold text-eden-sand">
-            지금 접수 중: {slot.dateLabel} {slot.label} 픽업
+            지금 접수 중: {slot.dateLabel} 픽업
           </span>
-          <span className="ml-2 text-eden-sage-dim">주문 마감 {slot.closesLabel}</span>
+          <span className="ml-2 text-eden-sage-dim">오늘 {slot.todayLabel} 자정 마감</span>
         </div>
       ) : null}
 
@@ -120,7 +120,7 @@ export function AdminOrdersPanel() {
           const waiting = g.orders.filter((o) => o.status === 'wait').length
           const prep = new Map<string, number>()
           for (const o of g.orders) for (const it of o.items) prep.set(it.name, (prep.get(it.name) ?? 0) + it.qty)
-          const isOpenNow = slot?.iso === g.iso && slot?.dow === g.dow
+          const isOpenNow = slot?.iso === g.iso
 
           return (
             <div key={g.key} className="mb-9 last:mb-0">

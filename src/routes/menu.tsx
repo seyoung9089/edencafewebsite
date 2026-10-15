@@ -27,16 +27,17 @@ type MenuItem = {
 function MenuPage() {
   const items = useQuery(api.menu.list)
   const { addItem } = useCart()
-  const [active, setActive] = useState<MenuItem | null>(null)
+  const [active, setActive] = useState<(MenuItem & { stock: number | null }) | null>(null)
   const [qty, setQty] = useState(1)
-  const [catalog, setCatalog] = useState<Map<string, { price: number; sold_out: boolean }> | null>(null)
+  const [catalog, setCatalog] = useState<Map<string, { price: number; sold_out: boolean; stock: number | null }> | null>(null)
   useEffect(() => {
-    void supabase.from('menu_catalog').select('name,price,sold_out').then(({ data }) => {
-      if (data) setCatalog(new Map(data.map(row => [row.name, { price: row.price, sold_out: row.sold_out }])))
+    // select('*') keeps working before the stock column is added.
+    void supabase.from('menu_catalog').select('*').then(({ data }) => {
+      if (data) setCatalog(new Map(data.map(row => [row.name, { price: row.price, sold_out: row.sold_out, stock: row.stock ?? null }])))
     })
   }, [])
 
-  const openModal = (item: MenuItem) => {
+  const openModal = (item: MenuItem & { stock: number | null }) => {
     setActive(item)
     setQty(1)
   }
@@ -50,7 +51,8 @@ function MenuPage() {
 
   const displayItems = items?.map(i => {
     const current = catalog?.get(i.name)
-    return { ...i, price: current?.price ?? i.price, soldOut: Boolean(i.soldOut || current?.sold_out), orderReady: !catalog || Boolean(current) }
+    const stock = current?.stock ?? null
+    return { ...i, price: current?.price ?? i.price, stock, soldOut: Boolean(i.soldOut || current?.sold_out || stock === 0), orderReady: !catalog || Boolean(current) }
   }) ?? []
   const bakery = displayItems.filter((i) => i.category === 'bakery')
   const drinks = displayItems.filter((i) => i.category === 'drink')
@@ -90,8 +92,11 @@ function MenuPage() {
                 )}
                 <h3 className="mb-1 font-serif text-base font-semibold">{item.name}</h3>
                 <p className="mb-4 min-h-[36px] text-xs text-eden-sage-dim">{item.description}</p>
-                <div className="mb-4 font-serif text-base font-semibold text-eden-sand">
-                  {item.price.toLocaleString('ko-KR')}원
+                <div className="mb-4 flex items-baseline justify-between gap-2">
+                  <span className="font-serif text-base font-semibold text-eden-sand">{item.price.toLocaleString('ko-KR')}원</span>
+                  {item.stock !== null && item.stock > 0 ? (
+                    <span className="text-xs text-eden-sage-dim">남은 수량 {item.stock}개</span>
+                  ) : null}
                 </div>
                 {item.soldOut || !item.orderReady ? (
                   <span className="block w-full rounded-full border border-eden-line py-2 text-center text-xs text-eden-sage-dim">
@@ -126,7 +131,7 @@ function MenuPage() {
             </button>
             <span className="min-w-6 text-center text-base font-semibold">{qty}</span>
             <button
-              onClick={() => setQty((q) => Math.min(20, q + 1))}
+              onClick={() => setQty((q) => Math.min(active?.stock ?? 20, 20, q + 1))}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim"
             >
               <Plus size={14} />

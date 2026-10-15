@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { useCart } from '@/lib/cart'
-import { useCurrentPickupSlot, otherPickupLabel } from '@/lib/pickup'
+import { useCurrentPickupSlot } from '@/lib/pickup'
 import { getErrorMessage } from '@/lib/errors'
 import { pageMeta } from '@/lib/seo'
 import { useState } from 'react'
@@ -87,17 +87,15 @@ function CartPage() {
                 {slot ? (
                   <div className="rounded-[10px] bg-eden-sand/15 px-4 py-3">
                     <div className="font-serif text-lg font-semibold text-eden-sand">
-                      {slot.dateLabel} {slot.label} 픽업
+                      {slot.dateLabel} 픽업
                     </div>
-                    <div className="mt-1 text-xs text-eden-sage-dim">
-                      주문 마감 {slot.closesLabel} · 마감 이후에 주문하시면 {otherPickupLabel(slot)} 픽업으로 접수돼요.
-                    </div>
+                    <div className="mt-1 text-xs text-eden-sage-dim">오늘 {slot.todayLabel} 주문</div>
                   </div>
                 ) : (
                   <div className="h-[62px] animate-pulse bg-eden-line" />
                 )}
                 <p className="mt-2.5 text-[11px] leading-relaxed text-eden-sage-dim">
-                  픽업은 화·목요일에만 가능하고, 주문하신 시간에 따라 픽업 요일이 자동으로 정해져요.
+                  오늘 자정까지 주문하시면 다음 날 픽업이에요.
                 </p>
               </div>
               <div className="mb-4 flex items-center justify-between text-base font-semibold">

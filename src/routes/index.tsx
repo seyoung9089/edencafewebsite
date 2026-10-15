@@ -53,6 +53,12 @@ const newsItems = [
   { key: 'n3' },
 ]
 
+/** 문의 → 문의하기 page; 공지·소식 → that item on the news page. */
+function NewsLink({ tag, newsKey, className, children }: { tag: string; newsKey: string; className: string; children: React.ReactNode }) {
+  if (tag.includes('문의')) return <Link to="/support" className={className}>{children}</Link>
+  return <Link to="/news" hash={`news-${newsKey}`} className={className}>{children}</Link>
+}
+
 function StructuredData({ menuItems }: { menuItems: { name: string; price: number; category: string; soldOut?: boolean }[] }) {
   // Phone number and street address are still placeholders on this site
   // (010-XXXX-XXXX / 금산군 ○○○), so they're deliberately left out here —
@@ -216,10 +222,12 @@ function HomePage() {
         </Reveal>
         <div className="max-w-3xl">
           {newsItems.map((n, i) => (
-            <Reveal key={n.key} delay={i * 80} className="flex items-center gap-6 border-t border-eden-line py-5 last:border-b">
-              <span className="rounded-full bg-eden-sand/15 px-3 py-1 text-xs font-semibold text-eden-ink">{cv(`news.${n.key}.tag`)}</span>
-              <span className="flex-1 text-[15px]">{cv(`news.${n.key}.title`)}</span>
-              <span className="text-sm text-eden-sage-dim">{cv(`news.${n.key}.date`)}</span>
+            <Reveal key={n.key} delay={i * 80} className="border-t border-eden-line last:border-b">
+              <NewsLink tag={cv(`news.${n.key}.tag`)} newsKey={n.key} className="group flex items-center gap-6 py-5">
+                <span className="rounded-full bg-eden-sand/15 px-3 py-1 text-xs font-semibold text-eden-ink">{cv(`news.${n.key}.tag`)}</span>
+                <span className="flex-1 text-[15px] group-hover:text-eden-sand">{cv(`news.${n.key}.title`)}</span>
+                <span className="text-sm text-eden-sage-dim">{cv(`news.${n.key}.date`)}</span>
+              </NewsLink>
             </Reveal>
           ))}
         </div>

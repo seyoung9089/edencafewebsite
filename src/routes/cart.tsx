@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { useCart } from '@/lib/cart'
-import { useCurrentPickupSlot, otherPickupLabel } from '@/lib/pickup'
+import { useCurrentPickupSlot } from '@/lib/pickup'
 import { getErrorMessage } from '@/lib/errors'
 import { pageMeta } from '@/lib/seo'
 import { useState } from 'react'
@@ -11,6 +11,19 @@ import { Minus, Plus, X } from 'lucide-react'
 import { useCustomerAuth } from '@/lib/customer-auth'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { OrderCompleteBody, type PlacedOrder } from '@/components/order-complete'
+import { useContentValue, useSiteContent } from '@/lib/site-content'
+
+
+/** Turns database errors from place_order into something a customer can act on. */
+function orderErrorMessage(e: unknown): string {
+  const message = getErrorMessage(e, '주문에 실패했습니다.')
+  if (message.includes('Pickup schedule changed')) return '픽업 날짜가 바뀌었어요. 새로고침한 뒤 다시 주문해주세요.'
+  if (message.includes('Unavailable menu item')) return `품절되었거나 없는 메뉴가 있어요: ${message.split(':').pop()?.trim()}`
+  if (message.includes('Login required')) return '로그인이 필요해요.'
+  return message
+}
 
 export const Route = createFileRoute('/cart')({ component: CartPage, head: () => pageMeta('/cart') })
 
@@ -20,23 +33,31 @@ function CartPage() {
   const { user, loading } = useCustomerAuth()
   const navigate = useNavigate()
   const [submitting, setSubmitting] = useState(false)
+  const [placed, setPlaced] = useState<Omit<PlacedOrder, 'pickupTime'> | null>(null)
+  const content = useSiteContent()
+  const pickupTime = useContentValue(content, 'pickup.time')
 
   const checkout = async () => {
     if (!items.length || !slot) return
     setSubmitting(true)
     try {
-      const { error } = await supabase.rpc('place_order', {
+      const { data, error } = await supabase.rpc('place_order', {
         p_items: items.map((it) => ({ name: it.name, qty: it.qty })),
         p_pickup_date: slot.iso,
       })
       if (error) throw error
+      // The server priced the order; read the saved total back for the transfer amount.
+      const id = String(data)
+      const { data: saved } = await supabase.from('orders').select('total').eq('id', id).maybeSingle()
+      setPlaced({
+        id,
+        total: saved?.total ?? totalPrice,
+        pickupLabel: slot.dateLabel,
+        items: items.map((it) => ({ name: it.name, qty: it.qty })),
+      })
       clear()
-      toast.success(
-        `${slot.dateLabel} 픽업으로 주문이 접수되었습니다. 무통장입금 계좌는 내 주문에서 확인해주세요.`,
-      )
-      navigate({ to: '/orders' })
     } catch (e) {
-      toast.error(getErrorMessage(e, '주문에 실패했습니다.'))
+      toast.error(orderErrorMessage(e))
     } finally {
       setSubmitting(false)
     }
@@ -87,17 +108,15 @@ function CartPage() {
                 {slot ? (
                   <div className="rounded-[10px] bg-eden-sand/15 px-4 py-3">
                     <div className="font-serif text-lg font-semibold text-eden-sand">
-                      {slot.dateLabel} {slot.label} 픽업
+                      {slot.dateLabel} 픽업
                     </div>
-                    <div className="mt-1 text-xs text-eden-sage-dim">
-                      주문 마감 {slot.closesLabel} · 마감 이후에 주문하시면 {otherPickupLabel(slot)} 픽업으로 접수돼요.
-                    </div>
+                    <div className="mt-1 text-xs text-eden-sage-dim">오늘 {slot.todayLabel} 주문</div>
                   </div>
                 ) : (
                   <div className="h-[62px] animate-pulse bg-eden-line" />
                 )}
                 <p className="mt-2.5 text-[11px] leading-relaxed text-eden-sage-dim">
-                  픽업은 화·목요일에만 가능하고, 주문하신 시간에 따라 픽업 요일이 자동으로 정해져요.
+                  오늘 자정까지 주문하시면 다음 날 픽업이에요.
                 </p>
               </div>
               <div className="mb-4 flex items-center justify-between text-base font-semibold">
@@ -125,6 +144,20 @@ function CartPage() {
         )}
       </section>
       <SiteFooter />
+
+      <Dialog open={!!placed} onOpenChange={(open) => !open && setPlaced(null)}>
+        <DialogContent className="max-w-[400px] rounded-card bg-eden-paper">
+          <DialogTitle className="sr-only">주문 완료</DialogTitle>
+          <DialogDescription className="sr-only">무통장 입금 안내와 픽업 정보</DialogDescription>
+          {placed ? (
+            <OrderCompleteBody
+              order={{ ...placed, pickupTime }}
+              onClose={() => setPlaced(null)}
+              onOrders={() => navigate({ to: '/orders' })}
+            />
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

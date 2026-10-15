@@ -17,12 +17,10 @@ import { MacalyBridge } from '@macaly/bridge'
 // the CSS into every HTML file).
 import '../styles.css'
 import siteMetadata from '../metadata.json'
-import AppConvexProvider from '@/components/convex-client-provider'
 import { CartProvider } from '@/lib/cart'
 import { CustomerAuthProvider } from '@/lib/customer-auth'
 import { Toaster } from '@/components/ui/sonner'
 import { BackToTop } from '@/components/back-to-top'
-import { LocalDesignMode } from '@/components/local-design-mode'
 import { designFont, initialDesignOverrides, renderDesignCss } from '@/lib/design-overrides'
 
 const rootMeta = siteMetadata['/']
@@ -42,7 +40,7 @@ export const Route = createRootRoute({
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
       {
         rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap',
+        href: 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@700&family=Gowun+Batang:wght@700&display=swap',
       },
     ],
   }),
@@ -61,14 +59,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <MacalyBridge>
         <body>
-          <AppConvexProvider>
-            <CustomerAuthProvider><CartProvider>
-              {children}
-              <BackToTop />
-              <Toaster />
-            </CartProvider></CustomerAuthProvider>
-          </AppConvexProvider>
-          <LocalDesignMode />
+          <CustomerAuthProvider><CartProvider>
+            {children}
+            <BackToTop />
+            <Toaster />
+          </CartProvider></CustomerAuthProvider>
           <Scripts />
         </body>
       </MacalyBridge>

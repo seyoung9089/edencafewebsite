@@ -1,74 +1,28 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useMutation, useQuery } from 'convex/react'
-import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { useState } from 'react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { GoogleAuthButton } from '@/components/google-auth-button'
-import { AdminContentPanel } from '@/components/admin-content-panel'
-import { AdminInquiriesPanel } from '@/components/admin-inquiries-panel'
-import { AdminMembersPanel } from '@/components/admin-members-panel'
-import { AdminMenuPanel } from '@/components/admin-menu-panel'
-import { AdminOrdersPanel } from '@/components/admin-orders-panel'
-import { getErrorMessage } from '@/lib/errors'
+import { useStaff } from '@/components/admin/use-staff'
+import { OrdersPanel } from '@/components/admin/orders-panel'
+import { InquiriesPanel } from '@/components/admin/inquiries-panel'
+import { MenuPanel } from '@/components/admin/menu-panel'
+import { ContentPanel } from '@/components/admin/content-panel'
+import { StaffPanel } from '@/components/admin/staff-panel'
+import { supabase } from '@/lib/supabase'
 import { pageMeta } from '@/lib/seo'
-import { useRef, useState } from 'react'
-import { toast } from 'sonner'
 
 export const Route = createFileRoute('/admin')({
   component: AdminPage,
   head: () => pageMeta('/admin', { noindex: true }),
 })
 
-function AdminClaimGate() {
-  const adminNow = useQuery(api.orders.isCurrentUserAdmin)
-  const claimAdmin = useMutation(api.orders.claimAdmin)
-  const [claiming, setClaiming] = useState(false)
-
-  // The login token refreshes in the background about every 90 seconds, and
-  // for a moment the admin check comes back empty. Without this, the whole
-  // dashboard was torn down and rebuilt, throwing the admin back to the first
-  // tab and wiping anything they were typing. Keep the last known answer.
-  const lastKnown = useRef<boolean | undefined>(undefined)
-  if (adminNow !== undefined) lastKnown.current = adminNow
-  const isAdmin = adminNow ?? lastKnown.current
-
-  if (isAdmin === undefined) return <p className="text-sm text-eden-sage-dim">확인하는 중…</p>
-  if (isAdmin) return <AdminDashboard />
-
-  const claim = async () => {
-    setClaiming(true)
-    try {
-      await claimAdmin({})
-      toast.success('관리자로 등록되었습니다.')
-    } catch (e) {
-      toast.error(getErrorMessage(e, '등록에 실패했습니다.'))
-    } finally {
-      setClaiming(false)
-    }
-  }
-
-  return (
-    <div className="max-w-md border border-eden-line bg-eden-paper-dim p-8">
-      <h2 className="mb-3 font-serif text-lg font-semibold">관리자 등록</h2>
-      <p className="mb-6 text-sm text-eden-sage-dim">
-        아직 등록된 관리자가 없습니다. 지금 로그인한 이 Google 계정을 이든카페의 관리자로 등록하시겠어요? (등록 후에는
-        관리자 페이지의 "회원 관리"에서 다른 계정도 관리자로 추가하거나 해제할 수 있어요.)
-      </p>
-      <button onClick={() => void claim()} disabled={claiming} className="w-full bg-eden-ink py-3 text-sm font-medium text-eden-paper disabled:opacity-50">
-        {claiming ? '등록하는 중…' : '이 계정을 관리자로 등록하기'}
-      </button>
-    </div>
-  )
-}
-
-type Tab = 'menu' | 'orders' | 'inquiries' | 'content' | 'members'
+type Tab = 'orders' | 'inquiries' | 'menu' | 'content' | 'staff'
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'orders', label: '이전 주문' },
-  { id: 'menu', label: '메뉴 관리' },
-  { id: 'inquiries', label: '이전 문의' },
-  { id: 'content', label: '콘텐츠 관리' },
-  { id: 'members', label: '회원 관리' },
+  { id: 'orders', label: '주문 · 입금' },
+  { id: 'inquiries', label: '문의' },
+  { id: 'menu', label: '메뉴' },
+  { id: 'content', label: '글귀 · 이미지' },
+  { id: 'staff', label: '관리자' },
 ]
 const TAB_STORAGE_KEY = 'edenAdminTab'
 
@@ -82,8 +36,7 @@ function readSavedTab(): Tab {
   return 'orders'
 }
 
-function AdminDashboard() {
-  // Also remembered for the browser session as a second safety net.
+function AdminDashboard({ userId }: { userId: string }) {
   const [tab, setTabState] = useState<Tab>(readSavedTab)
   const setTab = (t: Tab) => {
     setTabState(t)
@@ -95,29 +48,29 @@ function AdminDashboard() {
   }
 
   return (
-    <div className="grid grid-cols-1 border border-eden-line md:grid-cols-[210px_1fr]">
-      <div className="bg-eden-ink-2 p-5">
+    <div className="grid grid-cols-1 overflow-hidden rounded-card shadow-soft md:grid-cols-[200px_1fr]">
+      <nav className="flex gap-1 overflow-x-auto bg-eden-ink-2 p-3 md:block md:space-y-1 md:p-4">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`block w-full px-4 py-3 text-left text-sm ${tab === t.id ? 'bg-eden-sand/15 text-eden-sand' : 'text-[rgba(237,236,227,0.68)]'}`}
+            className={`block shrink-0 rounded-[10px] px-4 py-3 text-left text-sm md:w-full ${tab === t.id ? 'bg-eden-sand/15 text-eden-sand' : 'text-[rgba(237,236,227,0.68)] hover:text-eden-paper'}`}
           >
             {t.label}
           </button>
         ))}
-      </div>
-      <div className="bg-eden-paper-dim p-8">
+      </nav>
+      <div className="min-w-0 bg-eden-paper-dim p-5 md:p-8">
         {tab === 'orders' ? (
-          <AdminOrdersPanel />
-        ) : tab === 'menu' ? (
-          <AdminMenuPanel />
+          <OrdersPanel />
         ) : tab === 'inquiries' ? (
-          <AdminInquiriesPanel />
+          <InquiriesPanel />
+        ) : tab === 'menu' ? (
+          <MenuPanel />
         ) : tab === 'content' ? (
-          <AdminContentPanel />
+          <ContentPanel />
         ) : (
-          <AdminMembersPanel />
+          <StaffPanel currentUserId={userId} />
         )}
       </div>
     </div>
@@ -125,26 +78,35 @@ function AdminDashboard() {
 }
 
 function AdminPage() {
+  const { user, loading, isStaff } = useStaff()
+
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
       <section className="px-6 pb-24 pt-14 md:px-8">
         <h1 className="mb-3 font-serif text-3xl font-semibold">관리자 페이지</h1>
-        <p className="mb-10 text-[15px] text-eden-sage-dim">메뉴 · 주문 · 콘텐츠 · 회원을 관리자가 직접 관리합니다.</p>
-        <Link to="/customer-management" className="mb-8 inline-block bg-eden-ink px-5 py-3 text-sm text-eden-paper">이메일 고객 주문 · 입금 · 문의 관리 →</Link>
+        <p className="mb-10 text-[15px] text-eden-sage-dim">주문 · 문의 · 메뉴 · 글귀 · 관리자를 한곳에서 관리해요.</p>
 
-        <AuthLoading>
-          <div className="h-24 w-full max-w-3xl animate-pulse bg-eden-line" />
-        </AuthLoading>
-        <Unauthenticated>
+        {loading ? (
+          <div className="h-24 w-full max-w-3xl animate-pulse rounded-card bg-eden-line" />
+        ) : !user ? (
           <div className="max-w-sm">
             <p className="mb-4 text-sm text-eden-sage-dim">관리자 계정으로 로그인해주세요.</p>
-            <GoogleAuthButton className="w-full" />
+            <Link to="/login" className="inline-block rounded-full bg-eden-ink px-7 py-3 text-sm font-semibold text-eden-paper hover:bg-eden-ink-2">
+              로그인
+            </Link>
           </div>
-        </Unauthenticated>
-        <Authenticated>
-          <AdminClaimGate />
-        </Authenticated>
+        ) : !isStaff ? (
+          <div className="max-w-md rounded-card bg-eden-paper-dim p-6 shadow-soft">
+            <p className="mb-2">{user.email} 계정에는 관리자 권한이 없어요.</p>
+            <p className="mb-4 text-sm text-eden-sage-dim">기존 관리자에게 관리자 페이지 → 관리자 탭에서 이 이메일을 추가해달라고 요청해주세요.</p>
+            <button type="button" onClick={() => void supabase.auth.signOut()} className="text-sm underline">
+              다른 계정으로 로그인
+            </button>
+          </div>
+        ) : (
+          <AdminDashboard userId={user.id} />
+        )}
       </section>
       <SiteFooter />
     </div>

@@ -1,40 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { PickupNotice } from '@/components/pickup-notice'
 import { useCart } from '@/lib/cart'
 import { pageMeta } from '@/lib/seo'
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useState } from 'react'
+import { useMenu, isSoldOut, type MenuItem } from '@/lib/menu'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Minus, Plus, Croissant, Coffee } from 'lucide-react'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/menu')({ component: MenuPage, head: () => pageMeta('/menu') })
 
-type MenuItem = {
-  _id: string
-  category: 'bakery' | 'drink'
-  name: string
-  description: string
-  price: number
-  soldOut?: boolean
-  imageUrl: string | null
-}
-
 function MenuPage() {
-  const items = useQuery(api.menu.list)
+  const { items } = useMenu()
   const { addItem } = useCart()
   const [active, setActive] = useState<MenuItem | null>(null)
   const [qty, setQty] = useState(1)
-  const [catalog, setCatalog] = useState<Map<string, { price: number; sold_out: boolean }> | null>(null)
-  useEffect(() => {
-    void supabase.from('menu_catalog').select('name,price,sold_out').then(({ data }) => {
-      if (data) setCatalog(new Map(data.map(row => [row.name, { price: row.price, sold_out: row.sold_out }])))
-    })
-  }, [])
 
   const openModal = (item: MenuItem) => {
     setActive(item)
@@ -48,12 +30,8 @@ function MenuPage() {
     setActive(null)
   }
 
-  const displayItems = items?.map(i => {
-    const current = catalog?.get(i.name)
-    return { ...i, price: current?.price ?? i.price, soldOut: Boolean(i.soldOut || current?.sold_out), orderReady: !catalog || Boolean(current) }
-  }) ?? []
-  const bakery = displayItems.filter((i) => i.category === 'bakery')
-  const drinks = displayItems.filter((i) => i.category === 'drink')
+  const bakery = items?.filter((i) => i.category === 'bakery') ?? []
+  const drinks = items?.filter((i) => i.category === 'drink') ?? []
 
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
@@ -77,10 +55,10 @@ function MenuPage() {
           ) : null}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {group.list.map((item) => (
-              <div key={item._id} className="rounded-card bg-eden-paper-dim shadow-soft p-6 hover:-translate-y-1 hover:shadow-lift">
-                {item.imageUrl ? (
+              <div key={item.name} className="rounded-card bg-eden-paper-dim shadow-soft p-6 hover:-translate-y-1 hover:shadow-lift">
+                {item.image_url ? (
                   <img
-                    src={item.imageUrl}
+                    src={item.image_url}
                     alt={item.name}
                     className="mb-4 aspect-[4/3] w-full rounded-[10px] object-cover"
                     loading="lazy"
@@ -90,12 +68,15 @@ function MenuPage() {
                 )}
                 <h3 className="mb-1 font-serif text-base font-semibold">{item.name}</h3>
                 <p className="mb-4 min-h-[36px] text-xs text-eden-sage-dim">{item.description}</p>
-                <div className="mb-4 font-serif text-base font-semibold text-eden-sand">
-                  {item.price.toLocaleString('ko-KR')}원
+                <div className="mb-4 flex items-baseline justify-between gap-2">
+                  <span className="font-serif text-base font-semibold text-eden-sand">{item.price.toLocaleString('ko-KR')}원</span>
+                  {item.stock !== null && item.stock > 0 ? (
+                    <span className="text-xs text-eden-sage-dim">남은 수량 {item.stock}개</span>
+                  ) : null}
                 </div>
-                {item.soldOut || !item.orderReady ? (
+                {isSoldOut(item) ? (
                   <span className="block w-full rounded-full border border-eden-line py-2 text-center text-xs text-eden-sage-dim">
-                    {item.soldOut ? '품절' : '주문 준비 중'}
+                    품절
                   </span>
                 ) : (
                   <button
@@ -126,7 +107,7 @@ function MenuPage() {
             </button>
             <span className="min-w-6 text-center text-base font-semibold">{qty}</span>
             <button
-              onClick={() => setQty((q) => Math.min(20, q + 1))}
+              onClick={() => setQty((q) => Math.min(active?.stock ?? 20, 20, q + 1))}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim"
             >
               <Plus size={14} />

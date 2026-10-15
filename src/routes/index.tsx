@@ -1,13 +1,10 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useQuery } from 'convex/react'
-import { ConvexHttpClient } from 'convex/browser'
-import { CONVEX_URL } from '@/lib/convex-url'
-import { api } from '@/convex/_generated/api'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { HeroSection } from '@/components/hero-section'
 import { Reveal } from '@/components/reveal'
-import { useSiteContent, useContentValue } from '@/lib/site-content'
+import { useSiteContent, useContentValue, useContentImage } from '@/lib/site-content'
+import { fetchMenu, isSoldOut } from '@/lib/menu'
 import { pageMeta } from '@/lib/seo'
 import { Leaf, MessageCircle, Tag, Sunrise, MapPin } from 'lucide-react'
 
@@ -21,11 +18,8 @@ export const Route = createFileRoute('/')({
   head: () => pageMeta('/'),
   loader: async () => {
     try {
-      const url = CONVEX_URL
-      if (!url) return { menuItems: [] as { name: string; price: number; category: string; soldOut?: boolean }[] }
-      const client = new ConvexHttpClient(url)
-      const items = await client.query(api.menu.list, {})
-      return { menuItems: items.map((i) => ({ name: i.name, price: i.price, category: i.category, soldOut: i.soldOut })) }
+      const items = await fetchMenu()
+      return { menuItems: items.map((i) => ({ name: i.name, price: i.price, category: i.category, soldOut: isSoldOut(i) })) }
     } catch {
       return { menuItems: [] as { name: string; price: number; category: string; soldOut?: boolean }[] }
     }
@@ -53,6 +47,12 @@ const newsItems = [
   { key: 'n3' },
 ]
 
+/** 문의 → 문의하기 page; 공지·소식 → that item's own page. */
+function NewsLink({ tag, newsKey, className, children }: { tag: string; newsKey: string; className: string; children: React.ReactNode }) {
+  if (tag.includes('문의')) return <Link to="/support" className={className}>{children}</Link>
+  return <Link to="/news/$id" params={{ id: newsKey }} className={className}>{children}</Link>
+}
+
 function StructuredData({ menuItems }: { menuItems: { name: string; price: number; category: string; soldOut?: boolean }[] }) {
   // Phone number and street address are still placeholders on this site
   // (010-XXXX-XXXX / 금산군 ○○○), so they're deliberately left out here —
@@ -64,7 +64,7 @@ function StructuredData({ menuItems }: { menuItems: { name: string; price: numbe
     name: '이든카페',
     alternateName: 'Eden Cafe',
     description:
-      '별무리고등학교에서 시작된 학생 협동조합 카페. 화요일과 목요일에만 픽업을 운영합니다.',
+      '별무리고등학교에서 시작된 학생 협동조합 카페. 오늘 주문하면 다음 날 픽업할 수 있습니다.',
     areaServed: '충청남도 금산군',
     foundingDate: '2021',
     hasMenu: {
@@ -94,8 +94,8 @@ function HomePage() {
   const { menuItems } = Route.useLoaderData()
   const content = useSiteContent()
   const cv = (key: string) => useContentValue(content, key)
-  const locationPhoto = useQuery(api.siteContent.getImage, { key: 'location.photo' })
-  const historyPhoto = useQuery(api.siteContent.getImage, { key: 'history.photo' })
+  const locationPhoto = useContentImage('location.photo')
+  const historyPhoto = useContentImage('history.photo')
 
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
@@ -106,11 +106,11 @@ function HomePage() {
       {/* Philosophy */}
       <section id="about" className="mx-auto max-w-xl px-6 py-24 md:px-8">
         <Reveal className="border-t border-eden-line py-9">
-          <div className="mb-3 font-serif text-lg font-semibold text-eden-sand">{cv('phil.label1')}</div>
+          <div className="mb-3 font-myeongjo text-lg font-bold text-eden-sand">{cv('phil.label1')}</div>
           <p className="max-w-[46ch] text-[17px] leading-relaxed">{cv('phil.text1')}</p>
         </Reveal>
         <Reveal delay={100} className="border-t border-b border-eden-line py-9">
-          <div className="mb-3 font-serif text-lg font-semibold text-eden-sand">{cv('phil.label2')}</div>
+          <div className="mb-3 font-myeongjo text-lg font-bold text-eden-sand">{cv('phil.label2')}</div>
           <p className="max-w-[46ch] text-[17px] leading-relaxed">{cv('phil.text2')}</p>
         </Reveal>
       </section>
@@ -216,10 +216,12 @@ function HomePage() {
         </Reveal>
         <div className="max-w-3xl">
           {newsItems.map((n, i) => (
-            <Reveal key={n.key} delay={i * 80} className="flex items-center gap-6 border-t border-eden-line py-5 last:border-b">
-              <span className="rounded-full bg-eden-sand/15 px-3 py-1 text-xs font-semibold text-eden-ink">{cv(`news.${n.key}.tag`)}</span>
-              <span className="flex-1 text-[15px]">{cv(`news.${n.key}.title`)}</span>
-              <span className="text-sm text-eden-sage-dim">{cv(`news.${n.key}.date`)}</span>
+            <Reveal key={n.key} delay={i * 80} className="border-t border-eden-line last:border-b">
+              <NewsLink tag={cv(`news.${n.key}.tag`)} newsKey={n.key} className="group flex items-center gap-6 py-5">
+                <span className="rounded-full bg-eden-sand/15 px-3 py-1 text-xs font-semibold text-eden-ink">{cv(`news.${n.key}.tag`)}</span>
+                <span className="flex-1 text-[15px] group-hover:text-eden-sand">{cv(`news.${n.key}.title`)}</span>
+                <span className="text-sm text-eden-sage-dim">{cv(`news.${n.key}.date`)}</span>
+              </NewsLink>
             </Reveal>
           ))}
         </div>

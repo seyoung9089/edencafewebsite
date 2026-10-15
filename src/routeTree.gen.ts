@@ -21,8 +21,7 @@ import { Route as NewsRouteImport } from './routes/news'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SupportRouteImport } from './routes/support'
-import { Route as AuthGoogleCallbackRouteImport } from './routes/auth/google/callback'
-import { Route as AuthGooglePopupRouteImport } from './routes/auth/google/popup'
+import { Route as NewsIdRouteImport } from './routes/news_.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -84,14 +83,9 @@ const SupportRoute = SupportRouteImport.update({
   path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthGoogleCallbackRoute = AuthGoogleCallbackRouteImport.update({
-  id: '/auth/google/callback',
-  path: '/auth/google/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthGooglePopupRoute = AuthGooglePopupRouteImport.update({
-  id: '/auth/google/popup',
-  path: '/auth/google/popup',
+const NewsIdRoute = NewsIdRouteImport.update({
+  id: '/news_/$id',
+  path: '/news/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -108,8 +102,7 @@ export interface FileRoutesByFullPath {
   '/orders': typeof OrdersRoute
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
-  '/auth/google/callback': typeof AuthGoogleCallbackRoute
-  '/auth/google/popup': typeof AuthGooglePopupRoute
+  '/news/$id': typeof NewsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -124,8 +117,7 @@ export interface FileRoutesByTo {
   '/orders': typeof OrdersRoute
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
-  '/auth/google/callback': typeof AuthGoogleCallbackRoute
-  '/auth/google/popup': typeof AuthGooglePopupRoute
+  '/news/$id': typeof NewsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -141,8 +133,7 @@ export interface FileRoutesById {
   '/orders': typeof OrdersRoute
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
-  '/auth/google/callback': typeof AuthGoogleCallbackRoute
-  '/auth/google/popup': typeof AuthGooglePopupRoute
+  '/news_/$id': typeof NewsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -159,8 +150,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/reset-password'
     | '/support'
-    | '/auth/google/callback'
-    | '/auth/google/popup'
+    | '/news/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -175,8 +165,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/reset-password'
     | '/support'
-    | '/auth/google/callback'
-    | '/auth/google/popup'
+    | '/news/$id'
   id:
     | '__root__'
     | '/'
@@ -191,8 +180,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/reset-password'
     | '/support'
-    | '/auth/google/callback'
-    | '/auth/google/popup'
+    | '/news_/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -208,8 +196,7 @@ export interface RootRouteChildren {
   OrdersRoute: typeof OrdersRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SupportRoute: typeof SupportRoute
-  AuthGoogleCallbackRoute: typeof AuthGoogleCallbackRoute
-  AuthGooglePopupRoute: typeof AuthGooglePopupRoute
+  NewsIdRoute: typeof NewsIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -298,18 +285,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/google/callback': {
-      id: '/auth/google/callback'
-      path: '/auth/google/callback'
-      fullPath: '/auth/google/callback'
-      preLoaderRoute: typeof AuthGoogleCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth/google/popup': {
-      id: '/auth/google/popup'
-      path: '/auth/google/popup'
-      fullPath: '/auth/google/popup'
-      preLoaderRoute: typeof AuthGooglePopupRouteImport
+    '/news_/$id': {
+      id: '/news_/$id'
+      path: '/news/$id'
+      fullPath: '/news/$id'
+      preLoaderRoute: typeof NewsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -328,8 +308,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrdersRoute: OrdersRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SupportRoute: SupportRoute,
-  AuthGoogleCallbackRoute: AuthGoogleCallbackRoute,
-  AuthGooglePopupRoute: AuthGooglePopupRoute,
+  NewsIdRoute: NewsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -46,7 +46,7 @@ export function SiteHeader() {
       }`}
     >
       <div className="mx-auto flex h-[78px] max-w-6xl items-center justify-between px-6 md:px-8">
-        <Link to="/" className="flex items-baseline gap-2 font-serif text-xl font-bold text-eden-ink" onClick={() => setMobileOpen(false)}>
+        <Link to="/" className="flex items-baseline gap-2 font-logo text-xl font-bold text-eden-ink" onClick={() => setMobileOpen(false)}>
           이든카페
           <span className="font-sans text-[10px] font-normal tracking-[0.16em] text-eden-sage-dim">EDEN CAFE</span>
         </Link>

@@ -5,6 +5,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { useCustomerAuth } from '@/lib/customer-auth'
 import { supabase } from '@/lib/supabase'
 import { pageMeta } from '@/lib/seo'
+import { PaymentInfo } from '@/components/payment-info'
 
 export const Route = createFileRoute('/orders')({ component: OrdersPage, head: () => pageMeta('/orders') })
 type Order = { id: string; items: { name: string; price: number; qty: number }[]; total: number; status: string; pickup_date: string; created_at: string }
@@ -33,7 +34,7 @@ function OrdersPage() {
         <p className="mb-2 text-sm text-eden-sage-dim">픽업 {order.pickup_date} · 주문 {new Date(order.created_at).toLocaleString('ko-KR')}</p>
         {order.items.map((item, index) => <p key={index} className="text-sm">{item.name} × {item.qty} · {(item.price * item.qty).toLocaleString('ko-KR')}원</p>)}
         <p className="mt-3 font-semibold">합계 {order.total.toLocaleString('ko-KR')}원</p>
-        {order.status === 'wait' && <div className="mt-3 rounded-[10px] bg-eden-sage-dim px-4 py-3 text-xs leading-relaxed text-eden-paper">새마을금고 000-0000-0000-00<br />예금주: 이든협동조합<br />입금금액: {order.total.toLocaleString('ko-KR')}원 (주문 후 30분 이내)</div>}
+        {order.status === 'wait' && <PaymentInfo total={order.total} className="mt-3" />}
       </article>)}
     </>}
   </main><SiteFooter /></div>

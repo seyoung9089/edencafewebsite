@@ -1,8 +1,40 @@
-import { useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { useEffect, useReducer } from 'react'
+import { supabase } from '@/lib/supabase'
+
+// Site text and image links live in the Supabase `site_content` table
+// (key -> value). Loaded once per page visit and shared by every component;
+// the admin page calls refreshSiteContent() after saving.
+let cache: Record<string, string> | undefined
+let inflight: Promise<void> | null = null
+const listeners = new Set<() => void>()
+
+async function load() {
+  const { data, error } = await supabase.from('site_content').select('key,value')
+  // On error (e.g. table not created yet) fall back to the built-in defaults.
+  cache = !error && data ? Object.fromEntries(data.map((row) => [row.key, row.value])) : (cache ?? {})
+  listeners.forEach((notify) => notify())
+}
+
+export function refreshSiteContent(): Promise<void> {
+  inflight = load()
+  return inflight
+}
 
 export function useSiteContent(): Record<string, string> | undefined {
-  return useQuery(api.siteContent.getAll)
+  const [, rerender] = useReducer((n: number) => n + 1, 0)
+  useEffect(() => {
+    listeners.add(rerender)
+    if (!inflight) void refreshSiteContent()
+    return () => {
+      listeners.delete(rerender)
+    }
+  }, [])
+  return cache
+}
+
+/** Public URL of an admin-uploaded site image (e.g. 'hero.photo'), or null. */
+export function useContentImage(key: string): string | null {
+  return useSiteContent()?.[key] || null
 }
 
 export type ContentFieldType = 'input' | 'textarea'
@@ -54,21 +86,33 @@ export const CONTENT_SCHEMA: ContentField[] = [
   { group: '새소식', key: 'news.n1.tag', label: '공지1 태그', type: 'input', default: '공지' },
   { group: '새소식', key: 'news.n1.title', label: '공지1 제목', type: 'input', default: '추석 연휴 픽업 운영 안내' },
   { group: '새소식', key: 'news.n1.date', label: '공지1 날짜', type: 'input', default: '2026.09.10' },
+  { group: '새소식', key: 'news.n1.body', label: '공지1 내용', type: 'textarea', default: '' },
   { group: '새소식', key: 'news.n2.tag', label: '공지2 태그', type: 'input', default: '소식' },
   { group: '새소식', key: 'news.n2.title', label: '공지2 제목', type: 'input', default: '가을 신메뉴 출시 안내' },
   { group: '새소식', key: 'news.n2.date', label: '공지2 날짜', type: 'input', default: '2026.09.02' },
+  { group: '새소식', key: 'news.n2.body', label: '공지2 내용', type: 'textarea', default: '' },
   { group: '새소식', key: 'news.n3.tag', label: '공지3 태그', type: 'input', default: '소식' },
   { group: '새소식', key: 'news.n3.title', label: '공지3 제목', type: 'input', default: '베이커리실 이전 완료 안내' },
   { group: '새소식', key: 'news.n3.date', label: '공지3 날짜', type: 'input', default: '2026.08.20' },
+  { group: '새소식', key: 'news.n3.body', label: '공지3 내용', type: 'textarea', default: '' },
   { group: '새소식', key: 'news.n4.tag', label: '공지4 태그 (전체페이지 전용)', type: 'input', default: '소식' },
   { group: '새소식', key: 'news.n4.title', label: '공지4 제목 (전체페이지 전용)', type: 'input', default: '여름 시즌 메뉴 안내' },
   { group: '새소식', key: 'news.n4.date', label: '공지4 날짜', type: 'input', default: '2026.06.15' },
+  { group: '새소식', key: 'news.n4.body', label: '공지4 내용', type: 'textarea', default: '' },
   { group: '새소식', key: 'news.n5.tag', label: '공지5 태그 (전체페이지 전용)', type: 'input', default: '공지' },
   { group: '새소식', key: 'news.n5.title', label: '공지5 제목 (전체페이지 전용)', type: 'input', default: '정기 휴무일 변경 안내' },
   { group: '새소식', key: 'news.n5.date', label: '공지5 날짜', type: 'input', default: '2026.05.02' },
+  { group: '새소식', key: 'news.n5.body', label: '공지5 내용', type: 'textarea', default: '' },
   { group: '새소식', key: 'news.n6.tag', label: '공지6 태그 (전체페이지 전용)', type: 'input', default: '소식' },
   { group: '새소식', key: 'news.n6.title', label: '공지6 제목 (전체페이지 전용)', type: 'input', default: '이든 협동조합 정기총회 안내' },
   { group: '새소식', key: 'news.n6.date', label: '공지6 날짜', type: 'input', default: '2026.03.20' },
+  { group: '새소식', key: 'news.n6.body', label: '공지6 내용', type: 'textarea', default: '' },
+
+  { group: '입금 계좌', key: 'pickup.time', label: '픽업 시간 (주문 완료 창에 표시)', type: 'input', default: '09:00 – 18:00' },
+  { group: '입금 계좌', key: 'payment.bank', label: '은행', type: 'input', default: '새마을금고' },
+  { group: '입금 계좌', key: 'payment.account', label: '계좌번호', type: 'input', default: '000-0000-0000-00' },
+  { group: '입금 계좌', key: 'payment.holder', label: '예금주', type: 'input', default: '이든협동조합' },
+  { group: '입금 계좌', key: 'payment.note', label: '입금 안내', type: 'input', default: '주문 후 30분 이내에 입금해주세요.' },
 
   { group: '푸터 · 기타', key: 'footer.blurb', label: '푸터 소개문', type: 'textarea', default: '학생들의 작은 시작이 협동조합으로 자란 카페. 정직한 재료와 편안한 쉼을 나눕니다.' },
   { group: '푸터 · 기타', key: 'cta.title', label: '하단 CTA 제목', type: 'input', default: '이든에서 오늘의 첫 잔을 시작하세요' },

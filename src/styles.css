@@ -87,11 +87,13 @@
 }
 
 @theme inline {
-  /* Montserrat draws the Latin letters and numbers; Korean falls through
-     to Noto Sans KR. "font-serif" is kept as the class name for headings
-     across the site, but now points at the same display pairing. */
+  /* Headings ("font-serif" and h1–h3): Montserrat draws the Latin letters
+     and numbers; Korean falls through to Noto Sans KR. Everything else
+     (body text, buttons, labels, inputs) uses Gowun Dodum. */
   --font-serif: 'Montserrat', 'Noto Sans KR', sans-serif;
-  --font-sans: 'Montserrat', 'Noto Sans KR', sans-serif;
+  --font-sans: 'Gowun Dodum', 'Noto Sans KR', sans-serif;
+  --font-myeongjo: 'Nanum Myeongjo', 'Noto Serif KR', serif;
+  --font-logo: 'Gowun Batang', 'Noto Serif KR', serif;
 
   /* Soft, rounded surface language (radius 10–15px, pill buttons,
      diffuse shadows instead of hard borders). */
@@ -205,6 +207,10 @@ body vite-error-overlay {
     transform: translateY(28px);
     transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: opacity, transform;
+  }
+  /* Scrolled past: wait above, so scrolling back up slides it down into place. */
+  .reveal.is-above {
+    transform: translateY(-28px);
   }
   .reveal.is-visible {
     opacity: 1;

@@ -1,9 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { useSiteContent, useContentValue } from '@/lib/site-content'
+import { useSiteContent, useContentValue, useContentImage } from '@/lib/site-content'
 import { pageMeta } from '@/lib/seo'
 
 export const Route = createFileRoute('/history')({ component: HistoryPage, head: () => pageMeta('/history') })
@@ -19,7 +17,7 @@ const historyMeta = [
 function HistoryPage() {
   const content = useSiteContent()
   const cv = (key: string) => useContentValue(content, key)
-  const historyPhoto = useQuery(api.siteContent.getImage, { key: 'history.photo' })
+  const historyPhoto = useContentImage('history.photo')
 
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">

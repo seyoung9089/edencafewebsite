@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { useContentImage } from '@/lib/site-content'
 import { useRef } from 'react'
 
 const heroLines = [
@@ -37,8 +36,8 @@ function WaveBackground() {
 }
 
 export function HeroSection() {
-  const heroImage = useQuery(api.siteContent.getImage, { key: 'hero.photo' })
-  const bgPhoto = useQuery(api.siteContent.getImage, { key: 'hero.bgPhoto' })
+  const heroImage = useContentImage('hero.photo')
+  const bgPhoto = useContentImage('hero.bgPhoto')
   const sectionRef = useRef<HTMLElement | null>(null)
   const frameRef = useRef<number | null>(null)
 

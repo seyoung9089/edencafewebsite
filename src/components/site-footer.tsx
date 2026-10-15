@@ -6,7 +6,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-6 md:px-8">
         <div className="grid grid-cols-1 gap-10 border-b border-[rgba(126,153,134,0.2)] pb-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <span className="flex items-baseline gap-2 font-serif text-xl font-semibold text-eden-paper">
+            <span className="flex items-baseline gap-2 font-logo text-xl font-bold text-eden-paper">
               이든카페
               <span className="font-sans text-[10px] font-normal tracking-[0.16em] text-eden-sage">EDEN CAFE</span>
             </span>

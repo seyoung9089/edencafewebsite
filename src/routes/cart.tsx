@@ -12,11 +12,9 @@ import { useCustomerAuth } from '@/lib/customer-auth'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
-import { OrderCompleteBody, type PlacedOrder, type OrderCompleteVariant } from '@/components/order-complete'
+import { OrderCompleteBody, type PlacedOrder } from '@/components/order-complete'
 import { useContentValue, useSiteContent } from '@/lib/site-content'
 
-// Which order-complete design the cart uses (see /order-complete-preview).
-const ORDER_COMPLETE_VARIANT: OrderCompleteVariant = 'current'
 
 /** Turns database errors from place_order into something a customer can act on. */
 function orderErrorMessage(e: unknown): string {
@@ -153,7 +151,6 @@ function CartPage() {
           <DialogDescription className="sr-only">무통장 입금 안내와 픽업 정보</DialogDescription>
           {placed ? (
             <OrderCompleteBody
-              variant={ORDER_COMPLETE_VARIANT}
               order={{ ...placed, pickupTime }}
               onClose={() => setPlaced(null)}
               onOrders={() => navigate({ to: '/orders' })}

@@ -16,7 +16,6 @@ import { Route as CartRouteImport } from './routes/cart'
 import { Route as CustomerManagementRouteImport } from './routes/customer-management'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as LogoPreviewRouteImport } from './routes/logo-preview'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as OrdersRouteImport } from './routes/orders'
@@ -59,11 +58,6 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LogoPreviewRoute = LogoPreviewRouteImport.update({
-  id: '/logo-preview',
-  path: '/logo-preview',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const MenuRoute = MenuRouteImport.update({
   id: '/menu',
   path: '/menu',
@@ -103,7 +97,6 @@ export interface FileRoutesByFullPath {
   '/customer-management': typeof CustomerManagementRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
-  '/logo-preview': typeof LogoPreviewRoute
   '/menu': typeof MenuRoute
   '/news': typeof NewsRoute
   '/orders': typeof OrdersRoute
@@ -119,7 +112,6 @@ export interface FileRoutesByTo {
   '/customer-management': typeof CustomerManagementRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
-  '/logo-preview': typeof LogoPreviewRoute
   '/menu': typeof MenuRoute
   '/news': typeof NewsRoute
   '/orders': typeof OrdersRoute
@@ -136,7 +128,6 @@ export interface FileRoutesById {
   '/customer-management': typeof CustomerManagementRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
-  '/logo-preview': typeof LogoPreviewRoute
   '/menu': typeof MenuRoute
   '/news': typeof NewsRoute
   '/orders': typeof OrdersRoute
@@ -154,7 +145,6 @@ export interface FileRouteTypes {
     | '/customer-management'
     | '/history'
     | '/login'
-    | '/logo-preview'
     | '/menu'
     | '/news'
     | '/orders'
@@ -170,7 +160,6 @@ export interface FileRouteTypes {
     | '/customer-management'
     | '/history'
     | '/login'
-    | '/logo-preview'
     | '/menu'
     | '/news'
     | '/orders'
@@ -186,7 +175,6 @@ export interface FileRouteTypes {
     | '/customer-management'
     | '/history'
     | '/login'
-    | '/logo-preview'
     | '/menu'
     | '/news'
     | '/orders'
@@ -203,7 +191,6 @@ export interface RootRouteChildren {
   CustomerManagementRoute: typeof CustomerManagementRoute
   HistoryRoute: typeof HistoryRoute
   LoginRoute: typeof LoginRoute
-  LogoPreviewRoute: typeof LogoPreviewRoute
   MenuRoute: typeof MenuRoute
   NewsRoute: typeof NewsRoute
   OrdersRoute: typeof OrdersRoute
@@ -263,13 +250,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/logo-preview': {
-      id: '/logo-preview'
-      path: '/logo-preview'
-      fullPath: '/logo-preview'
-      preLoaderRoute: typeof LogoPreviewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/menu': {
       id: '/menu'
       path: '/menu'
@@ -323,7 +303,6 @@ const rootRouteChildren: RootRouteChildren = {
   CustomerManagementRoute: CustomerManagementRoute,
   HistoryRoute: HistoryRoute,
   LoginRoute: LoginRoute,
-  LogoPreviewRoute: LogoPreviewRoute,
   MenuRoute: MenuRoute,
   NewsRoute: NewsRoute,
   OrdersRoute: OrdersRoute,

@@ -28,7 +28,7 @@ export function MenuPanel() {
   return (
     <div>
       <p className="mb-6 text-sm text-eden-sage-dim">
-        여기서 바꾼 내용이 메뉴 화면과 주문에 바로 반영돼요. 수량을 비워두면 제한 없이 주문받고, 숫자를 넣으면 주문될 때마다 줄어들어 0개가 되면 자동으로 품절이 돼요.
+        베이커리만 온라인 픽업 주문을 받습니다. 음료는 메뉴에 표시되지만 장바구니에 담을 수 없어요. 베이커리 수량을 비워두면 제한 없이 주문받고, 숫자를 넣으면 주문될 때마다 줄어들어 0개가 되면 자동으로 품절이 돼요.
       </p>
       {(['bakery', 'drink'] as const).map((category) => (
         <section key={category} className="mb-10">

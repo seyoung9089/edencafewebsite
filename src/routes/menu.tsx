@@ -19,12 +19,13 @@ function MenuPage() {
   const [qty, setQty] = useState(1)
 
   const openModal = (item: MenuItem) => {
+    if (item.category !== 'bakery') return
     setActive(item)
     setQty(1)
   }
 
   const confirmAdd = () => {
-    if (!active) return
+    if (!active || active.category !== 'bakery') return
     addItem({ name: active.name, price: active.price, qty })
     toast.success(`${active.name} ${qty}개를 장바구니에 담았습니다.`)
     setActive(null)
@@ -74,7 +75,11 @@ function MenuPage() {
                     <span className="text-xs text-eden-sage-dim">남은 수량 {item.stock}개</span>
                   ) : null}
                 </div>
-                {isSoldOut(item) ? (
+                {item.category === 'drink' ? (
+                  <span className="block w-full rounded-full border border-eden-line py-2 text-center text-xs text-eden-sage-dim">
+                    매장에서만 주문 가능
+                  </span>
+                ) : isSoldOut(item) ? (
                   <span className="block w-full rounded-full border border-eden-line py-2 text-center text-xs text-eden-sage-dim">
                     품절
                   </span>

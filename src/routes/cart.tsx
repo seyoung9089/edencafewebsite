@@ -6,7 +6,7 @@ import { useCart } from '@/lib/cart'
 import { useCurrentPickupSlot } from '@/lib/pickup'
 import { getErrorMessage } from '@/lib/errors'
 import { pageMeta } from '@/lib/seo'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Minus, Plus, X } from 'lucide-react'
 import { useCustomerAuth } from '@/lib/customer-auth'
 import { supabase } from '@/lib/supabase'
@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { OrderCompleteBody, type PlacedOrder } from '@/components/order-complete'
 import { useContentValue, useSiteContent } from '@/lib/site-content'
+import { useMenu } from '@/lib/menu'
 
 
 /** Turns database errors from place_order into something a customer can act on. */
@@ -36,9 +37,21 @@ function CartPage() {
   const [placed, setPlaced] = useState<Omit<PlacedOrder, 'pickupTime'> | null>(null)
   const content = useSiteContent()
   const pickupTime = useContentValue(content, 'pickup.time')
+  const { items: menuItems, error: menuError } = useMenu()
+
+  useEffect(() => {
+    if (!menuItems || menuError) return
+    const drinks = new Set(menuItems.filter((item) => item.category === 'drink').map((item) => item.name))
+    for (const item of items) if (drinks.has(item.name)) removeItem(item.name)
+  }, [menuItems, menuError, items])
 
   const checkout = async () => {
-    if (!items.length || !slot) return
+    if (!items.length || !slot || !menuItems || menuError) return
+    const orderable = new Set(menuItems.filter((item) => item.category === 'bakery').map((item) => item.name))
+    if (items.some((item) => !orderable.has(item.name))) {
+      toast.error('베이커리 메뉴만 온라인으로 주문할 수 있어요.')
+      return
+    }
     setSubmitting(true)
     try {
       const { data, error } = await supabase.rpc('place_order', {
@@ -127,7 +140,7 @@ function CartPage() {
               {user ? (
                 <button
                   onClick={() => void checkout()}
-                  disabled={submitting || !slot}
+                  disabled={submitting || !slot || !menuItems || Boolean(menuError)}
                   className="w-full bg-eden-ink py-3 text-sm font-semibold text-eden-paper disabled:opacity-50 rounded-full transition-colors hover:bg-eden-ink-2"
                 >
                   {submitting ? '주문 처리 중…' : '주문하기 (무통장입금)'}

@@ -19,6 +19,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as NewsIdRouteImport } from './routes/news_.$id'
@@ -73,6 +74,11 @@ const OrdersRoute = OrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/menu': typeof MenuRoute
   '/news': typeof NewsRoute
   '/orders': typeof OrdersRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/news/$id': typeof NewsIdRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/menu': typeof MenuRoute
   '/news': typeof NewsRoute
   '/orders': typeof OrdersRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/news/$id': typeof NewsIdRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/menu': typeof MenuRoute
   '/news': typeof NewsRoute
   '/orders': typeof OrdersRoute
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
   '/news_/$id': typeof NewsIdRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/menu'
     | '/news'
     | '/orders'
+    | '/privacy'
     | '/reset-password'
     | '/support'
     | '/news/$id'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/menu'
     | '/news'
     | '/orders'
+    | '/privacy'
     | '/reset-password'
     | '/support'
     | '/news/$id'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/menu'
     | '/news'
     | '/orders'
+    | '/privacy'
     | '/reset-password'
     | '/support'
     | '/news_/$id'
@@ -194,6 +206,7 @@ export interface RootRouteChildren {
   MenuRoute: typeof MenuRoute
   NewsRoute: typeof NewsRoute
   OrdersRoute: typeof OrdersRoute
+  PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SupportRoute: typeof SupportRoute
   NewsIdRoute: typeof NewsIdRoute
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -306,6 +326,7 @@ const rootRouteChildren: RootRouteChildren = {
   MenuRoute: MenuRoute,
   NewsRoute: NewsRoute,
   OrdersRoute: OrdersRoute,
+  PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SupportRoute: SupportRoute,
   NewsIdRoute: NewsIdRoute,

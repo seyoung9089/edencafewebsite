@@ -36,6 +36,7 @@ export function SiteFooter() {
         <div className="flex flex-col gap-2 pt-6 text-xs text-[rgba(237,236,227,0.4)] md:flex-row md:items-center md:justify-between">
           <span>ⓒ 2026 이든 협동조합. All rights reserved.</span>
           <span>
+            <Link to="/privacy" className="text-inherit hover:text-eden-sand">개인정보처리방침</Link> · {' '}
             <Link to="/admin" className="text-inherit hover:text-eden-sand">관리자 페이지</Link> · EDEN CAFE, Since 2021
           </span>
         </div>

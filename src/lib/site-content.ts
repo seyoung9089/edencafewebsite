@@ -41,6 +41,10 @@ export type ContentFieldType = 'input' | 'textarea'
 export type ContentField = { group: string; key: string; label: string; type: ContentFieldType; default: string }
 
 export const CONTENT_SCHEMA: ContentField[] = [
+  { group: '개인정보처리방침', key: 'privacy.operator', label: '운영 주체', type: 'input', default: '이든카페 협동조합' },
+  { group: '개인정보처리방침', key: 'privacy.email', label: '개인정보 문의 이메일', type: 'input', default: '1125@bmrschool.org' },
+  { group: '개인정보처리방침', key: 'privacy.orderYears', label: '주문·결제 기록 보관 기간 (년)', type: 'input', default: '5' },
+  { group: '개인정보처리방침', key: 'privacy.inquiryYears', label: '문의·분쟁 기록 보관 기간 (년)', type: 'input', default: '3' },
   { group: '히어로', key: 'hero.eyebrow', label: '상단 안내 문구', type: 'input', default: '별무리고등학교에서 시작된 카페 협동조합 · Since 2021' },
   { group: '히어로', key: 'hero.l1', label: '첫 줄 (강조)', type: 'input', default: 'Eden Cafe' },
   { group: '히어로', key: 'hero.l2', label: '둘째 줄', type: 'input', default: 'Honest & Comfortable' },

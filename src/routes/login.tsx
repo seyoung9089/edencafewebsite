@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabase'
 export const Route = createFileRoute('/login')({ component: LoginPage, head: () => ({ meta: [{ title: '로그인 | 이든카페' }] }) })
 
 const socialEnabled = {
-  google: import.meta.env.VITE_GOOGLE_LOGIN_ENABLED === 'true',
+  google: import.meta.env.VITE_GOOGLE_LOGIN_ENABLED !== 'false',
   kakao: import.meta.env.VITE_KAKAO_LOGIN_ENABLED === 'true',
 }
 
@@ -71,7 +71,7 @@ function LoginPage() {
       {mode !== 'reset' && <div className="mt-7 space-y-3"><p className="text-center text-sm text-eden-sage-dim">또는 간편 로그인</p>
         <button type="button" disabled={!socialEnabled.google || Boolean(socialBusy)} onClick={() => void signInSocial('google')} className="w-full rounded-full border border-eden-line bg-white py-3 text-sm font-semibold text-eden-ink disabled:cursor-not-allowed disabled:opacity-50">{socialBusy === 'google' ? '구글로 이동 중…' : 'Google로 계속하기'}</button>
         <button type="button" disabled={!socialEnabled.kakao || Boolean(socialBusy)} onClick={() => void signInSocial('kakao')} className="w-full rounded-full bg-[#FEE500] py-3 text-sm font-semibold text-[#191919] disabled:cursor-not-allowed disabled:opacity-50">{socialBusy === 'kakao' ? '카카오로 이동 중…' : '카카오로 계속하기'}</button>
-        {(!socialEnabled.google || !socialEnabled.kakao) && <p className="text-center text-xs text-eden-sage-dim">간편 로그인은 제공사 설정이 완료되면 사용할 수 있어요.</p>}
+        {!socialEnabled.kakao && <p className="text-center text-xs text-eden-sage-dim">카카오 로그인은 준비 중이에요.</p>}
       </div>}
       {error && <p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}
     </>}

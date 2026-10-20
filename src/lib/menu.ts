@@ -12,6 +12,8 @@ export type MenuItem = {
   description: string
   sort_order: number
   image_url: string | null
+  /** Manually pinned into the "인기 메뉴" shelf by staff (max 2; see menu-panel.tsx). */
+  is_featured: boolean
 }
 
 export function toMenuItem(row: Record<string, unknown>): MenuItem {
@@ -24,6 +26,7 @@ export function toMenuItem(row: Record<string, unknown>): MenuItem {
     description: typeof row.description === 'string' ? row.description : '',
     sort_order: typeof row.sort_order === 'number' ? row.sort_order : 0,
     image_url: typeof row.image_url === 'string' && row.image_url ? row.image_url : null,
+    is_featured: Boolean(row.is_featured),
   }
 }
 

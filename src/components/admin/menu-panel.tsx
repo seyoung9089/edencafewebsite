@@ -25,10 +25,13 @@ export function MenuPanel() {
 
   if (!items) return <p className="text-sm text-eden-sage-dim">불러오는 중…</p>
 
+  const featuredCount = items.filter((i) => i.is_featured).length
+
   return (
     <div>
       <p className="mb-6 text-sm text-eden-sage-dim">
         베이커리만 온라인 픽업 주문을 받습니다. 음료는 메뉴에 표시되지만 장바구니에 담을 수 없어요. 베이커리 수량을 비워두면 제한 없이 주문받고, 숫자를 넣으면 주문될 때마다 줄어들어 0개가 되면 자동으로 품절이 돼요.
+        손님용 메뉴 페이지 맨 위 "인기 메뉴"에는 여기서 직접 고른 메뉴 최대 2개 + 손님이 실제로 가장 많이 산 베이커리 1개, 총 3개가 떠요.
       </p>
       {(['bakery', 'drink'] as const).map((category) => (
         <section key={category} className="mb-10">
@@ -37,7 +40,12 @@ export function MenuPanel() {
             {items
               .filter((i) => i.category === category)
               .map((item) => (
-                <MenuRow key={item.name} item={item} onChanged={refresh} />
+                <MenuRow
+                  key={item.name}
+                  item={item}
+                  otherFeaturedCount={featuredCount - (item.is_featured ? 1 : 0)}
+                  onChanged={refresh}
+                />
               ))}
           </div>
         </section>
@@ -47,7 +55,15 @@ export function MenuPanel() {
   )
 }
 
-function MenuRow({ item, onChanged }: { item: MenuItem; onChanged: () => Promise<void> }) {
+function MenuRow({
+  item,
+  otherFeaturedCount,
+  onChanged,
+}: {
+  item: MenuItem
+  otherFeaturedCount: number
+  onChanged: () => Promise<void>
+}) {
   const [name, setName] = useState(item.name)
   const [category, setCategory] = useState(item.category)
   const [description, setDescription] = useState(item.description)
@@ -55,8 +71,17 @@ function MenuRow({ item, onChanged }: { item: MenuItem; onChanged: () => Promise
   const [stock, setStock] = useState(item.stock === null ? '' : String(item.stock))
   const [soldOut, setSoldOut] = useState(item.sold_out)
   const [sortOrder, setSortOrder] = useState(String(item.sort_order))
+  const [featured, setFeatured] = useState(item.is_featured)
   const [busy, setBusy] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  const toggleFeatured = (checked: boolean) => {
+    if (checked && otherFeaturedCount >= 2) {
+      toast.error('인기 메뉴는 최대 2개까지 고를 수 있어요. 다른 메뉴의 선택을 먼저 해제해주세요.')
+      return
+    }
+    setFeatured(checked)
+  }
 
   const save = async () => {
     const nextPrice = Number(price)
@@ -66,10 +91,20 @@ function MenuRow({ item, onChanged }: { item: MenuItem; onChanged: () => Promise
     if (!Number.isInteger(nextPrice) || nextPrice <= 0) return void toast.error('가격은 1원 이상의 숫자로 입력해주세요.')
     if (nextStock !== null && (!Number.isInteger(nextStock) || nextStock < 0)) return void toast.error('수량은 0 이상의 숫자로 입력하거나 비워두세요.')
     if (!Number.isInteger(nextSort)) return void toast.error('순서는 숫자로 입력해주세요.')
+    if (featured && otherFeaturedCount >= 2) return void toast.error('인기 메뉴는 최대 2개까지 고를 수 있어요. 다른 메뉴의 선택을 먼저 해제해주세요.')
     setBusy(true)
     const { error } = await supabase
       .from('menu_catalog')
-      .update({ name: name.trim(), category, description: description.trim(), price: nextPrice, stock: nextStock, sold_out: soldOut, sort_order: nextSort })
+      .update({
+        name: name.trim(),
+        category,
+        description: description.trim(),
+        price: nextPrice,
+        stock: nextStock,
+        sold_out: soldOut,
+        sort_order: nextSort,
+        is_featured: featured,
+      })
       .eq('name', item.name)
     setBusy(false)
     if (error) return void toast.error(error.message)
@@ -148,6 +183,10 @@ function MenuRow({ item, onChanged }: { item: MenuItem; onChanged: () => Promise
           <label className="flex items-center gap-1">
             <input type="checkbox" checked={soldOut} onChange={(e) => setSoldOut(e.target.checked)} />
             품절
+          </label>
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={featured} onChange={(e) => toggleFeatured(e.target.checked)} />
+            인기 메뉴 추천
           </label>
           {item.stock === 0 ? <span className="text-xs text-destructive">수량 소진</span> : null}
           <div className="ml-auto flex gap-2">

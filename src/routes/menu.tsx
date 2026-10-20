@@ -14,8 +14,8 @@ export const Route = createFileRoute('/menu')({ component: MenuPage, head: () =>
 
 const CATEGORY_ICON = { bakery: Croissant, drink: Coffee } as const
 
-/** Number of items shown in the "인기 메뉴" shelf at the top. */
-const POPULAR_COUNT = 4
+/** Max staff-curated picks in the "인기 메뉴" shelf (see menu-panel.tsx). */
+const FEATURED_COUNT = 2
 
 function MenuCard({ item, popular, onOrder }: { item: MenuItem; popular?: boolean; onOrder: (item: MenuItem) => void }) {
   const Icon = CATEGORY_ICON[item.category]
@@ -106,10 +106,14 @@ function MenuPage() {
 
   const bakery = items?.filter((i) => i.category === 'bakery') ?? []
   const drinks = items?.filter((i) => i.category === 'drink') ?? []
-  const popular = (items ?? [])
+  // "인기 메뉴" shelf: up to 2 staff-curated picks, plus the one real bestselling
+  // bakery item (by actual order history) that isn't already among them.
+  const featured = (items ?? []).filter((i) => i.is_featured).slice(0, FEATURED_COUNT)
+  const bestBakery = (items ?? [])
+    .filter((i) => i.category === 'bakery' && !i.is_featured)
     .filter((i) => (popularity.get(i.name) ?? 0) > 0)
-    .sort((a, b) => (popularity.get(b.name) ?? 0) - (popularity.get(a.name) ?? 0))
-    .slice(0, POPULAR_COUNT)
+    .sort((a, b) => (popularity.get(b.name) ?? 0) - (popularity.get(a.name) ?? 0))[0]
+  const popular = bestBakery ? [...featured, bestBakery] : featured
 
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">

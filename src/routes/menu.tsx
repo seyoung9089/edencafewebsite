@@ -57,16 +57,27 @@ function MenuPage() {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {group.list.map((item) => (
               <div key={item.name} className="rounded-card bg-eden-paper-dim shadow-soft p-6 hover:-translate-y-1 hover:shadow-lift">
-                {item.image_url ? (
-                  <img
-                    src={item.image_url}
-                    alt={item.name}
-                    className="mb-4 aspect-[4/3] w-full rounded-[10px] object-cover"
-                    loading="lazy"
-                  />
-                ) : (
-                  <group.Icon size={36} strokeWidth={1.5} className="mb-4 text-eden-sage-dim" />
-                )}
+                <div className="relative mb-4">
+                  {item.image_url ? (
+                    <img
+                      src={item.image_url}
+                      alt={item.name}
+                      className={`aspect-[4/3] w-full rounded-[10px] object-cover ${item.category === 'bakery' && isSoldOut(item) ? 'grayscale opacity-50' : ''}`}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <group.Icon
+                      size={36}
+                      strokeWidth={1.5}
+                      className={`text-eden-sage-dim ${item.category === 'bakery' && isSoldOut(item) ? 'opacity-50' : ''}`}
+                    />
+                  )}
+                  {item.category === 'bakery' && isSoldOut(item) ? (
+                    <span className="absolute left-2 top-2 rounded-full bg-eden-ink-2/90 px-3 py-1 text-xs font-semibold text-eden-paper">
+                      품절
+                    </span>
+                  ) : null}
+                </div>
                 <h3 className="mb-1 font-serif text-base font-semibold">{item.name}</h3>
                 <p className="mb-4 min-h-[36px] text-xs text-eden-sage-dim">{item.description}</p>
                 <div className="mb-4 flex items-baseline justify-between gap-2">

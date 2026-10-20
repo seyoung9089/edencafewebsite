@@ -42,6 +42,13 @@ export function isSoldOut(item: MenuItem): boolean {
   return item.sold_out || item.stock === 0
 }
 
+/** Total quantity ever ordered, per menu item name. PII-free aggregate (see menu_popularity() RPC). */
+export async function fetchPopularity(): Promise<Map<string, number>> {
+  const { data, error } = await supabase.rpc('menu_popularity')
+  if (error) throw error
+  return new Map((data ?? []).map((r: { name: string; total_qty: number }) => [r.name, Number(r.total_qty)]))
+}
+
 /** The menu, or undefined while loading. */
 export function useMenu(): { items: MenuItem[] | undefined; error: string } {
   const [items, setItems] = useState<MenuItem[] | undefined>(undefined)

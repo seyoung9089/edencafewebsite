@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 import { supabase } from '@/lib/supabase'
 import { fetchCustomers, inputClass, type Customer } from './use-staff'
 
-type Row = Customer & { orders: number; spent: number; lastOrder: string | null }
+type Row = Customer & { orders: number; spent: number; lastOrder: string | null; favorite: string | null }
 
 export function CustomersPanel() {
   const [rows, setRows] = useState<Row[] | null>(null)
@@ -13,20 +13,37 @@ export function CustomersPanel() {
     void (async () => {
       const [customers, { data, error }] = await Promise.all([
         fetchCustomers(),
-        supabase.from('orders').select('user_id,total,created_at'),
+        supabase.from('orders').select('user_id,total,created_at,items'),
       ])
       if (error) toast.error(error.message)
-      const stats = new Map<string, { orders: number; spent: number; lastOrder: string | null }>()
+      const stats = new Map<string, { orders: number; spent: number; lastOrder: string | null; itemQty: Map<string, number> }>()
       for (const o of data ?? []) {
-        const s = stats.get(o.user_id) ?? { orders: 0, spent: 0, lastOrder: null }
+        const s = stats.get(o.user_id) ?? { orders: 0, spent: 0, lastOrder: null, itemQty: new Map<string, number>() }
         s.orders += 1
         s.spent += o.total
         if (!s.lastOrder || o.created_at > s.lastOrder) s.lastOrder = o.created_at
+        for (const it of (o.items ?? []) as { name: string; qty: number }[]) {
+          s.itemQty.set(it.name, (s.itemQty.get(it.name) ?? 0) + it.qty)
+        }
         stats.set(o.user_id, s)
+      }
+      const favoriteOf = (itemQty: Map<string, number>): string | null => {
+        let best: string | null = null
+        let bestQty = 0
+        for (const [name, qty] of itemQty) {
+          if (qty > bestQty) {
+            best = name
+            bestQty = qty
+          }
+        }
+        return best
       }
       setRows(
         customers
-          .map((c) => ({ ...c, ...(stats.get(c.id) ?? { orders: 0, spent: 0, lastOrder: null }) }))
+          .map((c) => {
+            const s = stats.get(c.id) ?? { orders: 0, spent: 0, lastOrder: null, itemQty: new Map<string, number>() }
+            return { ...c, orders: s.orders, spent: s.spent, lastOrder: s.lastOrder, favorite: favoriteOf(s.itemQty) }
+          })
           .sort((a, b) => (b.lastOrder ?? '').localeCompare(a.lastOrder ?? '') || a.email.localeCompare(b.email)),
       )
     })()
@@ -52,6 +69,7 @@ export function CustomersPanel() {
               <th className="px-4 py-3 font-normal">이메일</th>
               <th className="px-4 py-3 text-right font-normal">주문</th>
               <th className="px-4 py-3 text-right font-normal">총 주문 금액</th>
+              <th className="px-4 py-3 font-normal">자주 시킨 메뉴</th>
               <th className="px-4 py-3 text-right font-normal">최근 주문</th>
             </tr>
           </thead>
@@ -62,6 +80,7 @@ export function CustomersPanel() {
                 <td className="px-4 py-3">{r.email}</td>
                 <td className="px-4 py-3 text-right">{r.orders}건</td>
                 <td className="px-4 py-3 text-right">{r.spent.toLocaleString('ko-KR')}원</td>
+                <td className="px-4 py-3 text-eden-sage-dim">{r.favorite ?? '-'}</td>
                 <td className="px-4 py-3 text-right text-eden-sage-dim">{r.lastOrder ? new Date(r.lastOrder).toLocaleDateString('ko-KR') : '-'}</td>
               </tr>
             ))}

@@ -15,6 +15,16 @@ type Order = {
 }
 
 const STATUS_LABEL = { wait: '입금대기', done: '입금확인', picked: '픽업완료' } as const
+const STATUS_BADGE_CLASS = {
+  wait: 'bg-amber-100 text-amber-800 ring-1 ring-inset ring-amber-300',
+  done: 'bg-emerald-100 text-emerald-800 ring-1 ring-inset ring-emerald-300',
+  picked: 'bg-sky-100 text-sky-800 ring-1 ring-inset ring-sky-300',
+} as const
+const STATUS_SELECT_CLASS = {
+  wait: 'border-amber-300 bg-amber-50 text-amber-900 focus:ring-amber-400',
+  done: 'border-emerald-300 bg-emerald-50 text-emerald-900 focus:ring-emerald-400',
+  picked: 'border-sky-300 bg-sky-50 text-sky-900 focus:ring-sky-400',
+} as const
 const WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토']
 
 function dateLabel(iso: string): string {
@@ -104,11 +114,12 @@ export function OrdersPanel() {
                     <p className="text-sm">{o.items.map((i) => `${i.name} × ${i.qty}`).join(', ')}</p>
                   </div>
                   <span className="font-semibold">{o.total.toLocaleString('ko-KR')}원</span>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_BADGE_CLASS[o.status]}`}>{STATUS_LABEL[o.status]}</span>
                   <select
                     aria-label="입금·픽업 상태"
                     value={o.status}
                     onChange={(e) => void updateStatus(o.id, e.target.value as Order['status'])}
-                    className="rounded-[10px] border border-eden-line bg-eden-paper-dim p-2 text-sm"
+                    className={`rounded-[10px] border p-2 text-sm font-medium focus:outline-none focus:ring-2 ${STATUS_SELECT_CLASS[o.status]}`}
                   >
                     {Object.entries(STATUS_LABEL).map(([value, label]) => (
                       <option key={value} value={value}>

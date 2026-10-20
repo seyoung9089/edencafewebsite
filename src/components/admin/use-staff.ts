@@ -2,33 +2,37 @@ import { useEffect, useState } from 'react'
 import { useCustomerAuth } from '@/lib/customer-auth'
 import { supabase } from '@/lib/supabase'
 
-/** Whether the signed-in account is listed in Supabase `staff_users`. null while checking. */
+/** Whether the signed-in account is listed in Supabase `staff_users`, and whether it's a super admin. null while checking. */
 export function useStaff() {
   const { user, loading } = useCustomerAuth()
   const [isStaff, setIsStaff] = useState<boolean | null>(null)
+  const [isSuper, setIsSuper] = useState(false)
 
   useEffect(() => {
     if (loading) return
     if (!user) {
       setIsStaff(false)
+      setIsSuper(false)
       return
     }
     let active = true
     setIsStaff(null)
     void supabase
       .from('staff_users')
-      .select('user_id')
+      .select('user_id,is_super')
       .eq('user_id', user.id)
       .maybeSingle()
       .then(({ data }) => {
-        if (active) setIsStaff(Boolean(data))
+        if (!active) return
+        setIsStaff(Boolean(data))
+        setIsSuper(Boolean(data?.is_super))
       })
     return () => {
       active = false
     }
   }, [user?.id, loading])
 
-  return { user, loading: loading || (user !== null && isStaff === null), isStaff: Boolean(isStaff) }
+  return { user, loading: loading || (user !== null && isStaff === null), isStaff: Boolean(isStaff), isSuper }
 }
 
 export type Customer = { id: string; email: string; name: string }

@@ -38,7 +38,7 @@ function readSavedTab(): Tab {
   return 'orders'
 }
 
-function AdminDashboard({ userId }: { userId: string }) {
+function AdminDashboard({ userId, isSuper }: { userId: string; isSuper: boolean }) {
   const [tab, setTabState] = useState<Tab>(readSavedTab)
   const setTab = (t: Tab) => {
     setTabState(t)
@@ -74,7 +74,7 @@ function AdminDashboard({ userId }: { userId: string }) {
         ) : tab === 'content' ? (
           <ContentPanel />
         ) : (
-          <StaffPanel currentUserId={userId} />
+          <StaffPanel currentUserId={userId} isSuper={isSuper} />
         )}
       </div>
     </div>
@@ -82,7 +82,7 @@ function AdminDashboard({ userId }: { userId: string }) {
 }
 
 function AdminPage() {
-  const { user, loading, isStaff } = useStaff()
+  const { user, loading, isStaff, isSuper } = useStaff()
 
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
@@ -109,7 +109,7 @@ function AdminPage() {
             </button>
           </div>
         ) : (
-          <AdminDashboard userId={user.id} />
+          <AdminDashboard userId={user.id} isSuper={isSuper} />
         )}
       </section>
       <SiteFooter />

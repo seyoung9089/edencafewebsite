@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Link } from '@tanstack/react-router'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { useCart } from '@/lib/cart'
+import { MAX_QTY, maxQtyFor, reconcileCart, useCart } from '@/lib/cart'
 import { useCurrentPickupSlot } from '@/lib/pickup'
 import { getErrorMessage } from '@/lib/errors'
 import { pageMeta } from '@/lib/seo'
@@ -21,7 +21,10 @@ import { useMenu } from '@/lib/menu'
 function orderErrorMessage(e: unknown): string {
   const message = getErrorMessage(e, '주문에 실패했습니다.')
   if (message.includes('Pickup schedule changed')) return '픽업 날짜가 바뀌었어요. 새로고침한 뒤 다시 주문해주세요.'
-  if (message.includes('Unavailable menu item')) return `품절되었거나 없는 메뉴가 있어요: ${message.split(':').pop()?.trim()}`
+  if (message.includes('Unavailable menu item') || message.includes('Only available bakery items'))
+    return `방금 품절되었거나 지금 주문할 수 없는 메뉴가 있어요: ${message.split(':').pop()?.trim()}. 장바구니에서 빼고 다시 주문해주세요.`
+  if (message.includes('Invalid quantity')) return `한 메뉴는 ${MAX_QTY}개까지 주문할 수 있어요. 수량을 줄여주세요.`
+  if (message.includes('Invalid order')) return '장바구니가 비어 있거나 메뉴가 너무 많아요. 확인 후 다시 주문해주세요.'
   if (message.includes('Login required')) return '로그인이 필요해요.'
   return message
 }
@@ -29,7 +32,7 @@ function orderErrorMessage(e: unknown): string {
 export const Route = createFileRoute('/cart')({ component: CartPage, head: () => pageMeta('/cart') })
 
 function CartPage() {
-  const { items, updateQty, removeItem, clear, totalPrice } = useCart()
+  const { items, updateQty, removeItem, clear, replaceItems, totalPrice } = useCart()
   const slot = useCurrentPickupSlot()
   const { user, loading } = useCustomerAuth()
   const navigate = useNavigate()
@@ -39,11 +42,18 @@ function CartPage() {
   const pickupTime = useContentValue(content, 'pickup.time')
   const { items: menuItems, error: menuError } = useMenu()
 
+  // Sold out since it was added, drinks, or more than what's left: fix the cart
+  // here and say what changed, instead of letting the order fail later.
   useEffect(() => {
     if (!menuItems || menuError) return
-    const drinks = new Set(menuItems.filter((item) => item.category === 'drink').map((item) => item.name))
-    for (const item of items) if (drinks.has(item.name)) removeItem(item.name)
+    const { next, removed, reduced, changed } = reconcileCart(items, menuItems)
+    if (!changed) return
+    replaceItems(next)
+    if (removed.length) toast.info(`품절되었거나 온라인으로 주문할 수 없는 메뉴라 장바구니에서 뺐어요: ${removed.join(', ')}`)
+    for (const r of reduced) toast.info(`${r.name}은(는) 남은 수량이 ${r.qty}개라 수량을 맞췄어요.`)
   }, [menuItems, menuError, items])
+
+  const menuByName = new Map((menuItems ?? []).map((m) => [m.name, m]))
 
   const checkout = async () => {
     if (!items.length || !slot || !menuItems || menuError) return
@@ -101,7 +111,12 @@ function CartPage() {
                       <Minus size={12} />
                     </button>
                     <span className="min-w-5 text-center">{it.qty}</span>
-                    <button onClick={() => updateQty(it.name, it.qty + 1)} className="flex h-7 w-7 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim">
+                    <button
+                      onClick={() => updateQty(it.name, it.qty + 1)}
+                      disabled={it.qty >= maxQtyFor(menuByName.get(it.name))}
+                      aria-label="수량 늘리기"
+                      className="flex h-7 w-7 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim disabled:opacity-30"
+                    >
                       <Plus size={12} />
                     </button>
                   </div>

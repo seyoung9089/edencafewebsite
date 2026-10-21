@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { PickupNotice } from '@/components/pickup-notice'
-import { useCart } from '@/lib/cart'
+import { maxQtyFor, useCart } from '@/lib/cart'
 import { pageMeta } from '@/lib/seo'
 import { useEffect, useState } from 'react'
 import { useMenu, isSoldOut, fetchPopularity, type MenuItem } from '@/lib/menu'
@@ -74,7 +74,7 @@ function MenuCard({ item, popular, onOrder }: { item: MenuItem; popular?: boolea
 
 function MenuPage() {
   const { items } = useMenu()
-  const { addItem } = useCart()
+  const { items: cartItems, addItem } = useCart()
   const [active, setActive] = useState<MenuItem | null>(null)
   const [qty, setQty] = useState(1)
   const [popularity, setPopularity] = useState<Map<string, number>>(new Map())
@@ -97,10 +97,15 @@ function MenuPage() {
     setQty(1)
   }
 
+  // Already in the cart counts toward the 20-per-item / stock limit.
+  const inCart = active ? (cartItems.find((it) => it.name === active.name)?.qty ?? 0) : 0
+  const room = active ? Math.max(0, maxQtyFor(active) - inCart) : 0
+
   const confirmAdd = () => {
-    if (!active || active.category !== 'bakery') return
-    addItem({ name: active.name, price: active.price, qty })
-    toast.success(`${active.name} ${qty}개를 장바구니에 담았습니다.`)
+    if (!active || active.category !== 'bakery' || room === 0) return
+    const n = Math.min(qty, room)
+    addItem({ name: active.name, price: active.price, qty: n })
+    toast.success(`${active.name} ${n}개를 장바구니에 담았습니다.`)
     setActive(null)
   }
 
@@ -171,8 +176,9 @@ function MenuPage() {
             </button>
             <span className="min-w-6 text-center text-base font-semibold">{qty}</span>
             <button
-              onClick={() => setQty((q) => Math.min(active?.stock ?? 20, 20, q + 1))}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim"
+              onClick={() => setQty((q) => Math.min(Math.max(room, 1), q + 1))}
+              disabled={qty >= room}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-eden-line hover:bg-eden-paper-dim disabled:opacity-30"
             >
               <Plus size={14} />
             </button>
@@ -180,7 +186,12 @@ function MenuPage() {
           <div className="mb-5 font-serif text-base font-semibold">
             합계 <span className="text-eden-sand">{active ? (active.price * qty).toLocaleString('ko-KR') : 0}원</span>
           </div>
-          <button onClick={confirmAdd} className="w-full bg-eden-ink py-3 text-sm font-semibold text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2">
+          {inCart > 0 ? (
+            <p className="-mt-2 mb-4 text-sm text-eden-sage-dim">
+              {room > 0 ? `장바구니에 이미 ${inCart}개 있어요. ${room}개 더 담을 수 있어요.` : `장바구니에 이미 ${inCart}개 있어서 더 담을 수 없어요.`}
+            </p>
+          ) : null}
+          <button onClick={confirmAdd} disabled={room === 0} className="w-full bg-eden-ink py-3 text-sm font-semibold text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2 disabled:opacity-50">
             장바구니에 담기
           </button>
         </DialogContent>

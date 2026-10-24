@@ -8,7 +8,7 @@ export type CustomerOrder = {
   id: string
   items: { name: string; price: number; qty: number }[]
   total: number
-  status: 'wait' | 'done' | 'picked'
+  status: 'wait' | 'done' | 'picked' | 'cancelled'
   pickup_date: string
   created_at: string
 }
@@ -19,6 +19,8 @@ export type MyOrdersProps = {
   orders: CustomerOrder[]
   onSaveName: (name: string) => Promise<void>
   onSignOut: () => void
+  /** Cancels an order that is still 입금 대기; resolves false if it failed. */
+  onCancel: (id: string) => Promise<boolean>
 }
 
 // ── shared bits ──────────────────────────────────────────────────────────
@@ -28,6 +30,7 @@ const STATUS = {
   wait: { label: '입금 대기', short: '입금 대기', tone: 'bg-eden-sand text-eden-ink-2' },
   done: { label: '입금 확인 · 준비 중', short: '준비 중', tone: 'bg-eden-sage text-eden-ink-2' },
   picked: { label: '픽업 완료', short: '픽업 완료', tone: 'bg-eden-line text-eden-sage-dim' },
+  cancelled: { label: '취소한 주문', short: '취소', tone: 'bg-eden-line text-eden-sage-dim' },
 } as const
 
 export function pickupLabel(iso: string): string {
@@ -109,9 +112,28 @@ const Empty = () => (
 // Pickup is daily, so the top of the page is what matters today: orders to
 // pick up today (ordered yesterday) and the order placed today for tomorrow.
 
-function OrderCard({ order, highlight = false }: { order: CustomerOrder; highlight?: boolean }) {
+function CancelButton({ order, onCancel }: { order: CustomerOrder; onCancel: (id: string) => Promise<boolean> }) {
+  const [busy, setBusy] = useState(false)
   return (
-    <article className={`rounded-card bg-eden-paper-dim p-5 shadow-soft ${highlight ? 'border border-eden-sand/60' : ''}`}>
+    <button
+      type="button"
+      disabled={busy}
+      onClick={async () => {
+        if (!window.confirm('이 주문을 취소할까요? 취소한 주문은 되돌릴 수 없어요.')) return
+        setBusy(true)
+        await onCancel(order.id)
+        setBusy(false)
+      }}
+      className="mt-3 w-full rounded-full border border-eden-line py-2.5 text-sm text-eden-sage-dim hover:bg-eden-paper disabled:opacity-50"
+    >
+      {busy ? '취소하는 중…' : '주문 취소'}
+    </button>
+  )
+}
+
+function OrderCard({ order, onCancel, highlight = false }: { order: CustomerOrder; onCancel: (id: string) => Promise<boolean>; highlight?: boolean }) {
+  return (
+    <article className={`rounded-card bg-eden-paper-dim p-5 shadow-soft ${highlight && order.status !== 'cancelled' ? 'border border-eden-sand/60' : ''} ${order.status === 'cancelled' ? 'opacity-60' : ''}`}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <strong className={order.status === 'wait' ? 'text-eden-sand' : ''}>{STATUS[order.status].label}</strong>
         <span className="text-sm text-eden-sage-dim">
@@ -130,12 +152,17 @@ function OrderCard({ order, highlight = false }: { order: CustomerOrder; highlig
         <span>합계</span>
         <span>{won(order.total)}</span>
       </div>
-      {order.status === 'wait' ? <PaymentInfo total={order.total} className="mt-3" /> : null}
+      {order.status === 'wait' ? (
+        <>
+          <PaymentInfo total={order.total} className="mt-3" />
+          <CancelButton order={order} onCancel={onCancel} />
+        </>
+      ) : null}
     </article>
   )
 }
 
-function TodaySection({ title, subtitle, orders, empty }: { title: string; subtitle: string; orders: CustomerOrder[]; empty: React.ReactNode }) {
+function TodaySection({ title, subtitle, orders, empty, onCancel }: { title: string; subtitle: string; orders: CustomerOrder[]; empty: React.ReactNode; onCancel: (id: string) => Promise<boolean> }) {
   return (
     <section>
       <div className="mb-3 flex flex-wrap items-baseline gap-x-3">
@@ -145,7 +172,7 @@ function TodaySection({ title, subtitle, orders, empty }: { title: string; subti
       {orders.length ? (
         <div className="space-y-3">
           {orders.map((o) => (
-            <OrderCard key={o.id} order={o} highlight />
+            <OrderCard key={o.id} order={o} onCancel={onCancel} highlight />
           ))}
         </div>
       ) : (
@@ -155,7 +182,7 @@ function TodaySection({ title, subtitle, orders, empty }: { title: string; subti
   )
 }
 
-export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut }: MyOrdersProps) {
+export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut, onCancel }: MyOrdersProps) {
   const [filter, setFilter] = useState<'all' | CustomerOrder['status']>('all')
   const slot = getCurrentPickupSlot(Date.now())
   const pickupToday = orders.filter((o) => o.pickup_date === slot.todayIso)
@@ -180,12 +207,14 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut }: MyO
           title="오늘 픽업"
           subtitle={`${slot.todayLabel} · 오늘 챙겨야 할 주문`}
           orders={pickupToday}
+          onCancel={onCancel}
           empty="오늘 픽업할 주문이 없어요."
         />
         <TodaySection
           title="내일 픽업"
           subtitle={`${slot.dateLabel} · 오늘 주문한 메뉴`}
           orders={pickupTomorrow}
+          onCancel={onCancel}
           empty={
             <>
               오늘 주문한 메뉴가 없어요. 자정까지 주문하면 내일 픽업할 수 있어요.{' '}
@@ -201,7 +230,7 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut }: MyO
       ) : (
         <>
           <div className="mb-6 flex flex-wrap gap-2">
-            {(['all', 'wait', 'done', 'picked'] as const).map((f) => (
+            {(['all', 'wait', 'done', 'picked', 'cancelled'] as const).map((f) => (
               <button
                 key={f}
                 type="button"
@@ -217,7 +246,7 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut }: MyO
               <h4 className="mb-3 text-sm font-semibold text-eden-sage-dim">{day} 주문</h4>
               <div className="space-y-3">
                 {list.map((o) => (
-                  <OrderCard key={o.id} order={o} />
+                  <OrderCard key={o.id} order={o} onCancel={onCancel} />
                 ))}
               </div>
             </section>

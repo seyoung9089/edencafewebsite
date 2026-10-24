@@ -13,7 +13,7 @@ export function CustomersPanel() {
     void (async () => {
       const [customers, { data, error }] = await Promise.all([
         fetchCustomers(),
-        supabase.from('orders').select('user_id,total,created_at,items'),
+        supabase.from('orders').select('user_id,total,created_at,items').neq('status', 'cancelled'),
       ])
       if (error) toast.error(error.message)
       const stats = new Map<string, { orders: number; spent: number; lastOrder: string | null; itemQty: Map<string, number> }>()

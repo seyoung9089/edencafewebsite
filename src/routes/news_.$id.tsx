@@ -24,9 +24,9 @@ function NewsDetailPage() {
       <SiteHeader />
       <article className="px-6 pb-24 pt-14 md:px-8">
         <div className="max-w-3xl">
-          <Link to="/news" className="mb-8 inline-flex items-center gap-1 text-sm text-eden-sage-dim hover:text-eden-sand">
+          <Link to="/support" className="mb-8 inline-flex items-center gap-1 text-sm text-eden-sage-dim hover:text-eden-sand">
             <ChevronLeft size={16} />
-            새소식 목록
+            새소식 목록으로
           </Link>
           <div className="mb-4 flex items-center gap-3">
             <span className="rounded-full bg-eden-sand/15 px-3 py-1 text-xs font-semibold text-eden-ink">{cv(`news.${id}.tag`)}</span>

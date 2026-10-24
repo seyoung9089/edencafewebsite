@@ -119,7 +119,6 @@ export const CONTENT_SCHEMA: ContentField[] = [
   { group: '입금 계좌', key: 'payment.note', label: '입금 안내', type: 'input', default: '주문 후 30분 이내에 입금해주세요.' },
 
   { group: '푸터 · 기타', key: 'footer.blurb', label: '푸터 소개문', type: 'textarea', default: '학생들의 작은 시작이 협동조합으로 자란 카페. 정직한 재료와 편안한 쉼을 나눕니다.' },
-  { group: '푸터 · 기타', key: 'cta.title', label: '하단 CTA 제목', type: 'input', default: '이든에서 오늘의 첫 잔을 시작하세요' },
 ]
 
 export const ALL_NEWS_KEYS = ['n1', 'n2', 'n3', 'n4', 'n5', 'n6'] as const

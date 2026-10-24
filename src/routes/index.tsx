@@ -3,10 +3,10 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { HeroSection } from '@/components/hero-section'
 import { Reveal } from '@/components/reveal'
-import { useSiteContent, useContentValue, useContentImage } from '@/lib/site-content'
+import { useSiteContent, useContentValue, HOME_NEWS_KEYS } from '@/lib/site-content'
 import { fetchMenu, isSoldOut } from '@/lib/menu'
 import { pageMeta } from '@/lib/seo'
-import { Leaf, MessageCircle, Tag, Sunrise, MapPin } from 'lucide-react'
+import { LogIn, ShoppingBasket, Landmark, Store, ArrowRight } from 'lucide-react'
 
 // Fetched server-side (during SSR / static prerender) so the structured
 // data below is present in the raw HTML — not only after client JS runs.
@@ -26,30 +26,16 @@ export const Route = createFileRoute('/')({
   },
 })
 
-const valueMeta = [
-  { icon: Leaf, key: 'eco', tone: 'bg-eden-ink' },
-  { icon: MessageCircle, key: 'comm', tone: 'bg-eden-sage-dim' },
-  { icon: Tag, key: 'price', tone: 'bg-eden-ink' },
-  { icon: Sunrise, key: 'rest', tone: 'bg-eden-sage-dim' },
-]
-
-const historyMeta = [
-  { year: '2021', key: 'h1' },
-  { year: '2022', key: 'h2' },
-  { year: '2023', key: 'h3' },
-  { year: '2024–2025', key: 'h4' },
-  { year: '2026', key: 'h5', latest: true },
-]
-
-const newsItems = [
-  { key: 'n1' },
-  { key: 'n2' },
-  { key: 'n3' },
+const steps = [
+  { icon: LogIn, title: '로그인' },
+  { icon: ShoppingBasket, title: '빵 담기' },
+  { icon: Landmark, title: '주문하고 입금' },
+  { icon: Store, title: '다음 날 픽업' },
 ]
 
 /** 문의 → 문의하기 page; 공지·소식 → that item's own page. */
 function NewsLink({ tag, newsKey, className, children }: { tag: string; newsKey: string; className: string; children: React.ReactNode }) {
-  if (tag.includes('문의')) return <Link to="/support" className={className}>{children}</Link>
+  if (tag.includes('문의')) return <Link to="/support" hash="inquiry" className={className}>{children}</Link>
   return <Link to="/news/$id" params={{ id: newsKey }} className={className}>{children}</Link>
 }
 
@@ -94,8 +80,6 @@ function HomePage() {
   const { menuItems } = Route.useLoaderData()
   const content = useSiteContent()
   const cv = (key: string) => useContentValue(content, key)
-  const locationPhoto = useContentImage('location.photo')
-  const historyPhoto = useContentImage('history.photo')
 
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
@@ -103,136 +87,55 @@ function HomePage() {
       <SiteHeader />
       <HeroSection />
 
-      {/* Philosophy */}
-      <section id="about" className="mx-auto max-w-xl px-6 py-24 md:px-8">
-        <Reveal className="border-t border-eden-line py-9">
-          <div className="mb-3 font-myeongjo text-lg font-bold text-eden-sand">{cv('phil.label1')}</div>
-          <p className="max-w-[46ch] text-[17px] leading-relaxed">{cv('phil.text1')}</p>
-        </Reveal>
-        <Reveal delay={100} className="border-t border-b border-eden-line py-9">
-          <div className="mb-3 font-myeongjo text-lg font-bold text-eden-sand">{cv('phil.label2')}</div>
-          <p className="max-w-[46ch] text-[17px] leading-relaxed">{cv('phil.text2')}</p>
-        </Reveal>
-      </section>
-
-      {/* Values */}
-      <section className="mx-auto max-w-6xl px-6 pb-24 md:px-8">
-        <Reveal className="mb-14 max-w-xl">
-          <h2 className="mb-3 font-serif text-3xl font-semibold">{cv('values.title')}</h2>
-          <p className="text-[15px] text-eden-sage-dim">{cv('values.subtitle')}</p>
-        </Reveal>
-        <div className="grid grid-cols-2 gap-7 md:grid-cols-4">
-          {valueMeta.map((v, i) => (
-            <Reveal key={v.key} delay={i * 90} className="text-center">
-              <div className={`mx-auto mb-5 flex h-32 w-32 items-center justify-center rounded-full ${v.tone}`}>
-                <v.icon size={44} strokeWidth={1.6} className="text-eden-paper" />
-              </div>
-              <h3 className="mb-2 font-serif text-lg font-semibold">{cv(`value.${v.key}.title`)}</h3>
-              <p className="text-sm text-eden-sage-dim">{cv(`value.${v.key}.desc`)}</p>
-            </Reveal>
-          ))}
-        </div>
-        <Reveal delay={200} className="mt-14 text-center font-serif text-xl font-medium">
-          {cv('values.tagline')}
-        </Reveal>
-      </section>
-
-      {/* Menu preview */}
-      <section className="bg-eden-ink-2 px-6 py-24 text-eden-paper md:px-8">
-        <Reveal className="mx-auto max-w-6xl text-center">
-          <h2 className="mb-3 font-serif text-3xl font-semibold">{cv('menuHome.title')}</h2>
-          <p className="mb-10 text-[15px] text-eden-sage">{cv('menuHome.subtitle')}</p>
-          <Link
-            to="/menu"
-            className="inline-block rounded-full border border-[rgba(237,236,227,0.45)] px-9 py-3 text-sm font-semibold hover:border-eden-sand hover:bg-eden-sand hover:text-eden-ink-2"
-          >
-            전체 메뉴 보기
+      {/* How pickup ordering works, in one glance */}
+      <section className="mx-auto max-w-6xl px-6 py-14 md:px-8">
+        <Reveal className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <h2 className="font-serif text-2xl font-semibold">픽업 주문 이용 방법</h2>
+          <Link to="/guide" className="inline-flex items-center gap-1 rounded-full border border-eden-line px-4 py-2 text-sm font-medium hover:border-eden-sand hover:text-eden-sand">
+            자세히 보기 <ArrowRight size={14} />
           </Link>
         </Reveal>
-      </section>
-
-      {/* History */}
-      <section id="history" className="mx-auto max-w-6xl px-6 py-24 md:px-8">
-        <Reveal className="mb-14 flex flex-wrap items-end justify-between gap-6">
-          <div className="max-w-xl">
-            <h2 className="mb-3 font-serif text-3xl font-semibold">{cv('history.title')}</h2>
-            <p className="text-[15px] text-eden-sage-dim">{cv('history.subtitle')}</p>
-          </div>
-          <Link to="/history" className="rounded-full border border-eden-line px-4 py-2 text-sm font-medium hover:border-eden-sand hover:text-eden-sand">전체 히스토리 보기</Link>
-        </Reveal>
-        <div className="flex flex-col gap-10 md:flex-row md:items-start">
-          <div className="relative flex-1 border-l border-eden-sage-dim/30 pl-9">
-            {historyMeta.map((h, i) => (
-              <Reveal key={h.year} delay={i * 80} className="relative pb-12 last:pb-0">
-                <span
-                  className={`absolute -left-[41px] top-1 h-2.5 w-2.5 rounded-full border-2 ${
-                    h.latest ? 'border-eden-sand bg-eden-sand' : 'border-eden-sage-dim bg-eden-paper'
-                  }`}
-                />
-                <div className="mb-2 font-serif text-xl font-semibold text-eden-sand">{h.year}</div>
-                <p className="max-w-[48ch] text-[15px]">{cv(`history.${h.key}`)}</p>
-              </Reveal>
-            ))}
-          </div>
-          <Reveal delay={150} className="h-[220px] w-full flex-shrink-0 overflow-hidden rounded-card bg-eden-sage-dim shadow-soft md:w-[280px]">
-            {historyPhoto ? (
-              <img src={historyPhoto} alt="" className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
-            ) : (
-              <div className="flex h-full items-center justify-center text-xs text-eden-paper/60">사진 없음</div>
-            )}
-          </Reveal>
-        </div>
-      </section>
-
-      {/* Location */}
-      <section className="mx-auto max-w-6xl px-6 pb-24 md:px-8">
-        <Reveal className="mb-14">
-          <h2 className="font-serif text-3xl font-semibold">오시는 길</h2>
-        </Reveal>
-        <Reveal delay={100} className="grid grid-cols-1 overflow-hidden rounded-card shadow-soft md:grid-cols-[1.2fr_1fr]">
-          <div className="flex min-h-[280px] items-center justify-center overflow-hidden bg-eden-sage-dim">
-            {locationPhoto ? (
-              <img src={locationPhoto} alt="" className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
-            ) : (
-              <MapPin size={40} strokeWidth={1.6} className="text-eden-paper" />
-            )}
-          </div>
-          <div className="flex flex-col justify-center bg-eden-paper-dim p-10">
-            <div className="mb-2 text-xs text-eden-sand">주소</div>
-            <div className="mb-6 text-[16px]">{cv('location.addr')}</div>
-            <div className="mb-6 border-y border-eden-line py-6 font-serif text-xl leading-relaxed">
-              {cv('location.quote')}
-            </div>
-            <div id="contact" className="text-sm text-eden-sage-dim">{cv('location.phone')}</div>
-          </div>
-        </Reveal>
+        <ol className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {steps.map((s, i) => (
+            <Reveal key={s.title} delay={i * 70} className="flex items-center gap-3 rounded-card bg-eden-paper-dim p-4 shadow-soft">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-eden-ink text-eden-paper">
+                <s.icon size={18} strokeWidth={1.7} />
+              </div>
+              <div>
+                <div className="text-[11px] font-semibold text-eden-sand">{i + 1}단계</div>
+                <div className="text-[15px] font-semibold">{s.title}</div>
+              </div>
+            </Reveal>
+          ))}
+        </ol>
       </section>
 
       {/* News */}
-      <section id="news" className="mx-auto max-w-6xl px-6 pb-24 md:px-8">
-        <Reveal className="mb-14 flex flex-wrap items-end justify-between gap-6">
-          <h2 className="font-serif text-3xl font-semibold">새소식</h2>
-          <Link to="/news" className="rounded-full border border-eden-line px-4 py-2 text-sm font-medium hover:border-eden-sand hover:text-eden-sand">전체 새소식 보기</Link>
+      <section id="news" className="mx-auto max-w-6xl px-6 pb-16 md:px-8">
+        <Reveal className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <h2 className="font-serif text-2xl font-semibold">새소식</h2>
+          <Link to="/support" className="rounded-full border border-eden-line px-4 py-2 text-sm font-medium hover:border-eden-sand hover:text-eden-sand">전체 보기</Link>
         </Reveal>
         <div className="max-w-3xl">
-          {newsItems.map((n, i) => (
-            <Reveal key={n.key} delay={i * 80} className="border-t border-eden-line last:border-b">
-              <NewsLink tag={cv(`news.${n.key}.tag`)} newsKey={n.key} className="group flex items-center gap-6 py-5">
-                <span className="rounded-full bg-eden-sand/15 px-3 py-1 text-xs font-semibold text-eden-ink">{cv(`news.${n.key}.tag`)}</span>
-                <span className="flex-1 text-[15px] group-hover:text-eden-sand">{cv(`news.${n.key}.title`)}</span>
-                <span className="text-sm text-eden-sage-dim">{cv(`news.${n.key}.date`)}</span>
+          {HOME_NEWS_KEYS.map((key, i) => (
+            <Reveal key={key} delay={i * 80} className="border-t border-eden-line last:border-b">
+              <NewsLink tag={cv(`news.${key}.tag`)} newsKey={key} className="group flex flex-wrap items-center gap-x-4 gap-y-1 py-4">
+                <span className="rounded-full bg-eden-sand/15 px-3 py-1 text-xs font-semibold text-eden-ink">{cv(`news.${key}.tag`)}</span>
+                <span className="min-w-0 flex-1 text-[15px] group-hover:text-eden-sand">{cv(`news.${key}.title`)}</span>
+                <span className="text-sm text-eden-sage-dim">{cv(`news.${key}.date`)}</span>
               </NewsLink>
             </Reveal>
           ))}
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="bg-eden-ink-2 px-6 py-20 text-center text-eden-paper md:px-8">
+      {/* About teaser */}
+      <section className="bg-eden-ink-2 px-6 py-14 text-center text-eden-paper md:px-8">
         <Reveal>
-          <h2 className="mb-8 font-serif text-3xl font-semibold">{cv('cta.title')}</h2>
-          <Link to="/menu" className="inline-block rounded-full bg-eden-paper px-9 py-3 text-sm font-semibold text-eden-ink hover:-translate-y-0.5 hover:bg-eden-sand">
-            메뉴 보기
+          <p className="mb-2 text-sm text-eden-sage">{cv('hero.eyebrow')}</p>
+          <h2 className="mb-6 font-serif text-2xl font-semibold">이든이 어떤 곳인지 궁금하다면</h2>
+          <Link to="/about" className="inline-block rounded-full border border-[rgba(237,236,227,0.45)] px-8 py-3 text-sm font-semibold hover:border-eden-sand hover:bg-eden-sand hover:text-eden-ink-2">
+            카페소개 보기
           </Link>
         </Reveal>
       </section>

@@ -17,9 +17,9 @@ export function SiteFooter() {
           <div>
             <h4 className="mb-4 text-sm font-medium text-eden-paper">사이트</h4>
             <Link to="/about" className="block py-1 text-sm hover:text-eden-sand">카페소개</Link>
-            <Link to="/menu" className="block py-1 text-sm hover:text-eden-sand">메뉴</Link>
-            <Link to="/news" className="block py-1 text-sm hover:text-eden-sand">새소식</Link>
-            <Link to="/support" className="block py-1 text-sm hover:text-eden-sand">문의하기</Link>
+            <Link to="/order" className="block py-1 text-sm hover:text-eden-sand">주문</Link>
+            <Link to="/guide" className="block py-1 text-sm hover:text-eden-sand">픽업 이용방법</Link>
+            <Link to="/support" className="block py-1 text-sm hover:text-eden-sand">문의사항</Link>
           </div>
           <div>
             <h4 className="mb-4 text-sm font-medium text-eden-paper">고객</h4>

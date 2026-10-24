@@ -94,8 +94,8 @@ function NameLine({ name, onSave, className = '', suffix = '님' }: { name: stri
 function QuickLinks({ onSignOut, className = '' }: { onSignOut: () => void; className?: string }) {
   return (
     <div className={`flex flex-wrap gap-4 text-sm ${className}`}>
-      <Link to="/support" className="underline">내 문의</Link>
-      <Link to="/cart" className="underline">장바구니</Link>
+      <Link to="/support" hash="inquiry" className="underline">내 문의</Link>
+      <Link to="/order" className="underline">주문하러 가기</Link>
       <button type="button" onClick={onSignOut} className="underline opacity-70">로그아웃</button>
     </div>
   )
@@ -104,7 +104,7 @@ function QuickLinks({ onSignOut, className = '' }: { onSignOut: () => void; clas
 const Empty = () => (
   <div className="rounded-card bg-eden-paper-dim py-12 text-center text-sm text-eden-sage-dim">
     아직 주문 내역이 없어요.{' '}
-    <Link to="/menu" className="font-semibold text-eden-ink underline">메뉴 보러 가기</Link>
+    <Link to="/order" className="font-semibold text-eden-ink underline">메뉴 보러 가기</Link>
   </div>
 )
 
@@ -218,7 +218,7 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut, onCan
           empty={
             <>
               오늘 주문한 메뉴가 없어요. 자정까지 주문하면 내일 픽업할 수 있어요.{' '}
-              <Link to="/menu" className="font-semibold text-eden-ink underline">메뉴 보기</Link>
+              <Link to="/order" className="font-semibold text-eden-ink underline">메뉴 보기</Link>
             </>
           }
         />

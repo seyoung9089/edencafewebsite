@@ -14,17 +14,26 @@ const valueMeta = [
   { icon: Sunrise, key: 'rest', tone: 'bg-eden-sage-dim' },
 ]
 
+const historyMeta = [
+  { year: '2021', key: 'h1' },
+  { year: '2022', key: 'h2' },
+  { year: '2023', key: 'h3' },
+  { year: '2024–2025', key: 'h4' },
+  { year: '2026', key: 'h5', latest: true },
+]
+
 function AboutPage() {
   const content = useSiteContent()
   const cv = (key: string) => useContentValue(content, key)
   const locationPhoto = useContentImage('location.photo')
+  const historyPhoto = useContentImage('history.photo')
 
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
       <section className="px-6 pb-6 pt-14 md:px-8">
         <h1 className="mb-3 font-serif text-3xl font-semibold">카페소개</h1>
-        <p className="text-[15px] text-eden-sage-dim">이든이 걸어온 마음과 지키는 가치, 오시는 길까지 한 곳에 담았습니다.</p>
+        <p className="text-[15px] text-eden-sage-dim">이든이 걸어온 마음과 지키는 가치, 지나온 시간과 오시는 길까지 한 곳에 담았습니다.</p>
       </section>
 
       <section className="mx-auto max-w-xl px-6 py-16 md:px-8">
@@ -55,6 +64,35 @@ function AboutPage() {
           ))}
         </div>
         <p className="mt-14 text-center font-serif text-xl font-medium">{cv('values.tagline')}</p>
+      </section>
+
+      <section id="history" className="mx-auto max-w-6xl px-6 pb-24 md:px-8">
+        <div className="mb-14 max-w-xl">
+          <h2 className="mb-3 font-serif text-3xl font-semibold">{cv('history.title')}</h2>
+          <p className="text-[15px] text-eden-sage-dim">{cv('history.subtitle')}</p>
+        </div>
+        <div className="flex flex-col gap-10 md:flex-row md:items-start">
+          <div className="relative flex-1 border-l border-eden-sage-dim/30 pl-9">
+            {historyMeta.map((h) => (
+              <div key={h.year} className="relative pb-12 last:pb-0">
+                <span
+                  className={`absolute -left-[41px] top-1 h-2.5 w-2.5 rounded-full border-2 ${
+                    h.latest ? 'border-eden-sand bg-eden-sand' : 'border-eden-sage-dim bg-eden-paper'
+                  }`}
+                />
+                <div className="mb-2 font-serif text-xl font-semibold text-eden-sand">{h.year}</div>
+                <p className="max-w-[48ch] text-[15px]">{cv(`history.${h.key}`)}</p>
+              </div>
+            ))}
+          </div>
+          <div className="h-[220px] w-full flex-shrink-0 overflow-hidden rounded-card bg-eden-sage-dim shadow-soft md:w-[280px]">
+            {historyPhoto ? (
+              <img src={historyPhoto} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex h-full items-center justify-center text-xs text-eden-paper/60">사진 없음</div>
+            )}
+          </div>
+        </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-6 pb-24 md:px-8">

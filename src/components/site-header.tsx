@@ -5,11 +5,9 @@ import { useEffect, useState } from 'react'
 
 const NAV_LINKS = [
   { to: '/about', label: '카페소개' },
-  { to: '/menu', label: '메뉴' },
-  { to: '/history', label: '히스토리' },
-  { to: '/news', label: '새소식' },
-  { to: '/support', label: '문의' },
-]
+  { to: '/order', label: '주문' },
+  { to: '/support', label: '문의사항' },
+] as const
 
 export function SiteHeader() {
   const { totalQty } = useCart()
@@ -59,7 +57,7 @@ export function SiteHeader() {
           <Link to="/orders" aria-label="내 주문" className="text-eden-ink hover:text-eden-sand">
             <User size={19} strokeWidth={1.6} />
           </Link>
-          <Link to="/cart" aria-label="장바구니" className="relative text-eden-ink hover:text-eden-sand">
+          <Link to="/order" aria-label="주문 내역 보기" className="relative text-eden-ink hover:text-eden-sand">
             <ShoppingBag size={19} strokeWidth={1.6} />
             {totalQty > 0 ? (
               <span className="absolute -right-2 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-eden-sand px-1 text-[10px] font-bold text-eden-ink-2">

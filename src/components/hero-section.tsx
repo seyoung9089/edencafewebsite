@@ -1,17 +1,7 @@
 import { Link } from '@tanstack/react-router'
-import { useContentImage } from '@/lib/site-content'
-import { useRef } from 'react'
-
-const heroLines = [
-  { text: 'Eden Cafe', featured: true },
-  { text: 'Honest & Comfortable' },
-  { text: 'Started in 2021' },
-  { text: 'as a School Project' },
-  { text: 'Baked Fresh Every Morning' },
-  { text: 'Brewed with Honest Hearts' },
-  { text: 'A Small Rest, Like Eden' },
-  { text: 'Chungnam, Geumsan' },
-]
+import { ArrowRight } from 'lucide-react'
+import { useContentImage, useContentValue, useSiteContent } from '@/lib/site-content'
+import { useCurrentPickupSlot } from '@/lib/pickup'
 
 function WaveBackground() {
   return (
@@ -35,93 +25,56 @@ function WaveBackground() {
   )
 }
 
+/**
+ * Home first screen: the way into ordering. Kept short so the 주문 바로가기
+ * button and the pickup basics are visible without scrolling, even on phones.
+ */
 export function HeroSection() {
   const heroImage = useContentImage('hero.photo')
   const bgPhoto = useContentImage('hero.bgPhoto')
-  const sectionRef = useRef<HTMLElement | null>(null)
-  const frameRef = useRef<number | null>(null)
-
-  function handleMouseMove(e: React.MouseEvent<HTMLElement>) {
-    const el = sectionRef.current
-    if (!el) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
-    const rect = el.getBoundingClientRect()
-    // -1..1 range from section center
-    const px = ((e.clientX - rect.left) / rect.width - 0.5) * 2
-    const py = ((e.clientY - rect.top) / rect.height - 0.5) * 2
-
-    if (frameRef.current) cancelAnimationFrame(frameRef.current)
-    frameRef.current = requestAnimationFrame(() => {
-      el.style.setProperty('--px', px.toFixed(3))
-      el.style.setProperty('--py', py.toFixed(3))
-    })
-  }
-
-  function handleMouseLeave() {
-    const el = sectionRef.current
-    if (!el) return
-    el.style.setProperty('--px', '0')
-    el.style.setProperty('--py', '0')
-  }
+  const content = useSiteContent()
+  const cv = (key: string) => useContentValue(content, key)
+  const pickupTime = cv('pickup.time')
+  const slot = useCurrentPickupSlot()
 
   return (
-    <section
-      ref={sectionRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      // z-0 (not just "relative") is required here: without an explicit
-      // z-index, this section doesn't establish its own stacking context,
-      // so the -z-10 background layer below escapes it and paints behind
-      // the page's own body background instead — i.e. invisible.
-      // More vertical padding on mobile so the background photo reads as
-      // a clear margin around the card instead of a thin, easy-to-miss sliver.
-      className="relative z-0 overflow-hidden px-4 pb-20 pt-14 md:px-8 md:pb-24 md:pt-12"
-    >
-      <div className="parallax-layer absolute inset-0 -z-10" style={{ '--depth': 6 } as React.CSSProperties}>
-        {bgPhoto ? (
-          <img src={bgPhoto} alt="" className="h-full w-full object-cover" />
-        ) : (
-          <WaveBackground />
-        )}
+    // z-0 (not just "relative") is required here: without an explicit
+    // z-index, this section doesn't establish its own stacking context,
+    // so the -z-10 background layer below escapes it and paints behind
+    // the page's own body background instead — i.e. invisible.
+    <section className="relative z-0 overflow-hidden px-4 py-8 md:px-8 md:py-14">
+      <div className="absolute inset-0 -z-10">
+        {bgPhoto ? <img src={bgPhoto} alt="" className="h-full w-full object-cover" /> : <WaveBackground />}
       </div>
 
-      <div className="relative mx-auto max-w-3xl rounded-card bg-eden-paper px-6 pb-14 pt-10 shadow-[0_0_40px_0_rgba(14,27,22,0.18)] md:px-14 md:pt-12">
-        <p className="mb-8 text-center text-xs tracking-[0.1em] text-eden-sage-dim">
-          별무리고등학교에서 시작된 카페 협동조합 · Since 2021
-        </p>
+      <div className="relative mx-auto max-w-3xl rounded-card bg-eden-paper px-5 py-7 text-center shadow-[0_0_40px_0_rgba(14,27,22,0.18)] md:px-12 md:py-10">
+        <p className="mb-5 text-[11px] tracking-[0.1em] text-eden-sage-dim md:text-xs">{cv('hero.eyebrow')}</p>
 
-        <div className="relative mx-auto max-w-xl py-4 text-center">
-          <div className="relative z-0">
-            {heroLines.map((line, i) => (
-              <p
-                key={i}
-                className={`hero-line ${
-                  line.featured
-                    ? 'font-serif text-2xl font-bold text-eden-sand md:text-4xl'
-                    : 'font-serif text-2xl font-semibold text-eden-ink md:text-4xl'
-                }`}
-                style={{ animationDelay: `${i * 90}ms` }}
-              >
-                {line.text}
-              </p>
-            ))}
+        <div className="flex flex-col items-center gap-4 md:flex-row md:gap-8 md:text-left">
+          <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-card shadow-soft md:h-32 md:w-32">
+            {heroImage ? <img src={heroImage} alt="" className="h-full w-full object-cover" /> : <CabinIllustration />}
           </div>
-          <div className="absolute left-1/2 top-1/2 z-10 aspect-[3/3.7] w-[46%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-card shadow-[0_0_30px_0_rgba(14,27,22,0.3)]">
-            {heroImage ? (
-              <img src={heroImage} alt="" className="h-full w-full object-cover" />
-            ) : (
-              <CabinIllustration />
-            )}
+          <div>
+            <div className="mb-1 text-sm font-semibold text-eden-sand">{cv('menuHome.title')}</div>
+            <h1 className="font-serif text-2xl font-bold leading-snug md:text-3xl">오늘 주문하고, 내일 찾아가세요</h1>
+            <p className="mt-2 text-sm text-eden-sage-dim">{cv('menuHome.subtitle')}</p>
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col items-center gap-3">
-          <Link to="/menu" className="rounded-full bg-eden-ink px-9 py-3 text-sm font-semibold text-eden-paper shadow-soft hover:-translate-y-0.5 hover:bg-eden-ink-2">
-            메뉴 보기
-          </Link>
-          <span className="text-[11px] tracking-[0.2em] text-eden-sage-dim">SCROLL</span>
-        </div>
+        <Link
+          to="/order"
+          className="mt-6 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-eden-ink text-base font-semibold text-eden-paper shadow-soft transition-colors hover:bg-eden-ink-2 sm:w-auto sm:px-14"
+        >
+          주문 바로가기 <ArrowRight size={18} />
+        </Link>
+
+        <ul className="mt-5 flex flex-wrap justify-center gap-2 text-[13px]">
+          <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">매일 주문 가능</li>
+          <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">
+            오늘 자정까지 주문하면 {slot ? <strong>{slot.dateLabel}</strong> : '다음 날'} 픽업
+          </li>
+          {pickupTime ? <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">픽업 시간 {pickupTime}</li> : null}
+        </ul>
       </div>
     </section>
   )

@@ -14,7 +14,8 @@ import { pageMeta } from '@/lib/seo'
 import { useEffect, useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
-import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp } from 'lucide-react'
+import { MenuDetailDialog } from '@/components/menu-detail'
+import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/order')({ component: OrderPage, head: () => pageMeta('/order') })
@@ -44,41 +45,49 @@ function MenuCard({
   qty,
   onAdd,
   onQty,
+  onOpen,
 }: {
   item: MenuItem
   popular?: boolean
   qty: number
   onAdd: (item: MenuItem) => void
   onQty: (name: string, qty: number) => void
+  onOpen: (item: MenuItem) => void
 }) {
   const Icon = CATEGORY_ICON[item.category]
   const soldOut = item.category === 'bakery' && isSoldOut(item)
   const max = maxQtyFor(item)
   return (
     <div className={`flex flex-col rounded-card bg-eden-paper-dim p-3 shadow-soft ${qty > 0 ? 'ring-2 ring-eden-sand' : ''}`}>
-      <div className="relative mb-3 flex aspect-[2/1] items-center justify-center overflow-hidden rounded-[10px] bg-eden-paper">
-        {item.image_url ? (
-          <img
-            src={item.image_url}
-            alt={item.name}
-            className={`h-full w-full object-cover ${soldOut ? 'grayscale opacity-50' : ''}`}
-            loading="lazy"
-          />
-        ) : (
-          <Icon size={28} strokeWidth={1.5} className={`text-eden-sage-dim ${soldOut ? 'opacity-50' : ''}`} />
-        )}
-        {popular ? (
-          <span className="absolute right-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-eden-sand px-2 py-0.5 text-[11px] font-semibold text-eden-ink-2">
-            <Flame size={11} strokeWidth={2} /> 인기
-          </span>
-        ) : null}
-        {soldOut ? (
-          <span className="absolute left-1.5 top-1.5 rounded-full bg-eden-ink-2/90 px-2 py-0.5 text-[11px] font-semibold text-eden-paper">
-            품절
-          </span>
-        ) : null}
-      </div>
-      <h3 className="font-serif text-[15px] font-semibold leading-snug">{item.name}</h3>
+      {/* Photo and name both open the detail view: one big tap target. */}
+      <button type="button" onClick={() => onOpen(item)} aria-label={`${item.name} 자세히 보기`} className="group text-left">
+        <div className="relative mb-3 flex aspect-[2/1] items-center justify-center overflow-hidden rounded-[10px] bg-eden-paper">
+          {item.image_url ? (
+            <img
+              src={item.image_url}
+              alt={item.name}
+              className={`h-full w-full object-cover ${soldOut ? 'grayscale opacity-50' : ''}`}
+              loading="lazy"
+            />
+          ) : (
+            <Icon size={28} strokeWidth={1.5} className={`text-eden-sage-dim ${soldOut ? 'opacity-50' : ''}`} />
+          )}
+          {popular ? (
+            <span className="absolute right-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-eden-sand px-2 py-0.5 text-[11px] font-semibold text-eden-ink-2">
+              <Flame size={11} strokeWidth={2} /> 인기
+            </span>
+          ) : null}
+          {soldOut ? (
+            <span className="absolute left-1.5 top-1.5 rounded-full bg-eden-ink-2/90 px-2 py-0.5 text-[11px] font-semibold text-eden-paper">
+              품절
+            </span>
+          ) : null}
+        </div>
+        <span className="flex items-start gap-0.5 font-serif text-[15px] font-semibold leading-snug group-hover:underline group-hover:underline-offset-4">
+          {item.name}
+          <ChevronRight size={16} strokeWidth={2} className="mt-0.5 shrink-0 text-eden-sage-dim" aria-hidden />
+        </span>
+      </button>
       <div className="mb-3 mt-1 flex flex-wrap items-baseline justify-between gap-x-2">
         <span className="font-semibold text-eden-ink">{won(item.price)}</span>
         {item.category === 'bakery' && item.stock !== null && item.stock > 0 ? (
@@ -141,6 +150,8 @@ function OrderPage() {
   const [submitting, setSubmitting] = useState(false)
   const [placed, setPlaced] = useState<Omit<PlacedOrder, 'pickupTime'> | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
+  // By name, so the open detail picks up fresh stock from the menu.
+  const [detailName, setDetailName] = useState<string | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -268,7 +279,7 @@ function OrderPage() {
               ) : (
                 <div className={grid}>
                   {bakery.map((item) => (
-                    <MenuCard key={item.name} item={item} popular={popular.has(item.name)} qty={qtyOf(item.name)} onAdd={add} onQty={setQty} />
+                    <MenuCard key={item.name} item={item} popular={popular.has(item.name)} qty={qtyOf(item.name)} onAdd={add} onQty={setQty} onOpen={(i) => setDetailName(i.name)} />
                   ))}
                 </div>
               )}
@@ -280,7 +291,7 @@ function OrderPage() {
                 <p className="mb-4 mt-3 text-sm text-eden-sage-dim">음료는 매장에서 바로 주문해주세요.</p>
                 <div className={grid}>
                   {drinks.map((item) => (
-                    <MenuCard key={item.name} item={item} qty={0} onAdd={add} onQty={setQty} />
+                    <MenuCard key={item.name} item={item} qty={0} onAdd={add} onQty={setQty} onOpen={(i) => setDetailName(i.name)} />
                   ))}
                 </div>
               </section>
@@ -322,6 +333,15 @@ function OrderPage() {
           {receipt}
         </SheetContent>
       </Sheet>
+
+      <MenuDetailDialog
+        item={detailName ? (menuByName.get(detailName) ?? null) : null}
+        popular={detailName ? popular.has(detailName) : false}
+        qty={detailName ? qtyOf(detailName) : 0}
+        onAdd={add}
+        onQty={setQty}
+        onClose={() => setDetailName(null)}
+      />
 
       <Dialog open={!!placed} onOpenChange={(open) => !open && setPlaced(null)}>
         <DialogContent className="max-w-[400px] rounded-card bg-eden-paper">

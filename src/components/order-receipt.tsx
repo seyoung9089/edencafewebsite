@@ -15,13 +15,15 @@ type ReceiptProps = {
   totalPrice: number
   /** The pickup day the customer picked, or null if not yet */
   pickup: PickupDate | null
+  /** 학부모 주문 tab: student name and payment choice */
+  parents: boolean
   pickupTime: string
   /** null while the login state is still loading */
   loggedIn: boolean | null
   submitting: boolean
   /** Why the order can't go in yet (shown above the button), or '' */
   blocker: string
-  /** Friday only: who picks up, and how they pay */
+  /** 학부모 주문 only: who picks up, and how they pay */
   studentName: string
   onStudentName: (name: string) => void
   paymentMethod: PaymentMethod | null
@@ -32,7 +34,7 @@ type ReceiptProps = {
   onCheckout: () => void
 }
 
-/** Friday orders: the student's name and 계좌이체/현장결제. */
+/** 학부모 주문: the student's name and 계좌이체/현장결제. */
 function FridayFields({
   studentName,
   onStudentName,
@@ -108,6 +110,7 @@ export function OrderReceipt({
   menuByName,
   totalPrice,
   pickup,
+  parents,
   pickupTime,
   loggedIn,
   submitting,
@@ -121,7 +124,6 @@ export function OrderReceipt({
   onRemove,
   onCheckout,
 }: ReceiptProps) {
-  const friday = pickup?.day === 'friday'
   return (
     <div className="rounded-card bg-eden-paper-dim p-5 shadow-soft">
       <h2 className="font-serif text-lg font-semibold">주문 내역</h2>
@@ -132,10 +134,10 @@ export function OrderReceipt({
           <>
             <div className="font-serif text-base font-semibold text-eden-ink">
               {pickup.label}
-              {pickupTime && !friday ? <span className="ml-1.5 font-sans text-sm font-normal text-eden-sage-dim">{pickupTime}</span> : null}
+              {pickupTime && !parents ? <span className="ml-1.5 font-sans text-sm font-normal text-eden-sage-dim">{pickupTime}</span> : null}
             </div>
             <p className="mt-1 text-xs leading-relaxed text-eden-sage-dim">
-              {friday ? '학생이 금요일 하교할 때 찾아가요. ' : ''}주문 마감: {pickup.deadlineLabel} 23:59
+              {parents ? '학생이 금요일 하교할 때 찾아가요. ' : ''}주문 마감: {pickup.deadlineLabel} 23:59
             </p>
           </>
         ) : (
@@ -194,7 +196,7 @@ export function OrderReceipt({
         <span className="font-serif text-2xl font-bold text-eden-sand">{won(totalPrice)}</span>
       </div>
 
-      {friday ? (
+      {parents ? (
         <FridayFields
           studentName={studentName}
           onStudentName={onStudentName}
@@ -230,7 +232,7 @@ export function OrderReceipt({
             <p className="mt-2 text-center text-xs text-eden-sage-dim">담은 메뉴는 로그인해도 그대로 남아 있어요.</p>
           </>
         )}
-        {loggedIn && (!friday || paymentMethod === 'transfer') ? (
+        {loggedIn && (!parents || paymentMethod === 'transfer') ? (
           <p className="mt-2 text-center text-xs text-eden-sage-dim">주문하면 입금할 계좌를 바로 알려드려요.</p>
         ) : null}
       </div>

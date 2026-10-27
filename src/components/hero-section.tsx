@@ -61,12 +61,20 @@ export function HeroSection() {
           </div>
         </div>
 
-        <Link
-          to="/order"
-          className="mt-6 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-eden-ink text-base font-semibold text-eden-paper shadow-soft transition-colors hover:bg-eden-ink-2 sm:w-auto sm:px-14"
-        >
-          주문 바로가기 <ArrowRight size={18} />
-        </Link>
+        <div className="mt-6 flex flex-col items-center justify-center gap-2 sm:flex-row">
+          <Link
+            to="/order"
+            className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-eden-ink text-base font-semibold text-eden-paper shadow-soft transition-colors hover:bg-eden-ink-2 sm:w-auto sm:px-10"
+          >
+            마을 픽업 주문 <ArrowRight size={18} />
+          </Link>
+          <Link
+            to="/parents"
+            className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full border-2 border-eden-ink text-base font-semibold text-eden-ink transition-colors hover:bg-eden-ink hover:text-eden-paper sm:w-auto sm:px-10"
+          >
+            학부모 주문 (금요일) <ArrowRight size={18} />
+          </Link>
+        </div>
 
         <ul className="mt-5 flex flex-wrap justify-center gap-2 text-[13px]">
           <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">월~금 픽업</li>

@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react'
 
 const NAV_LINKS = [
   { to: '/about', label: '카페소개' },
-  { to: '/order', label: '주문' },
+  { to: '/order', label: '마을 픽업 주문' },
+  { to: '/parents', label: '학부모 주문' },
   { to: '/support', label: '문의사항' },
 ] as const
 

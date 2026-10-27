@@ -50,7 +50,11 @@ function dateLabel(iso: string): string {
   return `${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일(${WEEKDAY_KO[d.getUTCDay()]})`
 }
 
-const byStudent = (a: Order, b: Order) => (a.student_name ?? '').localeCompare(b.student_name ?? '', 'ko') || a.created_at.localeCompare(b.created_at)
+// 학부모 orders by student name first, then 마을 orders (no student) by time.
+const byStudent = (a: Order, b: Order) =>
+  Number(!a.student_name) - Number(!b.student_name) ||
+  (a.student_name ?? '').localeCompare(b.student_name ?? '', 'ko') ||
+  a.created_at.localeCompare(b.created_at)
 
 export function OrdersPanel() {
   const calendar = usePickupDates()
@@ -159,7 +163,11 @@ export function OrdersPanel() {
           <section key={iso} className="mb-10 last:mb-0">
             <div className="mb-3 flex flex-wrap items-baseline gap-3 border-b-2 border-eden-ink pb-3">
               <h3 className="font-serif text-lg font-semibold">{dateLabel(iso)} 픽업</h3>
-              {friday ? <span className="rounded-full bg-eden-sand px-2.5 py-0.5 text-xs font-semibold text-eden-ink-2">금요일 · 학생 픽업</span> : null}
+              {friday ? (
+                <span className="rounded-full bg-eden-sand px-2.5 py-0.5 text-xs font-semibold text-eden-ink-2">
+                  학부모 주문 {active.filter((o) => o.student_name).length}건
+                </span>
+              ) : null}
               <span className="text-sm text-eden-sage-dim">
                 주문 {active.length}건 · 입금대기 {active.filter((o) => o.payment_status === 'pending').length}건 ·{' '}
                 {active.reduce((sum, o) => sum + o.total, 0).toLocaleString('ko-KR')}원

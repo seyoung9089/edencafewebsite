@@ -5,7 +5,7 @@ import { OrderReceipt, type PaymentMethod } from '@/components/order-receipt'
 import { PickupDatePicker } from '@/components/pickup-date-picker'
 import { OrderCompleteBody, type PlacedOrder } from '@/components/order-complete'
 import { MAX_QTY, groupTotals, maxQtyFor, overGroupLimit, reconcileCart, useCart } from '@/lib/cart'
-import { usePickupDates } from '@/lib/pickup'
+import { pickupLabel, usePickupDates } from '@/lib/pickup'
 import { useCustomerAuth } from '@/lib/customer-auth'
 import { useContentValue, useSiteContent } from '@/lib/site-content'
 import { useMenu, isSoldOut, isUnpriced, fetchPopularity, type MenuGroup, type MenuItem } from '@/lib/menu'
@@ -188,7 +188,8 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
   const parents = audience === 'parents'
   const dates = calendar ? calendar.dates.filter((d) => !parents || d.day === 'friday') : null
   // Only a day that's still open counts; at midnight a closed day drops out.
-  const pickup = dates?.find((d) => d.iso === pickupIso && d.open) ?? null
+  // Only a day shown in this week's calendar can be the pickup day.
+  const pickup = dates?.find((d) => d.iso === pickupIso && d.open && calendar?.days.some((c) => c.iso === d.iso)) ?? null
 
   useEffect(() => {
     setPickupIso(readStored(PICKUP_KEY[audience]) || null)
@@ -374,11 +375,14 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
           <div>
             <section>
               <h2 className="mb-4 border-b border-eden-line pb-3 font-serif text-xl font-semibold">{parents ? '1. 금요일 고르기' : '1. 픽업 날짜 고르기'}</h2>
+              {calendar?.days.length ? (
+                <p className="mb-1 text-sm text-eden-sage-dim">
+                  {pickupLabel(calendar.days[0].iso)} ~ {pickupLabel(calendar.days[calendar.days.length - 1].iso)} 픽업
+                </p>
+              ) : null}
               <p className="mb-3 text-[15px] font-semibold">
-                픽업 2일 전 자정까지 주문해 주세요.{' '}
-                <span className="font-normal text-eden-sage-dim">
-                  {parents ? '금요일만 고를 수 있고, 회색 날짜는 주문할 수 없어요.' : '회색 날짜는 주문할 수 없어요.'}
-                </span>
+                픽업 2일 전 자정까지 주문해 주세요.
+                {parents ? <span className="font-normal text-eden-sage-dim"> 학부모 주문은 금요일만 고를 수 있어요.</span> : null}
               </p>
               <PickupDatePicker
                 days={calendar?.days ?? null}

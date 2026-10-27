@@ -22,17 +22,17 @@ export type PickupDate = {
   open: boolean
 }
 
-/** One square of the order calendar: today and the days after it. */
+/** One square of the order calendar: the next five weekdays that take orders. */
 export type CalendarDay = {
   iso: string
   /** Day of the month, e.g. 27 */
   date: number
   month: number
-  /** '월' … '일' */
+  /** '월' … '금' */
   weekday: string
-  isToday: boolean
-  /** Which menu that day uses; null on weekends (no pickup) */
-  day: PickupDay | null
+  /** '이번 주', '다음 주' or '다다음 주' (weeks start on Monday) */
+  weekLabel: string
+  day: PickupDay
   /** Pickup day still taking orders */
   open: boolean
 }
@@ -95,25 +95,37 @@ export function listPickupDates(nowMs: number): PickupDate[] {
   return dates
 }
 
-/** CALENDAR_DAYS squares starting today, one per day, weekends included. */
-export const CALENDAR_DAYS = 14
+/** One week of pickup: five weekdays. */
+export const CALENDAR_DAYS = 5
+const WEEK_LABELS = ['이번 주', '다음 주', '다다음 주']
 
+/**
+ * The first CALENDAR_DAYS weekdays that are still open for orders, weekends
+ * skipped. It moves along one square each day: Mon–Fri today becomes
+ * Tue–Mon tomorrow.
+ */
 export function listCalendarDays(nowMs: number): CalendarDay[] {
   const today = kstTodayStart(nowMs)
-  return Array.from({ length: CALENDAR_DAYS }, (_, i) => {
+  // Monday of this week, for 이번 주/다음 주.
+  const monday = today - ((new Date(today).getUTCDay() + 6) % 7) * DAY_MS
+  const days: CalendarDay[] = []
+  for (let i = DEADLINE_DAYS; days.length < CALENDAR_DAYS; i++) {
     const d = new Date(today + i * DAY_MS)
     const iso = d.toISOString().slice(0, 10)
     const day = pickupDayOf(iso)
-    return {
+    if (!day) continue
+    const week = Math.floor((d.getTime() - monday) / (7 * DAY_MS))
+    days.push({
       iso,
       date: d.getUTCDate(),
       month: d.getUTCMonth() + 1,
       weekday: WEEKDAY_KO[d.getUTCDay()],
-      isToday: i === 0,
+      weekLabel: WEEK_LABELS[week] ?? `${week}주 뒤`,
       day,
-      open: day !== null && i >= DEADLINE_DAYS && i <= PICKUP_WINDOW_DAYS,
-    }
-  })
+      open: i <= PICKUP_WINDOW_DAYS,
+    })
+  }
+  return days
 }
 
 type PickupCalendar = { todayIso: string; dates: PickupDate[]; days: CalendarDay[] }

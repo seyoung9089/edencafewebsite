@@ -1,11 +1,11 @@
 import type { CalendarDay } from '@/lib/pickup'
 
 /**
- * Step 1 on /order and /parents: the next two weeks as a calendar, seven days
- * a row, starting today, so it moves along one square each day. Days that
- * can't be ordered for (too soon, weekends, or not this tab's day) are greyed.
- * Fridays get a small dot when this tab also has other days, because their
- * menu is different.
+ * Step 1 on /order and /parents: one week of pickup, the next five weekdays
+ * that still take orders, so it moves along one square each day (월~금 today,
+ * 화~월 tomorrow). Days this tab doesn't take (학부모: anything but Friday)
+ * are greyed. Fridays get a small dot when this tab also has other days,
+ * because their menu is different.
  */
 export function PickupDatePicker({
   days,
@@ -23,29 +23,27 @@ export function PickupDatePicker({
 }) {
   if (!days) {
     return (
-      <div className="grid grid-cols-7 gap-1.5">
-        {Array.from({ length: 14 }, (_, i) => (
-          <div key={i} className="h-[72px] animate-pulse rounded-[10px] bg-eden-paper-dim" />
+      <div className="grid grid-cols-5 gap-2">
+        {Array.from({ length: 5 }, (_, i) => (
+          <div key={i} className="h-[104px] animate-pulse rounded-[10px] bg-eden-paper-dim" />
         ))}
       </div>
     )
   }
   return (
-    <div className="grid grid-cols-7 gap-1.5">
-      {days.map((d, i) => {
+    <div className="grid grid-cols-5 gap-2">
+      {days.map((d) => {
         const open = d.open && allowed(d)
         const active = d.iso === selected
-        // Month shown on the first square and wherever a new month starts.
-        const showMonth = i === 0 || d.date === 1
         return (
           <button
             key={d.iso}
             type="button"
             disabled={!open}
             aria-pressed={active}
-            aria-label={`${d.month}월 ${d.date}일 ${d.weekday}요일${open ? '' : ', 주문할 수 없음'}`}
+            aria-label={`${d.weekLabel} ${d.month}월 ${d.date}일 ${d.weekday}요일${open ? '' : ', 주문할 수 없음'}`}
             onClick={() => onSelect(d.iso)}
-            className={`relative flex h-[72px] flex-col items-center justify-center rounded-[10px] border transition-colors ${
+            className={`relative flex h-[104px] flex-col items-center justify-center gap-0.5 rounded-[10px] border px-1 transition-colors ${
               active
                 ? 'border-eden-ink bg-eden-ink text-eden-paper'
                 : open
@@ -53,11 +51,13 @@ export function PickupDatePicker({
                   : 'cursor-not-allowed border-transparent bg-eden-line/25 text-eden-sage-dim/45'
             }`}
           >
-            <span className="text-xs">{d.isToday ? '오늘' : d.weekday}</span>
-            <span className="font-serif text-xl font-semibold leading-tight">{d.date}</span>
-            <span className="h-3 text-[10px] leading-3">{showMonth ? `${d.month}월` : ''}</span>
+            <span className={`text-[11px] ${active ? 'text-eden-paper/75' : open ? 'text-eden-sage-dim' : ''}`}>{d.weekLabel}</span>
+            <span className="font-serif text-2xl font-semibold leading-tight">{d.weekday}</span>
+            <span className="text-sm font-semibold">
+              {d.month}/{d.date}
+            </span>
             {markFriday && d.day === 'friday' && open ? (
-              <span aria-hidden className={`absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full ${active ? 'bg-eden-paper' : 'bg-eden-sand'}`} />
+              <span aria-hidden className={`absolute right-2 top-2 h-2 w-2 rounded-full ${active ? 'bg-eden-paper' : 'bg-eden-sand'}`} />
             ) : null}
           </button>
         )

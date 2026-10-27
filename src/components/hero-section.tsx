@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
 import { useContentImage, useContentValue, useSiteContent } from '@/lib/site-content'
-import { useCurrentPickupSlot } from '@/lib/pickup'
+import { usePickupDates } from '@/lib/pickup'
 
 function WaveBackground() {
   return (
@@ -35,7 +35,7 @@ export function HeroSection() {
   const content = useSiteContent()
   const cv = (key: string) => useContentValue(content, key)
   const pickupTime = cv('pickup.time')
-  const slot = useCurrentPickupSlot()
+  const earliest = usePickupDates()?.dates.find((d) => d.open)
 
   return (
     // z-0 (not just "relative") is required here: without an explicit
@@ -56,23 +56,34 @@ export function HeroSection() {
           </div>
           <div>
             <div className="mb-1 text-sm font-semibold text-eden-sand">{cv('menuHome.title')}</div>
-            <h1 className="font-serif text-2xl font-bold leading-snug md:text-3xl">오늘 주문하고, 내일 찾아가세요</h1>
+            <h1 className="font-serif text-2xl font-bold leading-snug md:text-3xl">미리 주문하고, 고른 날 찾아가세요</h1>
             <p className="mt-2 text-sm text-eden-sage-dim">{cv('menuHome.subtitle')}</p>
           </div>
         </div>
 
-        <Link
-          to="/order"
-          className="mt-6 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-eden-ink text-base font-semibold text-eden-paper shadow-soft transition-colors hover:bg-eden-ink-2 sm:w-auto sm:px-14"
-        >
-          주문 바로가기 <ArrowRight size={18} />
-        </Link>
+        <div className="mt-6 flex flex-col items-center justify-center gap-2 sm:flex-row">
+          <Link
+            to="/order"
+            className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-eden-ink text-base font-semibold text-eden-paper shadow-soft transition-colors hover:bg-eden-ink-2 sm:w-auto sm:px-10"
+          >
+            마을 픽업 주문 <ArrowRight size={18} />
+          </Link>
+          <Link
+            to="/parents"
+            className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full border-2 border-eden-ink text-base font-semibold text-eden-ink transition-colors hover:bg-eden-ink hover:text-eden-paper sm:w-auto sm:px-10"
+          >
+            학부모 주문 (금요일) <ArrowRight size={18} />
+          </Link>
+        </div>
 
         <ul className="mt-5 flex flex-wrap justify-center gap-2 text-[13px]">
-          <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">매일 주문 가능</li>
-          <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">
-            오늘 자정까지 주문하면 {slot ? <strong>{slot.dateLabel}</strong> : '다음 날'} 픽업
-          </li>
+          <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">월~금 픽업</li>
+          <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">픽업 2일 전 23:59까지 주문</li>
+          {earliest ? (
+            <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">
+              가장 빠른 픽업 <strong>{earliest.label}</strong>
+            </li>
+          ) : null}
           {pickupTime ? <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">픽업 시간 {pickupTime}</li> : null}
         </ul>
       </div>

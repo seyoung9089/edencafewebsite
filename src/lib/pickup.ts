@@ -1,20 +1,29 @@
 import { useEffect, useState } from 'react'
 
-// Daily pickup (Korea time, UTC+9, no DST): an order placed any time on a
-// given day, up to midnight, is picked up the next day. The Supabase
-// place_order function applies the same rule and rejects a stale date, so
-// a wrong device clock can't book the wrong day.
+// Pre-order pickup (Korea time, UTC+9, no DST). Pickup is Monday to Friday,
+// chosen by the customer, up to PICKUP_WINDOW_DAYS ahead. Orders for a day
+// close at 23:59 two days before it (Friday pickup → Wednesday 23:59).
+// Monday–Thursday and Friday have different menus (menu_catalog.sale_days).
+// The Supabase check_order_rules trigger applies the same rules, so a wrong
+// device clock can't sneak an order past the deadline.
 
-export type PickupSlot = {
+/** Which menu a pickup day uses. */
+export type PickupDay = 'weekday' | 'friday'
+
+export type PickupDate = {
   /** Pickup date as YYYY-MM-DD (Korea calendar date) */
   iso: string
-  /** Today as YYYY-MM-DD (Korea calendar date) */
-  todayIso: string
-  /** e.g. "10월 15일(목)" */
-  todayLabel: string
-  /** e.g. "10월 16일(금)" */
-  dateLabel: string
+  /** e.g. "10월 31일(금)" */
+  label: string
+  day: PickupDay
+  /** Last day to order, e.g. "10월 29일(수)" (closes at 23:59) */
+  deadlineLabel: string
+  /** Still taking orders for this day */
+  open: boolean
 }
+
+export const DEADLINE_DAYS = 2
+export const PICKUP_WINDOW_DAYS = 14
 
 const KST_OFFSET_MS = 9 * 60 * 60 * 1000
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -24,31 +33,67 @@ function dayLabel(d: Date): string {
   return `${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일(${WEEKDAY_KO[d.getUTCDay()]})`
 }
 
-export function getCurrentPickupSlot(nowMs: number): PickupSlot {
-  // Shift into Korea time, then read the fields with the UTC getters.
-  const kst = new Date(nowMs + KST_OFFSET_MS)
-  const todayStart = Date.UTC(kst.getUTCFullYear(), kst.getUTCMonth(), kst.getUTCDate())
-  const today = new Date(todayStart)
-  const pickup = new Date(todayStart + DAY_MS)
+/** "10월 31일(금)" for a YYYY-MM-DD date. */
+export function pickupLabel(iso: string): string {
+  return dayLabel(new Date(`${iso}T00:00:00Z`))
+}
 
-  return {
-    iso: pickup.toISOString().slice(0, 10),
-    todayIso: today.toISOString().slice(0, 10),
-    todayLabel: dayLabel(today),
-    dateLabel: dayLabel(pickup),
-  }
+/** Friday uses the Friday menu; other weekdays the 월~목 menu; weekends have no pickup. */
+export function pickupDayOf(iso: string): PickupDay | null {
+  const dow = new Date(`${iso}T00:00:00Z`).getUTCDay()
+  if (dow === 0 || dow === 6) return null
+  return dow === 5 ? 'friday' : 'weekday'
+}
+
+/** Midnight (as a UTC timestamp) of today's Korea calendar date. */
+function kstTodayStart(nowMs: number): number {
+  const kst = new Date(nowMs + KST_OFFSET_MS)
+  return Date.UTC(kst.getUTCFullYear(), kst.getUTCMonth(), kst.getUTCDate())
+}
+
+/** Today as YYYY-MM-DD (Korea calendar date). */
+export function kstTodayIso(nowMs: number): string {
+  return new Date(kstTodayStart(nowMs)).toISOString().slice(0, 10)
 }
 
 /**
- * The pickup slot that a new order would fall into right now.
- * Refreshes every minute and when the tab regains focus, so it rolls over
- * at midnight. Returns null until mounted (avoids an SSR/client mismatch).
+ * Pickup days from tomorrow through PICKUP_WINDOW_DAYS ahead, weekends left
+ * out. Days whose deadline has passed are kept (open: false) so the customer
+ * sees why they can't pick them.
  */
-export function useCurrentPickupSlot(): PickupSlot | null {
-  const [slot, setSlot] = useState<PickupSlot | null>(null)
+export function listPickupDates(nowMs: number): PickupDate[] {
+  const today = kstTodayStart(nowMs)
+  const dates: PickupDate[] = []
+  for (let i = 1; i <= PICKUP_WINDOW_DAYS; i++) {
+    const d = new Date(today + i * DAY_MS)
+    const iso = d.toISOString().slice(0, 10)
+    const day = pickupDayOf(iso)
+    if (!day) continue
+    dates.push({
+      iso,
+      label: dayLabel(d),
+      day,
+      deadlineLabel: dayLabel(new Date(d.getTime() - DEADLINE_DAYS * DAY_MS)),
+      open: i >= DEADLINE_DAYS,
+    })
+  }
+  return dates
+}
+
+/**
+ * Today's pickup calendar. Refreshes every minute and when the tab regains
+ * focus, so a deadline closes at midnight without a reload. Returns null
+ * until mounted (avoids an SSR/client mismatch).
+ */
+export function usePickupDates(): { todayIso: string; dates: PickupDate[] } | null {
+  const [state, setState] = useState<{ todayIso: string; dates: PickupDate[] } | null>(null)
 
   useEffect(() => {
-    const load = () => setSlot(getCurrentPickupSlot(Date.now()))
+    const load = () => {
+      const now = Date.now()
+      const todayIso = kstTodayIso(now)
+      setState((prev) => (prev?.todayIso === todayIso ? prev : { todayIso, dates: listPickupDates(now) }))
+    }
     load()
     const timer = window.setInterval(load, 60_000)
     window.addEventListener('focus', load)
@@ -58,5 +103,5 @@ export function useCurrentPickupSlot(): PickupSlot | null {
     }
   }, [])
 
-  return slot
+  return state
 }

@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { useCustomerAuth } from '@/lib/customer-auth'
 import { supabase } from '@/lib/supabase'
-import { isSoldOut, type MenuItem } from '@/lib/menu'
+import { isSoldOut, isUnpriced, type MenuGroup, type MenuItem } from '@/lib/menu'
+import type { PickupDay } from '@/lib/pickup'
 import { toast } from 'sonner'
 
 export type CartItem = { name: string; price: number; qty: number }
@@ -16,19 +17,26 @@ export function maxQtyFor(item: Pick<MenuItem, 'stock'> | undefined): number {
 
 /**
  * Brings the cart in line with the current menu: drops items that sold out or
- * can't be ordered online, lowers quantities above what's left, and updates
- * prices. `changed` is false when the cart already matched.
+ * can't be ordered online, drops items not sold on the chosen pickup day
+ * (`offDay`), lowers quantities above what's left, and updates prices.
+ * `changed` is false when the cart already matched.
  */
-export function reconcileCart(items: CartItem[], menu: MenuItem[]) {
+export function reconcileCart(items: CartItem[], menu: MenuItem[], day: PickupDay | null = null) {
   const byName = new Map(menu.map((m) => [m.name, m]))
   const removed: string[] = []
+  const offDay: string[] = []
   const reduced: { name: string; qty: number }[] = []
   let changed = false
   const next: CartItem[] = []
   for (const it of items) {
     const m = byName.get(it.name)
-    if (!m || m.category !== 'bakery' || isSoldOut(m)) {
+    if (!m || m.category !== 'bakery' || isSoldOut(m) || isUnpriced(m)) {
       removed.push(it.name)
+      changed = true
+      continue
+    }
+    if (day && !m.sale_days.includes(day)) {
+      offDay.push(it.name)
       changed = true
       continue
     }
@@ -37,7 +45,23 @@ export function reconcileCart(items: CartItem[], menu: MenuItem[]) {
     if (qty !== it.qty || m.price !== it.price) changed = true
     next.push({ name: it.name, price: m.price, qty })
   }
-  return { next, removed, reduced, changed }
+  return { next, removed, offDay, reduced, changed }
+}
+
+/** How many of each kind of bread (menu_groups) the cart holds. */
+export function groupTotals(items: CartItem[], menuByName: Map<string, MenuItem>): Map<string, number> {
+  const totals = new Map<string, number>()
+  for (const it of items) {
+    const group = menuByName.get(it.name)?.group_name
+    if (group) totals.set(group, (totals.get(group) ?? 0) + it.qty)
+  }
+  return totals
+}
+
+/** The first capped kind (소금빵·치아바타·베이글) the cart holds too many of, or null. */
+export function overGroupLimit(items: CartItem[], menuByName: Map<string, MenuItem>, groups: MenuGroup[]): MenuGroup | null {
+  const totals = groupTotals(items, menuByName)
+  return groups.find((g) => g.max_qty !== null && (totals.get(g.name) ?? 0) > g.max_qty) ?? null
 }
 
 type CartContextValue = {

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ParentsRouteImport } from './routes/parents'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as OrderRouteImport } from './routes/order'
 import { Route as NewsRouteImport } from './routes/news'
@@ -38,6 +39,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParentsRoute = ParentsRouteImport.update({
+  id: '/parents',
+  path: '/parents',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrdersRoute = OrdersRouteImport.update({
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/news': typeof NewsRoute
   '/order': typeof OrderRoute
   '/orders': typeof OrdersRoute
+  '/parents': typeof ParentsRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/news': typeof NewsRoute
   '/order': typeof OrderRoute
   '/orders': typeof OrdersRoute
+  '/parents': typeof ParentsRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/news': typeof NewsRoute
   '/order': typeof OrderRoute
   '/orders': typeof OrdersRoute
+  '/parents': typeof ParentsRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/support': typeof SupportRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/news'
     | '/order'
     | '/orders'
+    | '/parents'
     | '/privacy'
     | '/reset-password'
     | '/support'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/news'
     | '/order'
     | '/orders'
+    | '/parents'
     | '/privacy'
     | '/reset-password'
     | '/support'
@@ -201,6 +212,7 @@ export interface FileRouteTypes {
     | '/news'
     | '/order'
     | '/orders'
+    | '/parents'
     | '/privacy'
     | '/reset-password'
     | '/support'
@@ -219,6 +231,7 @@ export interface RootRouteChildren {
   NewsRoute: typeof NewsRoute
   OrderRoute: typeof OrderRoute
   OrdersRoute: typeof OrdersRoute
+  ParentsRoute: typeof ParentsRoute
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SupportRoute: typeof SupportRoute
@@ -246,6 +259,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parents': {
+      id: '/parents'
+      path: '/parents'
+      fullPath: '/parents'
+      preLoaderRoute: typeof ParentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/orders': {
@@ -347,6 +367,7 @@ const rootRouteChildren: RootRouteChildren = {
   NewsRoute: NewsRoute,
   OrderRoute: OrderRoute,
   OrdersRoute: OrdersRoute,
+  ParentsRoute: ParentsRoute,
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SupportRoute: SupportRoute,

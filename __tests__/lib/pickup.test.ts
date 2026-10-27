@@ -1,0 +1,44 @@
+import { describe, it, expect } from "vitest"
+import { listPickupDates, pickupDayOf } from "@/lib/pickup"
+
+// 2026-10-27 is a Tuesday. Times are given in Korea time (+09:00).
+const at = (kst: string) => new Date(kst).getTime()
+
+describe("pickupDayOf", () => {
+  it("splits Mon–Thu, Friday and the weekend", () => {
+    expect(pickupDayOf("2026-10-26")).toBe("weekday")
+    expect(pickupDayOf("2026-10-29")).toBe("weekday")
+    expect(pickupDayOf("2026-10-30")).toBe("friday")
+    expect(pickupDayOf("2026-10-31")).toBeNull()
+    expect(pickupDayOf("2026-11-01")).toBeNull()
+  })
+})
+
+describe("listPickupDates", () => {
+  it("closes two days before pickup at 23:59 Korea time", () => {
+    const tueNight = listPickupDates(at("2026-10-27T23:59:00+09:00"))
+    expect(tueNight.find((d) => d.iso === "2026-10-28")?.open).toBe(false)
+    expect(tueNight.find((d) => d.iso === "2026-10-29")?.open).toBe(true)
+
+    // Friday pickup closes Wednesday 23:59.
+    const wedNight = listPickupDates(at("2026-10-28T23:59:00+09:00"))
+    const fri = wedNight.find((d) => d.iso === "2026-10-30")
+    expect(fri).toMatchObject({ day: "friday", open: true, deadlineLabel: "10월 28일(수)" })
+    const thuMorning = listPickupDates(at("2026-10-29T00:00:00+09:00"))
+    expect(thuMorning.find((d) => d.iso === "2026-10-30")?.open).toBe(false)
+  })
+
+  it("uses the Korea date even when UTC is still the day before", () => {
+    // 2026-10-28 00:30 KST = 2026-10-27 15:30 UTC
+    const dates = listPickupDates(at("2026-10-28T00:30:00+09:00"))
+    expect(dates[0].iso).toBe("2026-10-29")
+    expect(dates.find((d) => d.iso === "2026-10-30")?.open).toBe(true)
+  })
+
+  it("skips weekends and stays within two weeks", () => {
+    const dates = listPickupDates(at("2026-10-27T12:00:00+09:00"))
+    expect(dates.every((d) => pickupDayOf(d.iso) !== null)).toBe(true)
+    expect(dates[dates.length - 1].iso <= "2026-11-10").toBe(true)
+    expect(dates.length).toBe(10)
+  })
+})

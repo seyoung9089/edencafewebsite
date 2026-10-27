@@ -118,6 +118,11 @@ export const CONTENT_SCHEMA: ContentField[] = [
   { group: '입금 계좌', key: 'payment.holder', label: '예금주', type: 'input', default: '이든협동조합' },
   { group: '입금 계좌', key: 'payment.note', label: '입금 안내', type: 'input', default: '주문 후 30분 이내에 입금해주세요.' },
 
+  { group: '주문 안내', key: 'order.fridayNotice', label: '금요일 주문 안내 (주문 페이지 맨 위)', type: 'textarea', default: '금요일 주문 상품은 학생이 금요일 하교 시 픽업합니다. 주문 시 꼭 학생 이름을 적어 주세요.' },
+  { group: '주문 안내', key: 'order.studentDepositNote', label: '금요일 계좌이체 입금자명 안내', type: 'input', default: '입금자명은 학생 이름으로 해 주세요.' },
+  { group: '주문 안내', key: 'order.bulkNotice', label: '대량 주문 안내', type: 'textarea', default: '소금빵·치아바타·베이글은 10개 이상 대량 주문 시 사이트가 아닌 별도 문의로 받고 있습니다.' },
+  { group: '주문 안내', key: 'order.bulkContact', label: '대량 주문 문의처', type: 'input', default: '[문의처]' },
+
   { group: '푸터 · 기타', key: 'footer.blurb', label: '푸터 소개문', type: 'textarea', default: '학생들의 작은 시작이 협동조합으로 자란 카페. 정직한 재료와 편안한 쉼을 나눕니다.' },
 ]
 

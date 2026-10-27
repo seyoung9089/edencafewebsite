@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { maxQtyFor, reconcileCart } from "@/lib/cart"
+import { maxQtyFor, overGroupLimit, reconcileCart } from "@/lib/cart"
 import type { MenuItem } from "@/lib/menu"
 
 const bread = (over: Partial<MenuItem> = {}): MenuItem => ({
@@ -12,6 +12,8 @@ const bread = (over: Partial<MenuItem> = {}): MenuItem => ({
   sort_order: 0,
   image_url: null,
   is_featured: false,
+  sale_days: ["weekday", "friday"],
+  group_name: null,
   ...over,
 })
 
@@ -53,5 +55,71 @@ describe("reconcileCart", () => {
     const r = reconcileCart([{ name: "이든 소금빵", price: 3500, qty: 5 }], [bread({ stock: 2 })])
     expect(r.next).toEqual([{ name: "이든 소금빵", price: 4000, qty: 2 }])
     expect(r.reduced).toEqual([{ name: "이든 소금빵", qty: 2 }])
+  })
+})
+
+describe("reconcileCart by pickup day", () => {
+  const menu = [
+    bread({ name: "기본 소금빵", sale_days: ["friday"], group_name: "소금빵" }),
+    bread({ name: "에그타르트" }),
+    bread({ name: "가격 미정 빵", price: 0 }),
+  ]
+
+  it("drops items not sold on the chosen day", () => {
+    const r = reconcileCart(
+      [
+        { name: "기본 소금빵", price: 4000, qty: 1 },
+        { name: "에그타르트", price: 4000, qty: 1 },
+      ],
+      menu,
+      "weekday",
+    )
+    expect(r.next.map((it) => it.name)).toEqual(["에그타르트"])
+    expect(r.offDay).toEqual(["기본 소금빵"])
+  })
+
+  it("keeps day-only items while no day is chosen, but drops unpriced ones", () => {
+    const r = reconcileCart(
+      [
+        { name: "기본 소금빵", price: 4000, qty: 1 },
+        { name: "가격 미정 빵", price: 0, qty: 1 },
+      ],
+      menu,
+    )
+    expect(r.next.map((it) => it.name)).toEqual(["기본 소금빵"])
+    expect(r.removed).toEqual(["가격 미정 빵"])
+  })
+})
+
+describe("overGroupLimit", () => {
+  const menu = [
+    bread({ name: "기본 소금빵", group_name: "소금빵" }),
+    bread({ name: "햄치즈 소금빵", group_name: "소금빵" }),
+    bread({ name: "기본 휘낭시에", group_name: "휘낭시에" }),
+  ]
+  const byName = new Map(menu.map((m) => [m.name, m]))
+  const groups = [
+    { name: "소금빵", sort_order: 1, max_qty: 9 },
+    { name: "휘낭시에", sort_order: 2, max_qty: null },
+  ]
+
+  it("allows 9 flavours together", () => {
+    const cart = [
+      { name: "기본 소금빵", price: 4000, qty: 5 },
+      { name: "햄치즈 소금빵", price: 4000, qty: 4 },
+    ]
+    expect(overGroupLimit(cart, byName, groups)).toBeNull()
+  })
+
+  it("blocks 10 across flavours (6 + 4)", () => {
+    const cart = [
+      { name: "기본 소금빵", price: 4000, qty: 6 },
+      { name: "햄치즈 소금빵", price: 4000, qty: 4 },
+    ]
+    expect(overGroupLimit(cart, byName, groups)?.name).toBe("소금빵")
+  })
+
+  it("ignores kinds without a cap", () => {
+    expect(overGroupLimit([{ name: "기본 휘낭시에", price: 4000, qty: 20 }], byName, groups)).toBeNull()
   })
 })

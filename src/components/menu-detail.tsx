@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogClose } from '@/components/ui/dialog'
-import { isSoldOut, type MenuItem } from '@/lib/menu'
+import { isSoldOut, isUnpriced, type MenuItem } from '@/lib/menu'
 import { maxQtyFor } from '@/lib/cart'
 import { Coffee, Croissant, Flame, Minus, Plus, X } from 'lucide-react'
 
@@ -35,6 +35,7 @@ export function MenuDetailDialog({ item, popular, qty, onAdd, onQty, onClose }: 
 function Body({ item, popular, qty, onAdd, onQty }: Omit<Props, 'item' | 'onClose'> & { item: MenuItem }) {
   const Icon = CATEGORY_ICON[item.category]
   const soldOut = item.category === 'bakery' && isSoldOut(item)
+  const unpriced = isUnpriced(item)
   const max = maxQtyFor(item)
   return (
     <>
@@ -63,7 +64,7 @@ function Body({ item, popular, qty, onAdd, onQty }: Omit<Props, 'item' | 'onClos
         <div>
           <DialogTitle className="font-serif text-2xl font-semibold leading-snug">{item.name}</DialogTitle>
           <div className="mt-2 flex flex-wrap items-baseline justify-between gap-x-3">
-            <span className="text-xl font-semibold">{won(item.price)}</span>
+            <span className={unpriced ? 'text-lg text-eden-sage-dim' : 'text-xl font-semibold'}>{unpriced ? '가격 준비 중' : won(item.price)}</span>
             {item.category === 'bakery' && !soldOut && item.stock !== null ? (
               <span className="text-base text-eden-sage-dim">{item.stock}개 남음</span>
             ) : null}
@@ -82,6 +83,8 @@ function Body({ item, popular, qty, onAdd, onQty }: Omit<Props, 'item' | 'onClos
           </p>
         ) : soldOut ? (
           <p className="rounded-[10px] bg-eden-paper-dim px-4 py-3 text-base text-eden-sage-dim">오늘은 다 팔렸어요.</p>
+        ) : unpriced ? (
+          <p className="rounded-[10px] bg-eden-paper-dim px-4 py-3 text-base text-eden-sage-dim">가격이 정해지면 주문할 수 있어요.</p>
         ) : qty > 0 ? (
           <div className="flex h-14 items-center justify-between rounded-full bg-eden-ink px-2 text-eden-paper">
             <button

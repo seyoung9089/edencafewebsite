@@ -30,7 +30,7 @@ const steps = [
   { icon: LogIn, title: '로그인' },
   { icon: ShoppingBasket, title: '빵 담기' },
   { icon: Landmark, title: '주문하고 입금' },
-  { icon: Store, title: '다음 날 픽업' },
+  { icon: Store, title: '고른 날 픽업' },
 ]
 
 /** 문의 → 문의하기 page; 공지·소식 → that item's own page. */
@@ -50,7 +50,7 @@ function StructuredData({ menuItems }: { menuItems: { name: string; price: numbe
     name: '이든카페',
     alternateName: 'Eden Cafe',
     description:
-      '별무리고등학교에서 시작된 학생 협동조합 카페. 오늘 주문하면 다음 날 픽업할 수 있습니다.',
+      '별무리고등학교에서 시작된 학생 협동조합 카페. 픽업 날짜를 골라 미리 주문하면 그날 매장에서 찾아갈 수 있습니다.',
     areaServed: '충청남도 금산군',
     foundingDate: '2021',
     hasMenu: {

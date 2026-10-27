@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Pencil } from 'lucide-react'
 import { PaymentInfo } from '@/components/payment-info'
-import { getCurrentPickupSlot } from '@/lib/pickup'
+import { kstTodayIso, pickupLabel } from '@/lib/pickup'
 
 export type CustomerOrder = {
   id: string
@@ -11,6 +11,10 @@ export type CustomerOrder = {
   status: 'wait' | 'done' | 'picked' | 'cancelled'
   pickup_date: string
   created_at: string
+  /** Friday orders: who picks up */
+  student_name: string | null
+  payment_method: 'transfer' | 'onsite'
+  payment_status: 'pending' | 'confirmed' | 'onsite'
 }
 
 export type MyOrdersProps = {
@@ -25,7 +29,6 @@ export type MyOrdersProps = {
 
 // ── shared bits ──────────────────────────────────────────────────────────
 
-const WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토']
 const STATUS = {
   wait: { label: '입금 대기', short: '입금 대기', tone: 'bg-eden-sand text-eden-ink-2' },
   done: { label: '입금 확인 · 준비 중', short: '준비 중', tone: 'bg-eden-sage text-eden-ink-2' },
@@ -33,9 +36,12 @@ const STATUS = {
   cancelled: { label: '취소한 주문', short: '취소', tone: 'bg-eden-line text-eden-sage-dim' },
 } as const
 
-export function pickupLabel(iso: string): string {
-  const d = new Date(`${iso}T00:00:00Z`)
-  return `${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일(${WEEKDAY_KO[d.getUTCDay()]})`
+export { pickupLabel }
+
+/** 현장결제 orders aren't waiting on a transfer, so 'wait' reads differently. */
+function statusLabel(order: CustomerOrder): string {
+  if (order.payment_method === 'onsite' && order.status === 'wait') return '주문 접수 · 현장결제'
+  return STATUS[order.status].label
 }
 const orderedOn = (iso: string) =>
   new Date(iso).toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', month: 'numeric', day: 'numeric', weekday: 'short' })
@@ -135,11 +141,17 @@ function OrderCard({ order, onCancel, highlight = false }: { order: CustomerOrde
   return (
     <article className={`rounded-card bg-eden-paper-dim p-5 shadow-soft ${highlight && order.status !== 'cancelled' ? 'border border-eden-sand/60' : ''} ${order.status === 'cancelled' ? 'opacity-60' : ''}`}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <strong className={order.status === 'wait' ? 'text-eden-sand' : ''}>{STATUS[order.status].label}</strong>
+        <strong className={order.status === 'wait' ? 'text-eden-sand' : ''}>{statusLabel(order)}</strong>
         <span className="text-sm text-eden-sage-dim">
           {orderedOn(order.created_at)} 주문 · {pickupLabel(order.pickup_date)} 픽업
         </span>
       </div>
+      {order.student_name ? (
+        <p className="mb-2 text-sm">
+          <span className="text-eden-sage-dim">학생 이름</span> <strong>{order.student_name}</strong> ·{' '}
+          {order.payment_method === 'onsite' ? '현장결제' : '계좌이체'}
+        </p>
+      ) : null}
       {order.items.map((i) => (
         <div key={i.name} className="flex justify-between text-sm">
           <span>
@@ -154,7 +166,7 @@ function OrderCard({ order, onCancel, highlight = false }: { order: CustomerOrde
       </div>
       {order.status === 'wait' ? (
         <>
-          <PaymentInfo total={order.total} className="mt-3" />
+          {order.payment_method === 'transfer' ? <PaymentInfo total={order.total} className="mt-3" /> : null}
           <CancelButton order={order} onCancel={onCancel} />
         </>
       ) : null}
@@ -184,10 +196,11 @@ function TodaySection({ title, subtitle, orders, empty, onCancel }: { title: str
 
 export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut, onCancel }: MyOrdersProps) {
   const [filter, setFilter] = useState<'all' | CustomerOrder['status']>('all')
-  const slot = getCurrentPickupSlot(Date.now())
-  const pickupToday = orders.filter((o) => o.pickup_date === slot.todayIso)
-  const pickupTomorrow = orders.filter((o) => o.pickup_date === slot.iso)
-  const others = orders.filter((o) => o.pickup_date !== slot.todayIso && o.pickup_date !== slot.iso)
+  const todayIso = kstTodayIso(Date.now())
+  const pickupToday = orders.filter((o) => o.pickup_date === todayIso)
+  // Soonest pickup first.
+  const upcoming = orders.filter((o) => o.pickup_date > todayIso).sort((a, b) => a.pickup_date.localeCompare(b.pickup_date))
+  const others = orders.filter((o) => o.pickup_date < todayIso)
   const shown = filter === 'all' ? others : others.filter((o) => o.status === filter)
   const byDay = new Map<string, CustomerOrder[]>()
   for (const o of shown) byDay.set(orderedOn(o.created_at), [...(byDay.get(orderedOn(o.created_at)) ?? []), o])
@@ -205,19 +218,19 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut, onCan
       <div className="mb-12 grid gap-8 md:grid-cols-2">
         <TodaySection
           title="오늘 픽업"
-          subtitle={`${slot.todayLabel} · 오늘 챙겨야 할 주문`}
+          subtitle={`${pickupLabel(todayIso)} · 오늘 챙겨야 할 주문`}
           orders={pickupToday}
           onCancel={onCancel}
           empty="오늘 픽업할 주문이 없어요."
         />
         <TodaySection
-          title="내일 픽업"
-          subtitle={`${slot.dateLabel} · 오늘 주문한 메뉴`}
-          orders={pickupTomorrow}
+          title="다가오는 픽업"
+          subtitle="미리 주문해 둔 메뉴"
+          orders={upcoming}
           onCancel={onCancel}
           empty={
             <>
-              오늘 주문한 메뉴가 없어요. 자정까지 주문하면 내일 픽업할 수 있어요.{' '}
+              미리 주문한 메뉴가 없어요. 픽업 2일 전까지 주문할 수 있어요.{' '}
               <Link to="/order" className="font-semibold text-eden-ink underline">메뉴 보기</Link>
             </>
           }

@@ -1,21 +1,22 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { OrderReceipt } from '@/components/order-receipt'
+import { OrderReceipt, type PaymentMethod } from '@/components/order-receipt'
+import { PickupDatePicker } from '@/components/pickup-date-picker'
 import { OrderCompleteBody, type PlacedOrder } from '@/components/order-complete'
-import { MAX_QTY, maxQtyFor, reconcileCart, useCart } from '@/lib/cart'
-import { useCurrentPickupSlot } from '@/lib/pickup'
+import { MAX_QTY, groupTotals, maxQtyFor, overGroupLimit, reconcileCart, useCart } from '@/lib/cart'
+import { usePickupDates, type PickupDate } from '@/lib/pickup'
 import { useCustomerAuth } from '@/lib/customer-auth'
 import { useContentValue, useSiteContent } from '@/lib/site-content'
-import { useMenu, isSoldOut, fetchPopularity, type MenuItem } from '@/lib/menu'
+import { useMenu, isSoldOut, isUnpriced, fetchPopularity, type MenuGroup, type MenuItem } from '@/lib/menu'
 import { getErrorMessage } from '@/lib/errors'
 import { supabase } from '@/lib/supabase'
 import { pageMeta } from '@/lib/seo'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import { MenuDetailDialog } from '@/components/menu-detail'
-import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight } from 'lucide-react'
+import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School } from 'lucide-react'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/order')({ component: OrderPage, head: () => pageMeta('/order') })
@@ -28,7 +29,6 @@ const FEATURED_COUNT = 2
 /** Turns database errors from place_order into something a customer can act on. */
 function orderErrorMessage(e: unknown): string {
   const message = getErrorMessage(e, '주문에 실패했습니다.')
-  if (message.includes('Pickup schedule changed')) return '픽업 날짜가 바뀌었어요. 새로고침한 뒤 다시 주문해주세요.'
   if (message.includes('Unavailable menu item') || message.includes('Only available bakery items'))
     return `방금 품절되었거나 지금 주문할 수 없는 메뉴가 있어요: ${message.split(':').pop()?.trim()}. 주문 내역에서 빼고 다시 주문해주세요.`
   if (message.includes('Invalid quantity')) return `한 메뉴는 ${MAX_QTY}개까지 주문할 수 있어요. 수량을 줄여주세요.`
@@ -56,6 +56,7 @@ function MenuCard({
 }) {
   const Icon = CATEGORY_ICON[item.category]
   const soldOut = item.category === 'bakery' && isSoldOut(item)
+  const unpriced = isUnpriced(item)
   const max = maxQtyFor(item)
   return (
     <div className={`flex flex-col rounded-card bg-eden-paper-dim p-3 shadow-soft ${qty > 0 ? 'ring-2 ring-eden-sand' : ''}`}>
@@ -89,7 +90,7 @@ function MenuCard({
         </span>
       </button>
       <div className="mb-3 mt-1 flex flex-wrap items-baseline justify-between gap-x-2">
-        <span className="font-semibold text-eden-ink">{won(item.price)}</span>
+        <span className={unpriced ? 'text-sm text-eden-sage-dim' : 'font-semibold text-eden-ink'}>{unpriced ? '가격 준비 중' : won(item.price)}</span>
         {item.category === 'bakery' && item.stock !== null && item.stock > 0 ? (
           <span className="text-xs text-eden-sage-dim">{item.stock}개 남음</span>
         ) : null}
@@ -99,9 +100,9 @@ function MenuCard({
           <span className="flex h-10 items-center justify-center rounded-full border border-eden-line text-xs text-eden-sage-dim">
             매장에서만 주문
           </span>
-        ) : soldOut ? (
+        ) : soldOut || unpriced ? (
           <span className="flex h-10 items-center justify-center rounded-full border border-eden-line text-xs text-eden-sage-dim">
-            품절
+            {soldOut ? '품절' : '준비 중'}
           </span>
         ) : qty > 0 ? (
           <div className="flex h-10 items-center justify-between rounded-full bg-eden-ink px-1 text-eden-paper">
@@ -138,20 +139,54 @@ function MenuCard({
   )
 }
 
+const PICKUP_KEY = 'edenPickupDate'
+const STUDENT_KEY = 'edenStudentName'
+
+function readStored(key: string): string {
+  try {
+    return window.localStorage.getItem(key) ?? ''
+  } catch {
+    return ''
+  }
+}
+function store(key: string, value: string) {
+  try {
+    window.localStorage.setItem(key, value)
+  } catch {
+    /* ignore storage failures */
+  }
+}
+
 function OrderPage() {
-  const { items: menuItems, error: menuError } = useMenu()
+  const { items: menuItems, groups, error: menuError } = useMenu()
   const { items, addItem, updateQty, removeItem, clear, replaceItems, totalQty, totalPrice } = useCart()
-  const slot = useCurrentPickupSlot()
+  const calendar = usePickupDates()
   const { user, loading } = useCustomerAuth()
   const navigate = useNavigate()
   const content = useSiteContent()
   const pickupTime = useContentValue(content, 'pickup.time')
+  const fridayNotice = useContentValue(content, 'order.fridayNotice')
+  const studentDepositNote = useContentValue(content, 'order.studentDepositNote')
+  const bulkMessage = `${useContentValue(content, 'order.bulkNotice')} ${useContentValue(content, 'order.bulkContact')}`
   const [popularity, setPopularity] = useState<Map<string, number>>(new Map())
   const [submitting, setSubmitting] = useState(false)
   const [placed, setPlaced] = useState<Omit<PlacedOrder, 'pickupTime'> | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
   // By name, so the open detail picks up fresh stock from the menu.
   const [detailName, setDetailName] = useState<string | null>(null)
+  const [pickupIso, setPickupIso] = useState<string | null>(null)
+  const [studentName, setStudentName] = useState('')
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null)
+  const menuRef = useRef<HTMLElement>(null)
+
+  // Only a day that's still open counts; at midnight a closed day drops out.
+  const pickup = calendar?.dates.find((d) => d.iso === pickupIso && d.open) ?? null
+  const friday = pickup?.day === 'friday'
+
+  useEffect(() => {
+    setPickupIso(readStored(PICKUP_KEY) || null)
+    setStudentName(readStored(STUDENT_KEY))
+  }, [])
 
   useEffect(() => {
     let alive = true
@@ -165,41 +200,76 @@ function OrderPage() {
     }
   }, [])
 
-  // Sold out since it was added, drinks, or more than what's left: fix the cart
-  // here and say what changed, instead of letting the order fail later.
+  // Sold out since it was added, not on the chosen day's menu, or more than
+  // what's left: fix the cart here and say what changed, instead of letting
+  // the order fail later.
   useEffect(() => {
     if (!menuItems || menuError) return
-    const { next, removed, reduced, changed } = reconcileCart(items, menuItems)
+    const { next, removed, offDay, reduced, changed } = reconcileCart(items, menuItems, pickup?.day ?? null)
     if (!changed) return
     replaceItems(next)
-    if (removed.length) toast.info(`품절되었거나 온라인으로 주문할 수 없는 메뉴라 주문 내역에서 뺐어요: ${removed.join(', ')}`)
+    if (removed.length) toast.info(`품절되었거나 지금 주문할 수 없는 메뉴라 주문 내역에서 뺐어요: ${removed.join(', ')}`)
+    if (offDay.length && pickup) toast.info(`${pickup.label} 메뉴에 없는 빵이라 주문 내역에서 뺐어요: ${offDay.join(', ')}`)
     for (const r of reduced) toast.info(`${r.name}은(는) 남은 수량이 ${r.qty}개라 수량을 맞췄어요.`)
-  }, [menuItems, menuError, items])
+  }, [menuItems, menuError, items, pickup?.day])
 
   const menuByName = new Map((menuItems ?? []).map((m) => [m.name, m]))
+  const groupByName = new Map(groups.map((g) => [g.name, g]))
+  const totals = groupTotals(items, menuByName)
   const qtyOf = (name: string) => items.find((it) => it.name === name)?.qty ?? 0
 
+  /** The capped kind (소금빵·치아바타·베이글) this change would push past its limit, if any. */
+  const capHit = (name: string, nextQty: number): MenuGroup | null => {
+    const group = groupByName.get(menuByName.get(name)?.group_name ?? '')
+    if (!group || group.max_qty === null) return null
+    return (totals.get(group.name) ?? 0) - qtyOf(name) + nextQty > group.max_qty ? group : null
+  }
+
   const add = (item: MenuItem) => {
-    if (item.category !== 'bakery' || isSoldOut(item)) return
+    if (item.category !== 'bakery' || isSoldOut(item) || isUnpriced(item)) return
+    if (capHit(item.name, qtyOf(item.name) + 1)) return void toast.error(bulkMessage, { duration: 8000 })
     addItem({ name: item.name, price: item.price, qty: 1 })
   }
   const setQty = (name: string, qty: number) => {
-    if (qty <= 0) removeItem(name)
-    else updateQty(name, Math.min(qty, maxQtyFor(menuByName.get(name))))
+    if (qty <= 0) return removeItem(name)
+    if (qty > qtyOf(name) && capHit(name, qty)) return void toast.error(bulkMessage, { duration: 8000 })
+    updateQty(name, Math.min(qty, maxQtyFor(menuByName.get(name))))
   }
 
+  const choosePickup = (d: PickupDate) => {
+    setPickupIso(d.iso)
+    store(PICKUP_KEY, d.iso)
+    window.setTimeout(() => menuRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
+  }
+  const changeStudentName = (name: string) => {
+    setStudentName(name)
+    store(STUDENT_KEY, name)
+  }
+
+  // What still stops the order, in the order a customer would fix it.
+  const blocker = !pickup
+    ? '먼저 픽업 날짜를 골라 주세요.'
+    : !menuItems || menuError
+      ? '메뉴를 불러오는 중이에요.'
+      : overGroupLimit(items, menuByName, groups)
+        ? bulkMessage
+        : friday && !studentName.trim()
+          ? '학생 이름을 적어 주세요.'
+          : friday && !paymentMethod
+            ? '결제 방법을 골라 주세요.'
+            : ''
+
   const checkout = async () => {
-    if (!items.length || !slot || !menuItems || menuError) return
-    const orderable = new Set(menuItems.filter((item) => item.category === 'bakery').map((item) => item.name))
-    if (items.some((item) => !orderable.has(item.name))) {
-      toast.error('베이커리 메뉴만 온라인으로 주문할 수 있어요.')
-      return
-    }
+    if (!items.length || !pickup || blocker) return
+    const method: PaymentMethod = friday && paymentMethod ? paymentMethod : 'transfer'
+    const student = friday ? studentName.trim() : null
     setSubmitting(true)
     try {
       const { data, error } = await supabase.rpc('place_order', {
         p_items: items.map((it) => ({ name: it.name, qty: it.qty })),
-        p_pickup_date: slot.iso,
+        p_pickup_date: pickup.iso,
+        p_student_name: student,
+        p_payment_method: method,
       })
       if (error) throw error
       // The server priced the order; read the saved total back for the transfer amount.
@@ -209,8 +279,11 @@ function OrderPage() {
       setPlaced({
         id,
         total: saved?.total ?? totalPrice,
-        pickupLabel: slot.dateLabel,
+        pickupLabel: pickup.label,
         items: items.map((it) => ({ name: it.name, qty: it.qty })),
+        studentName: student,
+        paymentMethod: method,
+        studentDepositNote,
       })
       clear()
     } catch (e) {
@@ -220,16 +293,18 @@ function OrderPage() {
     }
   }
 
-  // Popular items (up to 2 staff picks plus the real bestseller) go first with a badge.
-  const featured = (menuItems ?? []).filter((i) => i.category === 'bakery' && i.is_featured).slice(0, FEATURED_COUNT)
-  const bestBakery = (menuItems ?? [])
-    .filter((i) => i.category === 'bakery' && !i.is_featured)
-    .filter((i) => (popularity.get(i.name) ?? 0) > 0)
+  // The chosen day's bakery menu, grouped by kind (휘낭시에, 소금빵, …).
+  const dayBakery = pickup ? (menuItems ?? []).filter((i) => i.category === 'bakery' && i.sale_days.includes(pickup.day)) : []
+  // 인기 badge: up to 2 staff picks plus the real bestseller of that day's menu.
+  const featured = dayBakery.filter((i) => i.is_featured).slice(0, FEATURED_COUNT)
+  const bestBakery = dayBakery
+    .filter((i) => !i.is_featured && (popularity.get(i.name) ?? 0) > 0)
     .sort((a, b) => (popularity.get(b.name) ?? 0) - (popularity.get(a.name) ?? 0))[0]
   const popular = new Set([...featured, ...(bestBakery ? [bestBakery] : [])].map((i) => i.name))
-  const bakery = (menuItems ?? [])
-    .filter((i) => i.category === 'bakery')
-    .sort((a, b) => Number(popular.has(b.name)) - Number(popular.has(a.name)))
+  const sections: { group: MenuGroup | null; title: string; items: MenuItem[] }[] = [
+    ...groups.map((g) => ({ group: g, title: g.name, items: dayBakery.filter((i) => i.group_name === g.name) })),
+    { group: null, title: '그 밖의 빵', items: dayBakery.filter((i) => !i.group_name || !groupByName.has(i.group_name)) },
+  ].filter((sec) => sec.items.length > 0)
   const drinks = (menuItems ?? []).filter((i) => i.category === 'drink')
 
   const receipt = (
@@ -237,11 +312,16 @@ function OrderPage() {
       items={items}
       menuByName={menuByName}
       totalPrice={totalPrice}
-      slot={slot}
+      pickup={pickup}
       pickupTime={pickupTime}
       loggedIn={loading ? null : Boolean(user)}
       submitting={submitting}
-      canSubmit={items.length > 0 && Boolean(slot) && Boolean(menuItems) && !menuError}
+      blocker={blocker}
+      studentName={studentName}
+      onStudentName={changeStudentName}
+      paymentMethod={paymentMethod}
+      onPaymentMethod={setPaymentMethod}
+      studentDepositNote={studentDepositNote}
       onQty={setQty}
       onRemove={removeItem}
       onCheckout={() => void checkout()}
@@ -254,33 +334,80 @@ function OrderPage() {
     <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
       <main className="mx-auto max-w-6xl px-4 pb-16 pt-10 md:px-8">
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="mb-2 font-serif text-3xl font-semibold">주문</h1>
           <p className="text-[15px] text-eden-sage-dim">
-            빵을 담고 주문하면 다음 날 매장에서 찾아가실 수 있어요.{' '}
+            픽업 날짜를 먼저 고르고 빵을 담아 주세요. 픽업 2일 전 밤 11시 59분까지 주문할 수 있어요.{' '}
             <Link to="/guide" className="whitespace-nowrap font-semibold text-eden-ink underline underline-offset-4">
               처음이신가요?
             </Link>
           </p>
         </div>
 
+        <div className="mb-8 flex gap-3 rounded-card border-2 border-eden-sand bg-eden-sand/15 px-5 py-4">
+          <School size={24} strokeWidth={1.8} className="mt-0.5 shrink-0 text-eden-sand" aria-hidden />
+          <p className="text-base font-semibold leading-relaxed text-eden-ink">{fridayNotice}</p>
+        </div>
+
         <div className="lg:grid lg:grid-cols-[1fr_320px] lg:items-start lg:gap-8">
           <div>
             <section>
-              <h2 className="mb-4 border-b border-eden-line pb-3 font-serif text-xl font-semibold">베이커리</h2>
+              <h2 className="mb-4 border-b border-eden-line pb-3 font-serif text-xl font-semibold">1. 픽업 날짜 고르기</h2>
+              <PickupDatePicker dates={calendar?.dates ?? null} selected={pickup?.iso ?? null} onSelect={choosePickup} />
+              <p className="mt-3 text-sm text-eden-sage-dim">월~목은 평일 메뉴, 금요일은 금요일 메뉴가 나와요. 주말에는 픽업이 없어요.</p>
+            </section>
+
+            <section ref={menuRef} className="mt-12 scroll-mt-[100px]">
+              <h2 className="mb-4 border-b border-eden-line pb-3 font-serif text-xl font-semibold">
+                2. 빵 고르기{pickup ? <span className="ml-2 font-sans text-base font-normal text-eden-sage-dim">{pickup.label} 메뉴</span> : null}
+              </h2>
               {menuError ? <p className="text-sm text-destructive">메뉴를 불러오지 못했어요. 새로고침해주세요.</p> : null}
-              {menuItems && bakery.length === 0 ? <p className="text-sm text-eden-sage-dim">등록된 메뉴가 없습니다.</p> : null}
-              {!menuItems && !menuError ? (
+              {!pickup ? (
+                <p className="rounded-card border border-dashed border-eden-line px-5 py-10 text-center text-base text-eden-sage-dim">
+                  위에서 픽업 날짜를 고르면 그날의 메뉴가 나와요.
+                </p>
+              ) : !menuItems && !menuError ? (
                 <div className={grid}>
                   {Array.from({ length: 6 }, (_, i) => (
                     <div key={i} className="h-56 animate-pulse rounded-card bg-eden-paper-dim" />
                   ))}
                 </div>
+              ) : menuItems && sections.length === 0 ? (
+                <p className="text-sm text-eden-sage-dim">이날 주문할 수 있는 메뉴가 아직 없어요.</p>
               ) : (
-                <div className={grid}>
-                  {bakery.map((item) => (
-                    <MenuCard key={item.name} item={item} popular={popular.has(item.name)} qty={qtyOf(item.name)} onAdd={add} onQty={setQty} onOpen={(i) => setDetailName(i.name)} />
-                  ))}
+                <div className="space-y-8">
+                  {sections.map((sec) => {
+                    const total = sec.group ? (totals.get(sec.group.name) ?? 0) : 0
+                    const cap = sec.group?.max_qty ?? null
+                    return (
+                      <div key={sec.title}>
+                        <div className="mb-3 flex flex-wrap items-baseline gap-x-3">
+                          <h3 className="font-serif text-lg font-semibold">{sec.title}</h3>
+                          {cap !== null ? (
+                            <span className="text-sm text-eden-sage-dim">
+                              맛 합계 {cap}개까지{total > 0 ? ` · 지금 ${total}개` : ''}
+                            </span>
+                          ) : null}
+                        </div>
+                        {cap !== null && total >= cap ? (
+                          <p className="mb-3 rounded-[10px] bg-eden-sand/15 px-4 py-3 text-sm font-semibold">{bulkMessage}</p>
+                        ) : null}
+                        <div className={grid}>
+                          {sec.items.map((item) => (
+                            <MenuCard
+                              key={item.name}
+                              item={item}
+                              popular={popular.has(item.name)}
+                              qty={qtyOf(item.name)}
+                              onAdd={add}
+                              onQty={setQty}
+                              onOpen={(i) => setDetailName(i.name)}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               )}
             </section>
@@ -346,7 +473,7 @@ function OrderPage() {
       <Dialog open={!!placed} onOpenChange={(open) => !open && setPlaced(null)}>
         <DialogContent className="max-w-[400px] rounded-card bg-eden-paper">
           <DialogTitle className="sr-only">주문 완료</DialogTitle>
-          <DialogDescription className="sr-only">무통장 입금 안내와 픽업 정보</DialogDescription>
+          <DialogDescription className="sr-only">결제 안내와 픽업 정보</DialogDescription>
           {placed ? (
             <OrderCompleteBody
               order={{ ...placed, pickupTime }}

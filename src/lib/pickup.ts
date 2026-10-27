@@ -100,20 +100,21 @@ export const CALENDAR_DAYS = 5
 const WEEK_LABELS = ['이번 주', '다음 주', '다다음 주']
 
 /**
- * The first CALENDAR_DAYS weekdays that are still open for orders, weekends
+ * The first `count` weekdays that are still open for orders, weekends
  * skipped. It moves along one square each day: Mon–Fri today becomes
- * Tue–Mon tomorrow.
+ * Tue–Mon tomorrow. With `only`, just those days (학부모 주문: the next two
+ * Fridays; on Thursdays the second one is past the two-week window and greyed).
  */
-export function listCalendarDays(nowMs: number): CalendarDay[] {
+export function listCalendarDays(nowMs: number, only: PickupDay | null = null, count = CALENDAR_DAYS): CalendarDay[] {
   const today = kstTodayStart(nowMs)
   // Monday of this week, for 이번 주/다음 주.
   const monday = today - ((new Date(today).getUTCDay() + 6) % 7) * DAY_MS
   const days: CalendarDay[] = []
-  for (let i = DEADLINE_DAYS; days.length < CALENDAR_DAYS; i++) {
+  for (let i = DEADLINE_DAYS; days.length < count; i++) {
     const d = new Date(today + i * DAY_MS)
     const iso = d.toISOString().slice(0, 10)
     const day = pickupDayOf(iso)
-    if (!day) continue
+    if (!day || (only && day !== only)) continue
     const week = Math.floor((d.getTime() - monday) / (7 * DAY_MS))
     days.push({
       iso,
@@ -128,7 +129,14 @@ export function listCalendarDays(nowMs: number): CalendarDay[] {
   return days
 }
 
-type PickupCalendar = { todayIso: string; dates: PickupDate[]; days: CalendarDay[] }
+type PickupCalendar = {
+  todayIso: string
+  dates: PickupDate[]
+  /** 마을 픽업 주문: the next five weekdays */
+  days: CalendarDay[]
+  /** 학부모 주문: the next two Fridays */
+  fridays: CalendarDay[]
+}
 
 /**
  * Today's pickup calendar. Refreshes every minute and when the tab regains
@@ -142,7 +150,12 @@ export function usePickupDates(): PickupCalendar | null {
     const load = () => {
       const now = Date.now()
       const todayIso = kstTodayIso(now)
-      setState((prev) => (prev?.todayIso === todayIso ? prev : { todayIso, dates: listPickupDates(now), days: listCalendarDays(now) }))
+      setState((prev) => (prev?.todayIso === todayIso ? prev : {
+              todayIso,
+              dates: listPickupDates(now),
+              days: listCalendarDays(now),
+              fridays: listCalendarDays(now, 'friday', 2),
+            }))
     }
     load()
     const timer = window.setInterval(load, 60_000)

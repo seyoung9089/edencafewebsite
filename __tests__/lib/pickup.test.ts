@@ -63,4 +63,19 @@ describe("listCalendarDays", () => {
       expect(listCalendarDays(at(t))[0].iso).toBe(t.startsWith("2026-11-01") ? "2026-11-03" : "2026-11-02")
     }
   })
+
+  it("lists the next two Fridays for 학부모 주문", () => {
+    // Tue 10/27: Fri 10/30 and Fri 11/6, both open.
+    const tue = listCalendarDays(at("2026-10-27T09:00:00+09:00"), "friday", 2)
+    expect(tue.map((d) => [d.iso, d.weekLabel, d.open])).toEqual([
+      ["2026-10-30", "이번 주", true],
+      ["2026-11-06", "다음 주", true],
+    ])
+    // Thu 10/29: this Friday has closed; 11/13 is past the two-week window.
+    const thu = listCalendarDays(at("2026-10-29T09:00:00+09:00"), "friday", 2)
+    expect(thu.map((d) => [d.iso, d.open])).toEqual([
+      ["2026-11-06", true],
+      ["2026-11-13", false],
+    ])
+  })
 })

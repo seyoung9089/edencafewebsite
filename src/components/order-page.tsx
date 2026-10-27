@@ -189,7 +189,8 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
   const dates = calendar ? calendar.dates.filter((d) => !parents || d.day === 'friday') : null
   // Only a day that's still open counts; at midnight a closed day drops out.
   // Only a day shown in this week's calendar can be the pickup day.
-  const pickup = dates?.find((d) => d.iso === pickupIso && d.open && calendar?.days.some((c) => c.iso === d.iso)) ?? null
+  const shownDays = calendar ? (parents ? calendar.fridays : calendar.days) : null
+  const pickup = dates?.find((d) => d.iso === pickupIso && d.open && shownDays?.some((c) => c.iso === d.iso && c.open)) ?? null
 
   useEffect(() => {
     setPickupIso(readStored(PICKUP_KEY[audience]) || null)
@@ -375,18 +376,16 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
           <div>
             <section>
               <h2 className="mb-4 border-b border-eden-line pb-3 font-serif text-xl font-semibold">{parents ? '1. 금요일 고르기' : '1. 픽업 날짜 고르기'}</h2>
-              {calendar?.days.length ? (
+              {shownDays?.length && !parents ? (
                 <p className="mb-1 text-sm text-eden-sage-dim">
-                  {pickupLabel(calendar.days[0].iso)} ~ {pickupLabel(calendar.days[calendar.days.length - 1].iso)} 픽업
+                  {pickupLabel(shownDays[0].iso)} ~ {pickupLabel(shownDays[shownDays.length - 1].iso)} 픽업
                 </p>
               ) : null}
               <p className="mb-3 text-[15px] font-semibold">
-                픽업 2일 전 자정까지 주문해 주세요.
-                {parents ? <span className="font-normal text-eden-sage-dim"> 학부모 주문은 금요일만 고를 수 있어요.</span> : null}
+                {parents ? '금요일 픽업은 그 주 수요일 자정까지 주문해 주세요.' : '픽업 2일 전 자정까지 주문해 주세요.'}
               </p>
               <PickupDatePicker
-                days={calendar?.days ?? null}
-                allowed={(d) => !parents || d.day === 'friday'}
+                days={shownDays}
                 markFriday={!parents}
                 selected={pickup?.iso ?? null}
                 onSelect={choosePickup}

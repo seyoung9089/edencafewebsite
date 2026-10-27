@@ -1,29 +1,28 @@
 import type { CalendarDay } from '@/lib/pickup'
 
 /**
- * Step 1 on /order and /parents: one week of pickup, the next five weekdays
- * that still take orders, so it moves along one square each day (월~금 today,
- * 화~월 tomorrow). Days this tab doesn't take (학부모: anything but Friday)
- * are greyed. Fridays get a small dot when this tab also has other days,
- * because their menu is different.
+ * Step 1 on /order and /parents. 마을 픽업 주문: one week of pickup, the next
+ * five weekdays that still take orders, so it moves along one square each day
+ * (월~금 today, 화~월 tomorrow). 학부모 주문: the next two Fridays. A day past
+ * the two-week window is greyed. Fridays get a small dot when this tab also
+ * has other days, because their menu is different.
  */
 export function PickupDatePicker({
   days,
-  allowed,
   markFriday,
   selected,
   onSelect,
 }: {
   days: CalendarDay[] | null
-  /** Whether this tab takes orders for that day at all (학부모 = Fridays only) */
-  allowed: (day: CalendarDay) => boolean
   markFriday: boolean
   selected: string | null
   onSelect: (iso: string) => void
 }) {
+  // Two Fridays sit side by side at a comfortable width, not stretched over five columns.
+  const grid = days && days.length <= 2 ? 'grid max-w-sm grid-cols-2 gap-2' : 'grid grid-cols-5 gap-2'
   if (!days) {
     return (
-      <div className="grid grid-cols-5 gap-2">
+      <div className={grid}>
         {Array.from({ length: 5 }, (_, i) => (
           <div key={i} className="h-[104px] animate-pulse rounded-[10px] bg-eden-paper-dim" />
         ))}
@@ -31,9 +30,9 @@ export function PickupDatePicker({
     )
   }
   return (
-    <div className="grid grid-cols-5 gap-2">
+    <div className={grid}>
       {days.map((d) => {
-        const open = d.open && allowed(d)
+        const open = d.open
         const active = d.iso === selected
         return (
           <button

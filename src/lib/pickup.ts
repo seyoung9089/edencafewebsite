@@ -22,6 +22,21 @@ export type PickupDate = {
   open: boolean
 }
 
+/** One square of the order calendar: the next five weekdays that take orders. */
+export type CalendarDay = {
+  iso: string
+  /** Day of the month, e.g. 27 */
+  date: number
+  month: number
+  /** '월' … '금' */
+  weekday: string
+  /** '이번 주', '다음 주' or '다다음 주' (weeks start on Monday) */
+  weekLabel: string
+  day: PickupDay
+  /** Pickup day still taking orders */
+  open: boolean
+}
+
 export const DEADLINE_DAYS = 2
 export const PICKUP_WINDOW_DAYS = 14
 
@@ -80,19 +95,54 @@ export function listPickupDates(nowMs: number): PickupDate[] {
   return dates
 }
 
+/** One week of pickup: five weekdays. */
+export const CALENDAR_DAYS = 5
+const WEEK_LABELS = ['이번 주', '다음 주', '다다음 주']
+
+/**
+ * The first CALENDAR_DAYS weekdays that are still open for orders, weekends
+ * skipped. It moves along one square each day: Mon–Fri today becomes
+ * Tue–Mon tomorrow.
+ */
+export function listCalendarDays(nowMs: number): CalendarDay[] {
+  const today = kstTodayStart(nowMs)
+  // Monday of this week, for 이번 주/다음 주.
+  const monday = today - ((new Date(today).getUTCDay() + 6) % 7) * DAY_MS
+  const days: CalendarDay[] = []
+  for (let i = DEADLINE_DAYS; days.length < CALENDAR_DAYS; i++) {
+    const d = new Date(today + i * DAY_MS)
+    const iso = d.toISOString().slice(0, 10)
+    const day = pickupDayOf(iso)
+    if (!day) continue
+    const week = Math.floor((d.getTime() - monday) / (7 * DAY_MS))
+    days.push({
+      iso,
+      date: d.getUTCDate(),
+      month: d.getUTCMonth() + 1,
+      weekday: WEEKDAY_KO[d.getUTCDay()],
+      weekLabel: WEEK_LABELS[week] ?? `${week}주 뒤`,
+      day,
+      open: i <= PICKUP_WINDOW_DAYS,
+    })
+  }
+  return days
+}
+
+type PickupCalendar = { todayIso: string; dates: PickupDate[]; days: CalendarDay[] }
+
 /**
  * Today's pickup calendar. Refreshes every minute and when the tab regains
  * focus, so a deadline closes at midnight without a reload. Returns null
  * until mounted (avoids an SSR/client mismatch).
  */
-export function usePickupDates(): { todayIso: string; dates: PickupDate[] } | null {
-  const [state, setState] = useState<{ todayIso: string; dates: PickupDate[] } | null>(null)
+export function usePickupDates(): PickupCalendar | null {
+  const [state, setState] = useState<PickupCalendar | null>(null)
 
   useEffect(() => {
     const load = () => {
       const now = Date.now()
       const todayIso = kstTodayIso(now)
-      setState((prev) => (prev?.todayIso === todayIso ? prev : { todayIso, dates: listPickupDates(now) }))
+      setState((prev) => (prev?.todayIso === todayIso ? prev : { todayIso, dates: listPickupDates(now), days: listCalendarDays(now) }))
     }
     load()
     const timer = window.setInterval(load, 60_000)

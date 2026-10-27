@@ -78,7 +78,7 @@ export function HeroSection() {
 
         <ul className="mt-5 flex flex-wrap justify-center gap-2 text-[13px]">
           <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">월~금 픽업</li>
-          <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">픽업 2일 전 23:59까지 주문</li>
+          <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">픽업 2일 전 자정까지 주문</li>
           {earliest ? (
             <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">
               가장 빠른 픽업 <strong>{earliest.label}</strong>

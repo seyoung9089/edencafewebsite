@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { listPickupDates, pickupDayOf } from "@/lib/pickup"
+import { listCalendarDays, listPickupDates, pickupDayOf } from "@/lib/pickup"
 
 // 2026-10-27 is a Tuesday. Times are given in Korea time (+09:00).
 const at = (kst: string) => new Date(kst).getTime()
@@ -40,5 +40,27 @@ describe("listPickupDates", () => {
     expect(dates.every((d) => pickupDayOf(d.iso) !== null)).toBe(true)
     expect(dates[dates.length - 1].iso <= "2026-11-10").toBe(true)
     expect(dates.length).toBe(10)
+  })
+})
+
+describe("listCalendarDays", () => {
+  it("shows the next five open weekdays, weekends skipped", () => {
+    // Tue 10/27: the first open day is Thu 10/29.
+    const days = listCalendarDays(at("2026-10-27T09:00:00+09:00"))
+    expect(days.map((d) => `${d.weekday}${d.date}`)).toEqual(["목29", "금30", "월2", "화3", "수4"])
+    expect(days.map((d) => d.weekLabel)).toEqual(["이번 주", "이번 주", "다음 주", "다음 주", "다음 주"])
+    expect(days.every((d) => d.open)).toBe(true)
+    expect(days[1].day).toBe("friday")
+  })
+
+  it("moves along one square the next day", () => {
+    const days = listCalendarDays(at("2026-10-28T00:00:00+09:00"))
+    expect(days.map((d) => d.weekday)).toEqual(["금", "월", "화", "수", "목"])
+  })
+
+  it("starts on Monday from Thursday night through the weekend", () => {
+    for (const t of ["2026-10-29T12:00:00+09:00", "2026-10-31T12:00:00+09:00", "2026-11-01T23:00:00+09:00"]) {
+      expect(listCalendarDays(at(t))[0].iso).toBe(t.startsWith("2026-11-01") ? "2026-11-03" : "2026-11-02")
+    }
   })
 })

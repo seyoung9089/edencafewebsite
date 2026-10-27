@@ -1,58 +1,64 @@
-import type { PickupDate } from '@/lib/pickup'
+import type { CalendarDay } from '@/lib/pickup'
 
-const DAY_TAG = { weekday: '평일 메뉴', friday: '금요일 메뉴' } as const
-
-/** Step 1 on /order: one big button per pickup day, closed days greyed out with their deadline. */
+/**
+ * Step 1 on /order and /parents: one week of pickup, the next five weekdays
+ * that still take orders, so it moves along one square each day (월~금 today,
+ * 화~월 tomorrow). Days this tab doesn't take (학부모: anything but Friday)
+ * are greyed. Fridays get a small dot when this tab also has other days,
+ * because their menu is different.
+ */
 export function PickupDatePicker({
-  dates,
+  days,
+  allowed,
+  markFriday,
   selected,
   onSelect,
 }: {
-  dates: PickupDate[] | null
+  days: CalendarDay[] | null
+  /** Whether this tab takes orders for that day at all (학부모 = Fridays only) */
+  allowed: (day: CalendarDay) => boolean
+  markFriday: boolean
   selected: string | null
-  onSelect: (date: PickupDate) => void
+  onSelect: (iso: string) => void
 }) {
-  if (!dates) {
+  if (!days) {
     return (
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
-        {Array.from({ length: 6 }, (_, i) => (
-          <div key={i} className="h-20 animate-pulse rounded-card bg-eden-paper-dim" />
+      <div className="grid grid-cols-5 gap-2">
+        {Array.from({ length: 5 }, (_, i) => (
+          <div key={i} className="h-[104px] animate-pulse rounded-[10px] bg-eden-paper-dim" />
         ))}
       </div>
     )
   }
   return (
-    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
-      {dates.map((d) => {
+    <div className="grid grid-cols-5 gap-2">
+      {days.map((d) => {
+        const open = d.open && allowed(d)
         const active = d.iso === selected
         return (
           <button
             key={d.iso}
             type="button"
-            disabled={!d.open}
+            disabled={!open}
             aria-pressed={active}
-            onClick={() => onSelect(d)}
-            className={`rounded-card border px-4 py-3 text-left transition-colors disabled:cursor-not-allowed ${
+            aria-label={`${d.weekLabel} ${d.month}월 ${d.date}일 ${d.weekday}요일${open ? '' : ', 주문할 수 없음'}`}
+            onClick={() => onSelect(d.iso)}
+            className={`relative flex h-[104px] flex-col items-center justify-center gap-0.5 rounded-[10px] border px-1 transition-colors ${
               active
                 ? 'border-eden-ink bg-eden-ink text-eden-paper'
-                : d.open
-                  ? 'border-eden-line bg-eden-paper-dim hover:border-eden-ink'
-                  : 'border-dashed border-eden-line bg-transparent opacity-50'
+                : open
+                  ? 'border-eden-sage-dim/40 bg-eden-paper text-eden-ink shadow-soft hover:border-eden-ink'
+                  : 'cursor-not-allowed border-transparent bg-eden-line/25 text-eden-sage-dim/45'
             }`}
           >
-            <span className="flex flex-wrap items-baseline justify-between gap-x-2">
-              <span className="font-serif text-lg font-semibold">{d.label}</span>
-              <span
-                className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                  active ? 'bg-eden-paper/15 text-eden-paper' : d.day === 'friday' ? 'bg-eden-sand/25 text-eden-ink' : 'bg-eden-sage/40 text-eden-ink'
-                }`}
-              >
-                {DAY_TAG[d.day]}
-              </span>
+            <span className={`text-[11px] ${active ? 'text-eden-paper/75' : open ? 'text-eden-sage-dim' : ''}`}>{d.weekLabel}</span>
+            <span className="font-serif text-2xl font-semibold leading-tight">{d.weekday}</span>
+            <span className="text-sm font-semibold">
+              {d.month}/{d.date}
             </span>
-            <span className={`mt-1 block text-sm ${active ? 'text-eden-paper/80' : 'text-eden-sage-dim'}`}>
-              {d.open ? `주문 마감: ${d.deadlineLabel} 23:59` : `주문 마감됨 (${d.deadlineLabel} 23:59)`}
-            </span>
+            {markFriday && d.day === 'friday' && open ? (
+              <span aria-hidden className={`absolute right-2 top-2 h-2 w-2 rounded-full ${active ? 'bg-eden-paper' : 'bg-eden-sand'}`} />
+            ) : null}
           </button>
         )
       })}

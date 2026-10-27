@@ -5,6 +5,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { useCustomerAuth } from '@/lib/customer-auth'
 import { supabase } from '@/lib/supabase'
 import { pageMeta } from '@/lib/seo'
+import { rememberReturnTo } from '@/lib/return-to'
 import { useSiteContent, useContentValue, ALL_NEWS_KEYS } from '@/lib/site-content'
 import { toast } from 'sonner'
 
@@ -54,7 +55,7 @@ function SupportPage() {
 
     <section id="inquiry" className="scroll-mt-24">
     <h2 className="mb-2 font-serif text-xl font-semibold">문의하기</h2><p className="mb-6 text-[15px] text-eden-sage-dim">궁금한 점을 남겨주시면 빠르게 답변드릴게요. 주문하는 방법은 <Link to="/guide" className="font-semibold text-eden-ink underline underline-offset-4">픽업 이용방법</Link>에도 정리해두었어요.</p>
-    {loading ? <p>로그인 상태 확인 중…</p> : !user ? <div><p className="mb-4">로그인 후 문의를 남길 수 있어요.</p><Link to="/login" className="inline-block bg-eden-ink px-7 py-3 text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2">로그인하기</Link></div> : <div className="grid gap-7 lg:grid-cols-[1.3fr_1fr]">
+    {loading ? <p>로그인 상태 확인 중…</p> : !user ? <div><p className="mb-4">로그인 후 문의를 남길 수 있어요.</p><Link to="/login" onClick={() => rememberReturnTo('/support')} className="inline-block bg-eden-ink px-7 py-3 text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2">로그인하기</Link></div> : <div className="grid gap-7 lg:grid-cols-[1.3fr_1fr]">
       <div className="rounded-card bg-eden-paper-dim shadow-soft p-7"><label htmlFor="category" className="mb-2 block text-sm">문의 종류</label><select id="category" value={category} onChange={e => setCategory(e.target.value)} className="mb-5 w-full rounded-[10px] border border-eden-line bg-eden-paper p-3">{categories.map(c => <option key={c}>{c}</option>)}</select>
         <label htmlFor="title" className="mb-2 block text-sm">제목</label><input id="title" maxLength={100} value={title} onChange={e => setTitle(e.target.value)} className="mb-5 w-full rounded-[10px] border border-eden-line bg-eden-paper p-3" />
         <label htmlFor="content" className="mb-2 block text-sm">내용</label><textarea id="content" maxLength={3000} value={content} onChange={e => setContent(e.target.value)} className="mb-5 min-h-36 w-full rounded-[10px] border border-eden-line bg-eden-paper p-3" />

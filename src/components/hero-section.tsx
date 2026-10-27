@@ -55,7 +55,6 @@ export function HeroSection() {
             {heroImage ? <img src={heroImage} alt="" className="h-full w-full object-cover" /> : <CabinIllustration />}
           </div>
           <div>
-            <div className="mb-1 text-sm font-semibold text-eden-sand">{cv('menuHome.title')}</div>
             <h1 className="font-serif text-2xl font-bold leading-snug md:text-3xl">미리 주문하고, 고른 날 찾아가세요</h1>
             <p className="mt-2 text-sm text-eden-sage-dim">{cv('menuHome.subtitle')}</p>
           </div>

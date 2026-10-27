@@ -1,6 +1,11 @@
 import { Link } from '@tanstack/react-router'
+import { isPlaceholder, useContentValue, useSiteContent } from '@/lib/site-content'
 
 export function SiteFooter() {
+  const content = useSiteContent()
+  // Same values as 카페소개 → 오시는 길 (admin → 글귀 · 이미지); sample text stays hidden.
+  const phone = useContentValue(content, 'location.phone').replace(/^담당 연락처\s*·\s*/, '')
+  const addr = useContentValue(content, 'location.addr')
   return (
     <footer className="bg-eden-ink-2 pb-6 pt-16 text-[rgba(237,236,227,0.65)]">
       <div className="mx-auto max-w-6xl px-6 md:px-8">
@@ -24,14 +29,14 @@ export function SiteFooter() {
           </div>
           <div>
             <h4 className="mb-4 text-sm font-medium text-eden-paper">고객</h4>
-            <Link to="/orders" className="block py-1 text-sm hover:text-eden-sand">마이페이지</Link>
             <Link to="/orders" className="block py-1 text-sm hover:text-eden-sand">내 주문</Link>
           </div>
           <div>
             <h4 className="mb-4 text-sm font-medium text-eden-paper">연락처</h4>
-            <p className="py-1 text-sm">010-XXXX-XXXX</p>
-            <p className="py-1 text-sm">충청남도 금산군 ○○○</p>
+            {isPlaceholder(phone) ? null : <p className="py-1 text-sm">{phone}</p>}
+            {isPlaceholder(addr) ? null : <p className="py-1 text-sm">{addr}</p>}
             <p className="py-1 text-sm">평일 09:00 – 18:00</p>
+            <Link to="/support" hash="inquiry" className="block py-1 text-sm hover:text-eden-sand">문의 남기기</Link>
           </div>
         </div>
         <div className="flex flex-col gap-2 pt-6 text-xs text-[rgba(237,236,227,0.4)] md:flex-row md:items-center md:justify-between">

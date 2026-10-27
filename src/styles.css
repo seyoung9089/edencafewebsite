@@ -154,6 +154,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: var(--font-sans);
+  /* Korean wraps between words, not mid-word ("나와\n요", "휘낭\n시에"). */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 /* Offset anchor scroll targets so the sticky header doesn't cover them. */

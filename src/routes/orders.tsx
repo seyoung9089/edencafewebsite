@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { SiteHeader } from '@/components/site-header'
@@ -7,6 +7,8 @@ import { MyOrdersBody, type CustomerOrder } from '@/components/my-orders'
 import { customerName, useCustomerAuth } from '@/lib/customer-auth'
 import { supabase } from '@/lib/supabase'
 import { pageMeta } from '@/lib/seo'
+import { useCart } from '@/lib/cart'
+import { lastOrderTab, rememberReturnTo, takeReturnTo } from '@/lib/return-to'
 
 export const Route = createFileRoute('/orders')({
   component: OrdersPage,
@@ -18,6 +20,17 @@ function OrdersPage() {
   const [orders, setOrders] = useState<CustomerOrder[]>([])
   const [busy, setBusy] = useState(true)
   const [error, setError] = useState('')
+  const { totalQty } = useCart()
+  const navigate = useNavigate()
+  const [orderTab, setOrderTab] = useState<'/order' | '/parents'>('/order')
+  useEffect(() => setOrderTab(lastOrderTab()), [])
+  // Google login and the sign-up email land here: go on to the order page the
+  // customer was on before logging in.
+  useEffect(() => {
+    if (loading || !user) return
+    const back = takeReturnTo()
+    if (back && back !== '/orders') void navigate({ to: back, replace: true })
+  }, [loading, user?.id])
   useEffect(() => {
     if (!user) { setOrders([]); setBusy(false); return }
     let active = true
@@ -43,7 +56,11 @@ function OrdersPage() {
 
   return <div className="min-h-screen bg-eden-paper text-eden-ink"><SiteHeader /><main className="mx-auto max-w-4xl px-6 pb-24 pt-14">
     <h1 className="mb-8 font-serif text-3xl font-semibold">내 주문</h1>
-    {loading ? <p>로그인 상태 확인 중…</p> : !user ? <div><p className="mb-4">로그인 후 주문 내역을 확인할 수 있어요.</p><Link to="/login" className="inline-block bg-eden-ink px-7 py-3 text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2">이메일 로그인</Link></div>
+    {user && totalQty > 0 ? <div className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-card border-2 border-eden-sand bg-eden-sand/15 px-5 py-4">
+      <p className="text-base font-semibold">담아 둔 빵 {totalQty}개가 아직 주문 전이에요.</p>
+      <Link to={orderTab} className="inline-flex h-12 items-center rounded-full bg-eden-ink px-6 text-base font-semibold text-eden-paper hover:bg-eden-ink-2">주문 마저 하기</Link>
+    </div> : null}
+    {loading ? <p>로그인 상태 확인 중…</p> : !user ? <div><p className="mb-4">로그인 후 주문 내역을 확인할 수 있어요.</p><Link to="/login" onClick={() => rememberReturnTo('/orders')} className="inline-block bg-eden-ink px-7 py-3 text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2">로그인하기</Link></div>
       : busy ? <p>불러오는 중…</p> : error ? <p role="alert">주문 내역을 불러오지 못했습니다: {error}</p>
       : <MyOrdersBody name={customerName(user)} email={user.email ?? ''} orders={orders} onSaveName={saveName} onCancel={cancelOrder} onSignOut={() => void supabase.auth.signOut()} />}
   </main><SiteFooter /></div>

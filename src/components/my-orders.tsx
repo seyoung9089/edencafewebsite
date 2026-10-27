@@ -43,8 +43,8 @@ function statusLabel(order: CustomerOrder): string {
   if (order.payment_method === 'onsite' && order.status === 'wait') return '주문 접수 · 현장결제'
   return STATUS[order.status].label
 }
-const orderedOn = (iso: string) =>
-  new Date(iso).toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', month: 'numeric', day: 'numeric', weekday: 'short' })
+/** "10월 27일(화)", the same way pickup days read. */
+const orderedOn = (iso: string) => pickupLabel(kstTodayIso(new Date(iso).getTime()))
 const won = (n: number) => `${n.toLocaleString('ko-KR')}원`
 /** Shows the customer's name with a small inline editor. */
 function NameLine({ name, onSave, className = '', suffix = '님' }: { name: string; onSave: (name: string) => Promise<void>; className?: string; suffix?: string }) {

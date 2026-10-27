@@ -51,7 +51,8 @@ export function OrderCompleteBody({ order, onClose, onOrders }: BodyProps) {
       <div>
         <h2 className="font-serif text-xl font-semibold">주문 완료!</h2>
         <p className="mt-1 text-sm text-eden-sage-dim">
-          {pickupText(order)} 픽업{order.studentName ? ` · ${order.studentName} 학생` : ''}
+          {/* 학부모 주문 is picked up after school, not during shop hours. */}
+          {order.studentName ? `${order.pickupLabel} 하교할 때 ${order.studentName} 학생이 찾아가요` : `${pickupText(order)} 픽업`}
         </p>
       </div>
       {order.paymentMethod === 'onsite' ? (

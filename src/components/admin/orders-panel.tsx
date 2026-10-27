@@ -18,13 +18,6 @@ type Order = {
 }
 
 const PAYMENT_METHOD_LABEL = { transfer: '계좌이체', onsite: '현장결제' } as const
-const PAYMENT_STATUS_LABEL = { pending: '입금 대기', confirmed: '입금 확인', onsite: '현장결제' } as const
-const PAYMENT_BADGE_CLASS = {
-  pending: 'bg-amber-100 text-amber-800 ring-1 ring-inset ring-amber-300',
-  confirmed: 'bg-emerald-100 text-emerald-800 ring-1 ring-inset ring-emerald-300',
-  onsite: 'bg-sky-100 text-sky-800 ring-1 ring-inset ring-sky-300',
-} as const
-
 /** 현장결제 orders aren't waiting on a transfer, so 'wait' reads as 접수. */
 function statusLabel(o: Pick<Order, 'payment_method'>, status: Order['status']): string {
   return o.payment_method === 'onsite' && status === 'wait' ? '접수' : STATUS_LABEL[status]
@@ -76,8 +69,16 @@ export function OrdersPanel() {
     setOrders((data ?? []) as Order[])
     setCustomers(map)
   }
+  // New orders show up without reloading: every minute and when the tab comes back.
   useEffect(() => {
     void refresh()
+    const timer = window.setInterval(() => void refresh(), 60_000)
+    const onFocus = () => void refresh()
+    window.addEventListener('focus', onFocus)
+    return () => {
+      window.clearInterval(timer)
+      window.removeEventListener('focus', onFocus)
+    }
   }, [])
 
   const updateStatus = async (id: string, status: Order['status']) => {
@@ -91,12 +92,14 @@ export function OrdersPanel() {
     }
   }
 
-  const confirmPayment = async (o: Order) => {
-    // The order status follows (입금대기 → 입금확인) in the database.
-    const { error } = await supabase.from('orders').update({ payment_status: 'confirmed' }).eq('id', o.id)
+  // Staff may only write orders.status (column grant), so 입금 확인 sets the
+  // status and the sync_order_payment trigger marks the payment confirmed.
+  const quickStatus = async (o: Order, status: 'done' | 'picked') => {
+    const { error } = await supabase.from('orders').update({ status }).eq('id', o.id)
     if (error) toast.error(error.message)
     else {
-      toast.success(`${o.student_name ?? customers.get(o.user_id) ?? '주문'} 입금 확인했어요.`)
+      const who = o.student_name ? `${o.student_name} 학생` : (customers.get(o.user_id) ?? '주문')
+      toast.success(status === 'done' ? `${who} 입금 확인했어요.` : `${who} 픽업 완료로 바꿨어요.`)
       void refresh()
     }
   }
@@ -132,10 +135,15 @@ export function OrdersPanel() {
         ) : (
           <span />
         )}
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={showPast} onChange={(e) => setShowPast(e.target.checked)} />
-          지난 픽업도 보기
-        </label>
+        <span className="flex items-center gap-4">
+          <button type="button" onClick={() => void refresh()} className="rounded-full border border-eden-line bg-eden-paper px-3 py-1.5 text-sm hover:border-eden-ink">
+            새로고침
+          </button>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={showPast} onChange={(e) => setShowPast(e.target.checked)} />
+            지난 픽업도 보기
+          </label>
+        </span>
       </div>
 
       {allDates.length > 1 ? (
@@ -201,21 +209,22 @@ export function OrdersPanel() {
                     )}
                     <p className="text-sm">{o.items.map((i) => `${i.name} × ${i.qty}`).join(', ')}</p>
                   </div>
-                  <span className="font-semibold">{o.total.toLocaleString('ko-KR')}원</span>
-                  <span className="text-xs text-eden-sage-dim">{PAYMENT_METHOD_LABEL[o.payment_method]}</span>
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${PAYMENT_BADGE_CLASS[o.payment_status]}`}>{PAYMENT_STATUS_LABEL[o.payment_status]}</span>
-                  {o.payment_status === 'pending' && o.status !== 'cancelled' ? (
-                    <button
-                      type="button"
-                      onClick={() => void confirmPayment(o)}
-                      className="rounded-full bg-eden-ink px-4 py-2 text-sm font-semibold text-eden-paper hover:bg-eden-ink-2"
-                    >
+                  <span className="font-semibold">
+                    {o.total.toLocaleString('ko-KR')}원 <span className="text-xs font-normal text-eden-sage-dim">{PAYMENT_METHOD_LABEL[o.payment_method]}</span>
+                  </span>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_BADGE_CLASS[o.status]}`}>{statusLabel(o, o.status)}</span>
+                  {/* The one next step for this order, as a big button. */}
+                  {o.status === 'wait' && o.payment_method === 'transfer' ? (
+                    <button type="button" onClick={() => void quickStatus(o, 'done')} className="rounded-full bg-eden-ink px-4 py-2 text-sm font-semibold text-eden-paper hover:bg-eden-ink-2">
                       입금 확인
                     </button>
+                  ) : o.status === 'done' || (o.status === 'wait' && o.payment_method === 'onsite') ? (
+                    <button type="button" onClick={() => void quickStatus(o, 'picked')} className="rounded-full bg-eden-sand px-4 py-2 text-sm font-semibold text-eden-ink-2 hover:opacity-90">
+                      픽업 완료
+                    </button>
                   ) : null}
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_BADGE_CLASS[o.status]}`}>{statusLabel(o, o.status)}</span>
                   <select
-                    aria-label="입금·픽업 상태"
+                    aria-label="상태 직접 바꾸기"
                     value={o.status}
                     disabled={o.status === 'cancelled'}
                     onChange={(e) => void updateStatus(o.id, e.target.value as Order['status'])}

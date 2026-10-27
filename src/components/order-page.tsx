@@ -7,10 +7,11 @@ import { OrderCompleteBody, type PlacedOrder } from '@/components/order-complete
 import { MAX_QTY, groupTotals, maxQtyFor, overGroupLimit, reconcileCart, useCart } from '@/lib/cart'
 import { pickupLabel, usePickupDates } from '@/lib/pickup'
 import { useCustomerAuth } from '@/lib/customer-auth'
-import { useContentValue, useSiteContent } from '@/lib/site-content'
+import { isPlaceholder, useContentValue, useSiteContent } from '@/lib/site-content'
 import { useMenu, isSoldOut, isUnpriced, fetchPopularity, type MenuGroup, type MenuItem } from '@/lib/menu'
 import { getErrorMessage } from '@/lib/errors'
 import { supabase } from '@/lib/supabase'
+import { rememberOrderTab } from '@/lib/return-to'
 import { useEffect, useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
@@ -172,7 +173,8 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
   const pickupTime = useContentValue(content, 'pickup.time')
   const fridayNotice = useContentValue(content, 'order.fridayNotice')
   const studentDepositNote = useContentValue(content, 'order.studentDepositNote')
-  const bulkMessage = `${useContentValue(content, 'order.bulkNotice')} ${useContentValue(content, 'order.bulkContact')}`
+  const bulkContact = useContentValue(content, 'order.bulkContact')
+  const bulkMessage = `${useContentValue(content, 'order.bulkNotice')} ${isPlaceholder(bulkContact) ? '문의사항에 남겨 주세요.' : bulkContact}`
   const [popularity, setPopularity] = useState<Map<string, number>>(new Map())
   const [submitting, setSubmitting] = useState(false)
   const [placed, setPlaced] = useState<Omit<PlacedOrder, 'pickupTime'> | null>(null)
@@ -193,6 +195,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
   const pickup = dates?.find((d) => d.iso === pickupIso && d.open && shownDays?.some((c) => c.iso === d.iso && c.open)) ?? null
 
   useEffect(() => {
+    rememberOrderTab(parents ? '/parents' : '/order')
     setPickupIso(readStored(PICKUP_KEY[audience]) || null)
     setStudentName(readStored(STUDENT_KEY))
   }, [])
@@ -453,15 +456,25 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
               )}
             </section>
 
+            {/* Drinks can't be ordered here, so a short price list instead of big cards. */}
             {!parents && drinks.length > 0 ? (
               <section className="mt-12">
                 <h2 className="mb-1 border-b border-eden-line pb-3 font-serif text-xl font-semibold">음료</h2>
-                <p className="mb-4 mt-3 text-sm text-eden-sage-dim">음료는 매장에서 바로 주문해주세요.</p>
-                <div className={grid}>
+                <p className="mb-3 mt-3 text-sm text-eden-sage-dim">음료는 온라인 주문이 안 돼요. 매장에서 바로 주문해 주세요.</p>
+                <ul className="grid gap-x-8 sm:grid-cols-2">
                   {drinks.map((item) => (
-                    <MenuCard key={item.name} item={item} qty={0} onAdd={add} onQty={setQty} onOpen={(i) => setDetailName(i.name)} />
+                    <li key={item.name}>
+                      <button
+                        type="button"
+                        onClick={() => setDetailName(item.name)}
+                        className="flex w-full items-baseline justify-between gap-3 border-b border-dashed border-eden-line py-2.5 text-left text-[15px] hover:text-eden-sand"
+                      >
+                        <span>{item.name}</span>
+                        <span className="text-eden-sage-dim">{isUnpriced(item) ? '가격 준비 중' : won(item.price)}</span>
+                      </button>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </section>
             ) : null}
           </div>

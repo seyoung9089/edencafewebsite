@@ -4,6 +4,7 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { useStaff } from '@/components/admin/use-staff'
 import { OrdersPanel } from '@/components/admin/orders-panel'
+import { rememberReturnTo } from '@/lib/return-to'
 import { InquiriesPanel } from '@/components/admin/inquiries-panel'
 import { MenuPanel } from '@/components/admin/menu-panel'
 import { ContentPanel } from '@/components/admin/content-panel'
@@ -96,7 +97,7 @@ function AdminPage() {
         ) : !user ? (
           <div className="max-w-sm">
             <p className="mb-4 text-sm text-eden-sage-dim">관리자 계정으로 로그인해주세요.</p>
-            <Link to="/login" className="inline-block rounded-full bg-eden-ink px-7 py-3 text-sm font-semibold text-eden-paper hover:bg-eden-ink-2">
+            <Link to="/login" onClick={() => rememberReturnTo('/admin')} className="inline-block rounded-full bg-eden-ink px-7 py-3 text-sm font-semibold text-eden-paper hover:bg-eden-ink-2">
               로그인
             </Link>
           </div>

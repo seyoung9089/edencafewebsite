@@ -4,6 +4,7 @@ import { maxQtyFor, type CartItem } from '@/lib/cart'
 import type { MenuItem } from '@/lib/menu'
 import type { PickupDate } from '@/lib/pickup'
 import { CopyLabel, usePayment } from '@/components/payment-info'
+import { rememberReturnTo } from '@/lib/return-to'
 
 const won = (n: number) => `${n.toLocaleString('ko-KR')}원`
 
@@ -223,11 +224,12 @@ export function OrderReceipt({
           <>
             <Link
               to="/login"
+              onClick={() => rememberReturnTo(parents ? '/parents' : '/order')}
               className="flex h-14 w-full items-center justify-center rounded-full bg-eden-ink text-base font-semibold text-eden-paper transition-colors hover:bg-eden-ink-2"
             >
               로그인하고 주문하기
             </Link>
-            <p className="mt-2 text-center text-xs text-eden-sage-dim">담은 메뉴는 로그인해도 그대로 남아 있어요.</p>
+            <p className="mt-2 text-center text-xs text-eden-sage-dim">처음이시면 회원가입부터 해요. 담은 빵은 그대로 남아 있어요.</p>
           </>
         )}
         {loggedIn && (!parents || paymentMethod === 'transfer') ? (

@@ -22,6 +22,21 @@ export type PickupDate = {
   open: boolean
 }
 
+/** One square of the order calendar: today and the days after it. */
+export type CalendarDay = {
+  iso: string
+  /** Day of the month, e.g. 27 */
+  date: number
+  month: number
+  /** '월' … '일' */
+  weekday: string
+  isToday: boolean
+  /** Which menu that day uses; null on weekends (no pickup) */
+  day: PickupDay | null
+  /** Pickup day still taking orders */
+  open: boolean
+}
+
 export const DEADLINE_DAYS = 2
 export const PICKUP_WINDOW_DAYS = 14
 
@@ -80,19 +95,42 @@ export function listPickupDates(nowMs: number): PickupDate[] {
   return dates
 }
 
+/** CALENDAR_DAYS squares starting today, one per day, weekends included. */
+export const CALENDAR_DAYS = 14
+
+export function listCalendarDays(nowMs: number): CalendarDay[] {
+  const today = kstTodayStart(nowMs)
+  return Array.from({ length: CALENDAR_DAYS }, (_, i) => {
+    const d = new Date(today + i * DAY_MS)
+    const iso = d.toISOString().slice(0, 10)
+    const day = pickupDayOf(iso)
+    return {
+      iso,
+      date: d.getUTCDate(),
+      month: d.getUTCMonth() + 1,
+      weekday: WEEKDAY_KO[d.getUTCDay()],
+      isToday: i === 0,
+      day,
+      open: day !== null && i >= DEADLINE_DAYS && i <= PICKUP_WINDOW_DAYS,
+    }
+  })
+}
+
+type PickupCalendar = { todayIso: string; dates: PickupDate[]; days: CalendarDay[] }
+
 /**
  * Today's pickup calendar. Refreshes every minute and when the tab regains
  * focus, so a deadline closes at midnight without a reload. Returns null
  * until mounted (avoids an SSR/client mismatch).
  */
-export function usePickupDates(): { todayIso: string; dates: PickupDate[] } | null {
-  const [state, setState] = useState<{ todayIso: string; dates: PickupDate[] } | null>(null)
+export function usePickupDates(): PickupCalendar | null {
+  const [state, setState] = useState<PickupCalendar | null>(null)
 
   useEffect(() => {
     const load = () => {
       const now = Date.now()
       const todayIso = kstTodayIso(now)
-      setState((prev) => (prev?.todayIso === todayIso ? prev : { todayIso, dates: listPickupDates(now) }))
+      setState((prev) => (prev?.todayIso === todayIso ? prev : { todayIso, dates: listPickupDates(now), days: listCalendarDays(now) }))
     }
     load()
     const timer = window.setInterval(load, 60_000)

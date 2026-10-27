@@ -5,7 +5,7 @@ import { OrderReceipt, type PaymentMethod } from '@/components/order-receipt'
 import { PickupDatePicker } from '@/components/pickup-date-picker'
 import { OrderCompleteBody, type PlacedOrder } from '@/components/order-complete'
 import { MAX_QTY, groupTotals, maxQtyFor, overGroupLimit, reconcileCart, useCart } from '@/lib/cart'
-import { usePickupDates, type PickupDate } from '@/lib/pickup'
+import { usePickupDates } from '@/lib/pickup'
 import { useCustomerAuth } from '@/lib/customer-auth'
 import { useContentValue, useSiteContent } from '@/lib/site-content'
 import { useMenu, isSoldOut, isUnpriced, fetchPopularity, type MenuGroup, type MenuItem } from '@/lib/menu'
@@ -243,9 +243,9 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
     updateQty(name, Math.min(qty, maxQtyFor(menuByName.get(name))))
   }
 
-  const choosePickup = (d: PickupDate) => {
-    setPickupIso(d.iso)
-    store(PICKUP_KEY[audience], d.iso)
+  const choosePickup = (iso: string) => {
+    setPickupIso(iso)
+    store(PICKUP_KEY[audience], iso)
     window.setTimeout(() => menuRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
   }
   const changeStudentName = (name: string) => {
@@ -347,8 +347,8 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
           <h1 className="mb-2 font-serif text-3xl font-semibold">{parents ? '학부모 주문' : '마을 픽업 주문'}</h1>
           <p className="text-[15px] text-eden-sage-dim">
             {parents
-              ? '금요일에 학생이 하교하면서 찾아갈 빵을 주문해 주세요. 수요일 밤 11시 59분까지 주문할 수 있어요.'
-              : '픽업 날짜를 먼저 고르고 빵을 담아 주세요. 픽업 2일 전 밤 11시 59분까지 주문할 수 있어요.'}{' '}
+              ? '금요일에 학생이 하교하면서 찾아갈 빵을 주문해 주세요.'
+              : '픽업 날짜를 먼저 고르고 빵을 담아 주세요.'}{' '}
             <Link to="/guide" className="whitespace-nowrap font-semibold text-eden-ink underline underline-offset-4">
               처음이신가요?
             </Link>
@@ -374,9 +374,24 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
           <div>
             <section>
               <h2 className="mb-4 border-b border-eden-line pb-3 font-serif text-xl font-semibold">{parents ? '1. 금요일 고르기' : '1. 픽업 날짜 고르기'}</h2>
-              <PickupDatePicker dates={dates} selected={pickup?.iso ?? null} onSelect={choosePickup} />
+              <p className="mb-3 text-[15px] font-semibold">
+                픽업 2일 전 자정까지 주문해 주세요.{' '}
+                <span className="font-normal text-eden-sage-dim">
+                  {parents ? '금요일만 고를 수 있고, 회색 날짜는 주문할 수 없어요.' : '회색 날짜는 주문할 수 없어요.'}
+                </span>
+              </p>
+              <PickupDatePicker
+                days={calendar?.days ?? null}
+                allowed={(d) => !parents || d.day === 'friday'}
+                markFriday={!parents}
+                selected={pickup?.iso ?? null}
+                onSelect={choosePickup}
+              />
               {parents ? null : (
-                <p className="mt-3 text-sm text-eden-sage-dim">월~목은 평일 메뉴, 금요일은 금요일 메뉴가 나와요. 주말에는 픽업이 없어요.</p>
+                <p className="mt-3 flex items-center gap-1.5 text-sm text-eden-sage-dim">
+                  <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-eden-sand" />
+                  표시가 있는 금요일은 메뉴가 달라요.
+                </p>
               )}
             </section>
 

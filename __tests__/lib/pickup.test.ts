@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { listPickupDates, pickupDayOf } from "@/lib/pickup"
+import { listCalendarDays, listPickupDates, pickupDayOf } from "@/lib/pickup"
 
 // 2026-10-27 is a Tuesday. Times are given in Korea time (+09:00).
 const at = (kst: string) => new Date(kst).getTime()
@@ -40,5 +40,23 @@ describe("listPickupDates", () => {
     expect(dates.every((d) => pickupDayOf(d.iso) !== null)).toBe(true)
     expect(dates[dates.length - 1].iso <= "2026-11-10").toBe(true)
     expect(dates.length).toBe(10)
+  })
+})
+
+describe("listCalendarDays", () => {
+  it("starts today and greys out the next day, weekends and later than two weeks", () => {
+    const days = listCalendarDays(at("2026-10-27T09:00:00+09:00"))
+    expect(days).toHaveLength(14)
+    expect(days[0]).toMatchObject({ iso: "2026-10-27", isToday: true, weekday: "화", open: false })
+    expect(days[1].open).toBe(false) // 수: closed (deadline was Monday)
+    expect(days[2]).toMatchObject({ iso: "2026-10-29", open: true })
+    expect(days.find((d) => d.iso === "2026-10-31")?.open).toBe(false) // 토
+    expect(days.find((d) => d.iso === "2026-10-30")?.day).toBe("friday")
+  })
+
+  it("moves along one square the next day", () => {
+    const days = listCalendarDays(at("2026-10-28T00:00:00+09:00"))
+    expect(days[0].iso).toBe("2026-10-28")
+    expect(days[13].iso).toBe("2026-11-10")
   })
 })

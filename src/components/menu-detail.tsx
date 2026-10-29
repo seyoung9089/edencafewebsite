@@ -43,18 +43,18 @@ function Body({ item, popular, qty, onAdd, onQty }: Omit<Props, 'item' | 'onClos
         {item.image_url ? (
           <img src={item.image_url} alt={item.name} className={`h-full w-full object-cover ${soldOut ? 'grayscale opacity-50' : ''}`} />
         ) : (
-          <Icon size={56} strokeWidth={1.25} className="text-eden-sage-dim" />
+          <Icon size={56} strokeWidth={1.25} className="text-eden-mute" />
         )}
         <DialogClose
           aria-label="닫기"
-          className="absolute right-3 top-3 flex h-12 w-12 items-center justify-center rounded-full bg-eden-paper/95 text-eden-ink shadow-soft"
+          className="absolute right-3 top-3 flex h-12 w-12 items-center justify-center rounded-[3px] bg-eden-paper/95 text-eden-ink shadow-soft"
         >
           <X size={26} strokeWidth={2.25} />
         </DialogClose>
         {soldOut ? (
           <span className="absolute left-3 top-3 rounded-full bg-eden-ink-2/90 px-3 py-1 text-sm font-semibold text-eden-paper">품절</span>
         ) : popular ? (
-          <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-eden-sand px-3 py-1 text-sm font-semibold text-eden-ink-2">
+          <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-eden-accent px-3 py-1 text-sm font-semibold text-white">
             <Flame size={14} strokeWidth={2} /> 인기
           </span>
         ) : null}
@@ -62,36 +62,36 @@ function Body({ item, popular, qty, onAdd, onQty }: Omit<Props, 'item' | 'onClos
 
       <div className="space-y-5 p-5 sm:p-6">
         <div>
-          <DialogTitle className="font-serif text-2xl font-semibold leading-snug">{item.name}</DialogTitle>
+          <DialogTitle className="font-serif text-2xl font-light leading-snug">{item.name}</DialogTitle>
           <div className="mt-2 flex flex-wrap items-baseline justify-between gap-x-3">
-            <span className={unpriced ? 'text-lg text-eden-sage-dim' : 'text-xl font-semibold'}>{unpriced ? '가격 준비 중' : won(item.price)}</span>
+            <span className={unpriced ? 'text-lg text-eden-mute' : 'text-xl font-semibold'}>{unpriced ? '가격 준비 중' : won(item.price)}</span>
             {item.category === 'bakery' && !soldOut && item.stock !== null ? (
-              <span className="text-base text-eden-sage-dim">{item.stock}개 남음</span>
+              <span className="text-base text-eden-mute">{item.stock}개 남음</span>
             ) : null}
           </div>
         </div>
 
         <DialogDescription asChild>
           <div className="whitespace-pre-line text-[17px] leading-relaxed text-eden-ink">
-            {item.description || <span className="text-eden-sage-dim">아직 메뉴 설명이 없어요.</span>}
+            {item.description || <span className="text-eden-mute">아직 메뉴 설명이 없어요.</span>}
           </div>
         </DialogDescription>
 
         {item.category === 'drink' ? (
-          <p className="rounded-[10px] bg-eden-paper-dim px-4 py-3 text-base text-eden-sage-dim">
+          <p className="rounded-[2px] bg-eden-paper-dim px-4 py-3 text-base text-eden-mute">
             음료는 온라인 주문이 안 돼요. 매장에서 바로 주문해주세요.
           </p>
         ) : soldOut ? (
-          <p className="rounded-[10px] bg-eden-paper-dim px-4 py-3 text-base text-eden-sage-dim">오늘은 다 팔렸어요.</p>
+          <p className="rounded-[2px] bg-eden-paper-dim px-4 py-3 text-base text-eden-mute">오늘은 다 팔렸어요.</p>
         ) : unpriced ? (
-          <p className="rounded-[10px] bg-eden-paper-dim px-4 py-3 text-base text-eden-sage-dim">가격이 정해지면 주문할 수 있어요.</p>
+          <p className="rounded-[2px] bg-eden-paper-dim px-4 py-3 text-base text-eden-mute">가격이 정해지면 주문할 수 있어요.</p>
         ) : qty > 0 ? (
-          <div className="flex h-14 items-center justify-between rounded-full bg-eden-ink px-2 text-eden-paper">
+          <div className="flex h-14 items-center justify-between rounded-[3px] bg-eden-accent px-2 text-white">
             <button
               type="button"
               onClick={() => onQty(item.name, qty - 1)}
               aria-label={`${item.name} 하나 빼기`}
-              className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-eden-ink-2"
+              className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-eden-accent-d"
             >
               <Minus size={22} />
             </button>
@@ -103,7 +103,7 @@ function Body({ item, popular, qty, onAdd, onQty }: Omit<Props, 'item' | 'onClos
               onClick={() => onQty(item.name, qty + 1)}
               disabled={qty >= max}
               aria-label={`${item.name} 하나 더`}
-              className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-eden-ink-2 disabled:opacity-30"
+              className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-eden-accent-d disabled:opacity-30"
             >
               <Plus size={22} />
             </button>
@@ -112,13 +112,13 @@ function Body({ item, popular, qty, onAdd, onQty }: Omit<Props, 'item' | 'onClos
           <button
             type="button"
             onClick={() => onAdd(item)}
-            className="h-14 w-full rounded-full bg-eden-ink text-lg font-semibold text-eden-paper hover:bg-eden-ink-2"
+            className="h-14 w-full rounded-[3px] bg-eden-accent text-lg font-semibold text-white hover:bg-eden-accent-d"
           >
             담기
           </button>
         )}
 
-        <DialogClose className="h-12 w-full rounded-full border border-eden-line text-base font-semibold text-eden-ink hover:bg-eden-paper-dim">
+        <DialogClose className="h-12 w-full rounded-[3px] border border-eden-line text-base font-semibold text-eden-ink hover:bg-eden-paper-dim">
           닫기
         </DialogClose>
       </div>

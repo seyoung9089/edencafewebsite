@@ -56,45 +56,46 @@ function GuidePage() {
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
-      <main className="mx-auto max-w-3xl px-6 pb-24 pt-14 md:px-8">
-        <h1 className="mb-3 font-serif text-3xl font-semibold">픽업 주문 이용방법</h1>
-        <p className="mb-8 text-[15px] text-eden-sage-dim">픽업 날짜를 골라 미리 주문하고, 그날 매장에서 찾아가요. 네 단계면 충분해요.</p>
+      <main className="mx-auto max-w-3xl px-6 pb-24 pt-[clamp(48px,7vw,96px)] md:px-8">
+        <p className="eyebrow mb-3">HOW TO ORDER</p>
+        <h1 className="mb-3 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">픽업 주문 이용방법</h1>
+        <p className="mb-8 text-[15px] text-eden-mute">픽업 날짜를 골라 미리 주문하고, 그날 매장에서 찾아가요. 네 단계면 충분해요.</p>
 
         <div className="mb-10 flex flex-wrap gap-2 text-sm">
-          <span className="rounded-full bg-eden-sand/15 px-4 py-2">월~금 픽업</span>
-          <span className="rounded-full bg-eden-sand/15 px-4 py-2">픽업 2일 전 자정까지 주문</span>
-          {pickupTime ? <span className="rounded-full bg-eden-sand/15 px-4 py-2">픽업 시간 {pickupTime}</span> : null}
+          <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2">월~금 픽업</span>
+          <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2">픽업 2일 전 자정까지 주문</span>
+          {pickupTime ? <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2">픽업 시간 {pickupTime}</span> : null}
         </div>
 
         <ol className="grid gap-4 sm:grid-cols-2">
           {steps.map((s, i) => (
             <li key={s.title} className="flex gap-4 rounded-card bg-eden-paper-dim p-5 shadow-soft">
-              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-eden-ink text-eden-paper">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[3px] bg-eden-accent text-white">
                 <s.icon size={22} strokeWidth={1.7} />
               </div>
               <div>
-                <div className="text-xs font-semibold text-eden-sand">{i + 1}단계</div>
-                <h2 className="mb-1 font-serif text-lg font-semibold">{s.title}</h2>
-                <p className="text-sm leading-relaxed text-eden-sage-dim">{s.desc}</p>
+                <div className="text-xs font-semibold text-eden-accent">{i + 1}단계</div>
+                <h2 className="mb-1 font-serif text-lg font-light">{s.title}</h2>
+                <p className="text-sm leading-relaxed text-eden-mute">{s.desc}</p>
               </div>
             </li>
           ))}
         </ol>
 
         <section className="mt-16">
-          <h2 className="mb-4 font-serif text-xl font-semibold">자주 묻는 질문</h2>
+          <h2 className="mb-4 font-serif text-xl font-light">자주 묻는 질문</h2>
           <div className="border-t border-eden-line">
             {faqs.map((f) => (
               <details key={f.q} className="group border-b border-eden-line">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-[15px] font-semibold">
                   {f.q}
-                  <ChevronDown size={18} className="flex-shrink-0 text-eden-sage-dim transition-transform group-open:rotate-180" />
+                  <ChevronDown size={18} className="flex-shrink-0 text-eden-mute transition-transform group-open:rotate-180" />
                 </summary>
-                <p className="pb-5 text-sm leading-relaxed text-eden-sage-dim">{f.a}</p>
+                <p className="pb-5 text-sm leading-relaxed text-eden-mute">{f.a}</p>
               </details>
             ))}
           </div>
-          <p className="mt-4 text-sm text-eden-sage-dim">
+          <p className="mt-4 text-sm text-eden-mute">
             다른 궁금한 점은{' '}
             <Link to="/support" hash="inquiry" className="font-semibold text-eden-ink underline underline-offset-4">
               문의사항
@@ -106,7 +107,7 @@ function GuidePage() {
         <div className="mt-14 text-center">
           <Link
             to="/order"
-            className="inline-flex h-14 items-center justify-center rounded-full bg-eden-ink px-12 text-base font-semibold text-eden-paper transition-colors hover:bg-eden-ink-2"
+            className="inline-flex h-14 items-center justify-center rounded-[3px] bg-eden-accent px-12 text-base font-semibold text-white transition-colors hover:bg-eden-accent-d"
           >
             지금 주문하기
           </Link>

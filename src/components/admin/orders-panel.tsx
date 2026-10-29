@@ -104,7 +104,7 @@ export function OrdersPanel() {
     }
   }
 
-  if (!orders) return <p className="text-sm text-eden-sage-dim">불러오는 중…</p>
+  if (!orders) return <p className="text-sm text-eden-mute">불러오는 중…</p>
 
   // Today's pickups and later are "upcoming"; older ones are hidden unless asked.
   const todayIso = kstTodayIso(Date.now())
@@ -123,20 +123,20 @@ export function OrdersPanel() {
       return next
     })
   const chip = (active: boolean) =>
-    `rounded-full border px-3 py-1.5 text-sm ${active ? 'border-eden-ink bg-eden-ink text-eden-paper' : 'border-eden-line bg-eden-paper'}`
+    `rounded-[3px] border px-3 py-1.5 text-sm ${active ? 'border-eden-accent bg-eden-accent text-white' : 'border-eden-line bg-eden-paper'}`
 
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         {earliest ? (
-          <p className="rounded-full bg-eden-sand/15 px-4 py-2 text-sm">
-            지금 받는 가장 빠른 픽업 <strong className="text-eden-sand">{earliest.label}</strong> · 마감 {earliest.deadlineLabel} 23:59
+          <p className="rounded-[3px] bg-eden-paper-dim px-4 py-2 text-sm">
+            지금 받는 가장 빠른 픽업 <strong className="text-eden-accent">{earliest.label}</strong> · 마감 {earliest.deadlineLabel} 23:59
           </p>
         ) : (
           <span />
         )}
         <span className="flex items-center gap-4">
-          <button type="button" onClick={() => void refresh()} className="rounded-full border border-eden-line bg-eden-paper px-3 py-1.5 text-sm hover:border-eden-ink">
+          <button type="button" onClick={() => void refresh()} className="rounded-[3px] border border-eden-line bg-eden-paper px-3 py-1.5 text-sm hover:border-eden-ink">
             새로고침
           </button>
           <label className="flex items-center gap-2 text-sm">
@@ -159,7 +159,7 @@ export function OrdersPanel() {
         </div>
       ) : null}
 
-      {dates.length === 0 ? <p className="py-6 text-center text-sm text-eden-sage-dim">해당하는 주문이 없어요.</p> : null}
+      {dates.length === 0 ? <p className="py-6 text-center text-sm text-eden-mute">해당하는 주문이 없어요.</p> : null}
       {dates.map((iso) => {
         const friday = pickupDayOf(iso) === 'friday'
         const nameOrder = friday && !byOrderTime.has(iso)
@@ -170,13 +170,13 @@ export function OrdersPanel() {
         return (
           <section key={iso} className="mb-10 last:mb-0">
             <div className="mb-3 flex flex-wrap items-baseline gap-3 border-b-2 border-eden-ink pb-3">
-              <h3 className="font-serif text-lg font-semibold">{dateLabel(iso)} 픽업</h3>
+              <h3 className="font-serif text-lg font-light">{dateLabel(iso)} 픽업</h3>
               {friday ? (
-                <span className="rounded-full bg-eden-sand px-2.5 py-0.5 text-xs font-semibold text-eden-ink-2">
+                <span className="rounded-full bg-eden-accent px-2.5 py-0.5 text-xs font-semibold text-white">
                   학부모 주문 {active.filter((o) => o.student_name).length}건
                 </span>
               ) : null}
-              <span className="text-sm text-eden-sage-dim">
+              <span className="text-sm text-eden-mute">
                 주문 {active.length}건 · 입금대기 {active.filter((o) => o.payment_status === 'pending').length}건 ·{' '}
                 {active.reduce((sum, o) => sum + o.total, 0).toLocaleString('ko-KR')}원
                 {active.length < list.length ? ` · 취소 ${list.length - active.length}건` : ''}
@@ -192,17 +192,17 @@ export function OrdersPanel() {
                 </span>
               ) : null}
             </div>
-            <p className="mb-4 rounded-[10px] bg-eden-paper px-4 py-3 text-sm">
+            <p className="mb-4 rounded-[2px] bg-eden-paper px-4 py-3 text-sm">
               <strong className="mr-2">준비할 메뉴</strong>
               {[...prep].map(([name, qty]) => `${name} ${qty}개`).join(' · ')}
             </p>
             <div className="space-y-2">
               {list.map((o) => (
-                <article key={o.id} className={`flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[10px] border border-eden-line bg-eden-paper p-4 ${o.status === 'cancelled' ? 'opacity-60' : ''}`}>
+                <article key={o.id} className={`flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[2px] border border-eden-line bg-eden-paper p-4 ${o.status === 'cancelled' ? 'opacity-60' : ''}`}>
                   <div className="min-w-48 flex-1">
                     {o.student_name ? (
-                      <p className="font-serif text-lg font-semibold">
-                        {o.student_name} <span className="font-sans text-xs font-normal text-eden-sage-dim">학생 · 주문 {customers.get(o.user_id) ?? o.user_id.slice(0, 8)}</span>
+                      <p className="font-serif text-lg font-light">
+                        {o.student_name} <span className="font-sans text-xs font-normal text-eden-mute">학생 · 주문 {customers.get(o.user_id) ?? o.user_id.slice(0, 8)}</span>
                       </p>
                     ) : (
                       <p className="text-sm font-semibold">{customers.get(o.user_id) ?? o.user_id.slice(0, 8)}</p>
@@ -210,16 +210,16 @@ export function OrdersPanel() {
                     <p className="text-sm">{o.items.map((i) => `${i.name} × ${i.qty}`).join(', ')}</p>
                   </div>
                   <span className="font-semibold">
-                    {o.total.toLocaleString('ko-KR')}원 <span className="text-xs font-normal text-eden-sage-dim">{PAYMENT_METHOD_LABEL[o.payment_method]}</span>
+                    {o.total.toLocaleString('ko-KR')}원 <span className="text-xs font-normal text-eden-mute">{PAYMENT_METHOD_LABEL[o.payment_method]}</span>
                   </span>
                   <span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_BADGE_CLASS[o.status]}`}>{statusLabel(o, o.status)}</span>
                   {/* The one next step for this order, as a big button. */}
                   {o.status === 'wait' && o.payment_method === 'transfer' ? (
-                    <button type="button" onClick={() => void quickStatus(o, 'done')} className="rounded-full bg-eden-ink px-4 py-2 text-sm font-semibold text-eden-paper hover:bg-eden-ink-2">
+                    <button type="button" onClick={() => void quickStatus(o, 'done')} className="rounded-[3px] bg-eden-accent px-4 py-2 text-sm font-semibold text-white hover:bg-eden-accent-d">
                       입금 확인
                     </button>
                   ) : o.status === 'done' || (o.status === 'wait' && o.payment_method === 'onsite') ? (
-                    <button type="button" onClick={() => void quickStatus(o, 'picked')} className="rounded-full bg-eden-sand px-4 py-2 text-sm font-semibold text-eden-ink-2 hover:opacity-90">
+                    <button type="button" onClick={() => void quickStatus(o, 'picked')} className="rounded-[3px] bg-eden-accent px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
                       픽업 완료
                     </button>
                   ) : null}
@@ -228,7 +228,7 @@ export function OrdersPanel() {
                     value={o.status}
                     disabled={o.status === 'cancelled'}
                     onChange={(e) => void updateStatus(o.id, e.target.value as Order['status'])}
-                    className={`rounded-[10px] border p-2 text-sm font-medium focus:outline-none focus:ring-2 ${STATUS_SELECT_CLASS[o.status]}`}
+                    className={`rounded-[2px] border p-2 text-sm font-medium focus:outline-none focus:ring-2 ${STATUS_SELECT_CLASS[o.status]}`}
                   >
                     {(Object.keys(STATUS_LABEL) as Order['status'][]).map((value) => (
                       <option key={value} value={value}>

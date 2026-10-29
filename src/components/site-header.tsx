@@ -17,7 +17,21 @@ const MOBILE_EXTRA_LINKS = [
   { to: '/orders', label: '내 주문 · 로그인' },
 ] as const
 
-export function SiteHeader() {
+/** The little three-hill mark next to the wordmark. */
+export function EdenMark({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 70" className={className} aria-hidden fill="none" stroke="currentColor" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 62 L30 22 L50 50 L66 30 L94 62" />
+      <path d="M6 62 H94" />
+    </svg>
+  )
+}
+
+/**
+ * Low fixed bar. `overlay` (home only): see-through with white text over the
+ * hero photo, turning solid once the page scrolls.
+ */
+export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
   const { totalQty } = useCart()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -39,7 +53,7 @@ export function SiteHeader() {
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     const onResize = () => {
-      if (window.innerWidth >= 768) setMobileOpen(false)
+      if (window.innerWidth >= 1024) setMobileOpen(false)
     }
     window.addEventListener('resize', onResize)
     return () => {
@@ -48,71 +62,94 @@ export function SiteHeader() {
     }
   }, [mobileOpen])
 
-  return (
-    <header
-      className={`sticky top-0 z-40 border-b bg-eden-paper backdrop-blur transition-all duration-300 ${
-        scrolled ? 'border-transparent shadow-soft' : 'border-transparent'
-      }`}
-    >
-      <div className="mx-auto flex h-[78px] max-w-6xl items-center justify-between px-6 md:px-8">
-        <Link to="/" className="flex items-baseline gap-2 font-logo text-xl font-bold text-eden-ink" onClick={() => setMobileOpen(false)}>
-          이든카페
-          <span className="font-sans text-[10px] font-normal tracking-[0.16em] text-eden-sage-dim">EDEN CAFE</span>
-        </Link>
-        <nav className="hidden items-center gap-1 text-sm font-medium text-eden-ink md:flex">
-          {NAV_LINKS.map((l) => (
-            <Link key={l.to} to={l.to} className="rounded-full px-4 py-2 hover:bg-eden-paper-dim" activeProps={{ className: 'bg-eden-paper-dim' }}>{l.label}</Link>
-          ))}
-        </nav>
-        {/* Icons carry a word underneath: not everyone reads a person icon as 내 주문. */}
-        <div className="flex items-center gap-3 md:gap-4">
-          <Link to="/orders" className="flex flex-col items-center gap-0.5 text-eden-ink hover:text-eden-sand">
-            <User size={20} strokeWidth={1.6} />
-            <span className="text-[11px] font-medium leading-none">내 주문</span>
-          </Link>
-          <Link to={cartTab} className="relative flex flex-col items-center gap-0.5 text-eden-ink hover:text-eden-sand">
-            <ShoppingBag size={20} strokeWidth={1.6} />
-            <span className="text-[11px] font-medium leading-none">담은 빵</span>
-            {totalQty > 0 ? (
-              <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-eden-sand px-1 text-[10px] font-bold text-eden-ink-2">
-                {totalQty > 99 ? '99+' : totalQty}
-              </span>
-            ) : null}
-          </Link>
-          <button
-            type="button"
-            aria-label={mobileOpen ? '메뉴 닫기' : '메뉴 열기'}
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen((v) => !v)}
-            className="text-eden-ink hover:text-eden-sand md:hidden"
-          >
-            <span className="flex flex-col items-center gap-0.5">
-              {mobileOpen ? <X size={20} strokeWidth={1.6} /> : <Menu size={20} strokeWidth={1.6} />}
-              <span className="text-[11px] font-medium leading-none">{mobileOpen ? '닫기' : '메뉴'}</span>
-            </span>
-          </button>
-        </div>
-      </div>
+  const clear = overlay && !scrolled && !mobileOpen
 
-      {/* Mobile nav panel */}
-      <div
-        className={`overflow-hidden border-t border-eden-line bg-eden-paper transition-[max-height,opacity] duration-300 ease-out md:hidden ${
-          mobileOpen ? 'max-h-[28rem] opacity-100' : 'invisible max-h-0 opacity-0'
+  return (
+    <>
+      <header
+        className={`fixed inset-x-0 top-0 z-40 border-b transition-colors duration-300 ${
+          clear ? 'border-transparent bg-transparent text-white' : 'border-[#E1DBD1] bg-eden-paper text-eden-ink'
         }`}
       >
-        <nav className="flex flex-col px-6 py-2">
-          {[...NAV_LINKS, ...MOBILE_EXTRA_LINKS].map((l) => (
+        <div className="pad relative flex h-16 items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <Link
-              key={l.to}
-              to={l.to}
+              to="/"
               onClick={() => setMobileOpen(false)}
-              className="border-b border-eden-line py-4 text-base text-eden-ink last:border-b-0 hover:text-eden-sand"
+              className={`font-logo text-[1.25rem] font-bold tracking-[-0.06em] ${clear ? 'text-white' : 'text-eden-green'}`}
             >
-              {l.label}
+              이든카페
             </Link>
-          ))}
-        </nav>
-      </div>
-    </header>
+            <span aria-hidden className="hidden h-4 w-px bg-current opacity-30 lg:block" />
+            <Link to="/" aria-label="처음 화면" className="hidden w-6 lg:flex">
+              <EdenMark className="h-auto w-full" />
+            </Link>
+          </div>
+
+          <nav className="absolute left-1/2 hidden -translate-x-1/2 gap-1 lg:flex">
+            {NAV_LINKS.map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                className="border-b-2 border-transparent px-3.5 py-1.5 text-[0.95rem] font-medium hover:opacity-70"
+                activeProps={{ className: '!border-current font-bold' }}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Icons carry a word beside them: not everyone reads a person icon as 내 주문. */}
+          <div className="flex items-center gap-1 md:gap-2">
+            <Link to="/orders" className="inline-flex items-center gap-1.5 whitespace-nowrap px-2 py-1.5 text-[0.9rem] font-medium hover:underline hover:underline-offset-[5px]">
+              <User size={18} strokeWidth={1.7} />
+              <span>내 주문</span>
+            </Link>
+            <Link to={cartTab} className="relative inline-flex items-center gap-1.5 whitespace-nowrap px-2 py-1.5 text-[0.9rem] font-medium hover:underline hover:underline-offset-[5px]">
+              <ShoppingBag size={18} strokeWidth={1.7} />
+              <span>담은 빵</span>
+              {totalQty > 0 ? (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-eden-accent px-1 text-[11px] font-bold text-white">
+                  {totalQty > 99 ? '99+' : totalQty}
+                </span>
+              ) : null}
+            </Link>
+            <button
+              type="button"
+              aria-label={mobileOpen ? '메뉴 닫기' : '메뉴 열기'}
+              aria-expanded={mobileOpen}
+              onClick={() => setMobileOpen((v) => !v)}
+              className="inline-flex items-center gap-1.5 px-2 py-1.5 text-[0.9rem] font-medium lg:hidden"
+            >
+              {mobileOpen ? <X size={20} strokeWidth={1.7} /> : <Menu size={20} strokeWidth={1.7} />}
+              <span className="hidden sm:inline">{mobileOpen ? '닫기' : '메뉴'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile nav panel */}
+        <div
+          className={`overflow-hidden border-t border-eden-line bg-eden-paper text-eden-ink transition-[max-height,opacity] duration-300 ease-out lg:hidden ${
+            mobileOpen ? 'max-h-[30rem] opacity-100' : 'invisible max-h-0 border-transparent opacity-0'
+          }`}
+        >
+          <nav className="pad flex flex-col py-2">
+            {[...NAV_LINKS, ...MOBILE_EXTRA_LINKS].map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                onClick={() => setMobileOpen(false)}
+                className="border-b border-eden-line py-4 font-serif text-lg last:border-b-0 hover:text-eden-accent"
+                activeProps={{ className: 'text-eden-accent' }}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      </header>
+      {/* The bar is fixed, so other pages keep their content below it. */}
+      {overlay ? null : <div aria-hidden className="h-16" />}
+    </>
   )
 }

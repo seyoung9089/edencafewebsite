@@ -54,13 +54,14 @@ function OrdersPage() {
     else toast.success('이름을 저장했어요.')
   }
 
-  return <div className="min-h-screen bg-eden-paper text-eden-ink"><SiteHeader /><main className="mx-auto max-w-4xl px-6 pb-24 pt-14">
-    <h1 className="mb-8 font-serif text-3xl font-semibold">내 주문</h1>
-    {user && totalQty > 0 ? <div className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-card border-2 border-eden-sand bg-eden-sand/15 px-5 py-4">
+  return <div className="min-h-screen bg-eden-paper text-eden-ink"><SiteHeader /><main className="mx-auto max-w-4xl px-6 pb-24 pt-[clamp(48px,7vw,96px)]">
+    <p className="eyebrow mb-3">MY ORDERS</p>
+        <h1 className="mb-8 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">내 주문</h1>
+    {user && totalQty > 0 ? <div className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-card border-2 border-eden-accent bg-eden-paper-dim px-5 py-4">
       <p className="text-base font-semibold">담아 둔 빵 {totalQty}개가 아직 주문 전이에요.</p>
-      <Link to={orderTab} className="inline-flex h-12 items-center rounded-full bg-eden-ink px-6 text-base font-semibold text-eden-paper hover:bg-eden-ink-2">주문 마저 하기</Link>
+      <Link to={orderTab} className="inline-flex h-12 items-center rounded-[3px] bg-eden-accent px-6 text-base font-semibold text-white hover:bg-eden-accent-d">주문 마저 하기</Link>
     </div> : null}
-    {loading ? <p>로그인 상태 확인 중…</p> : !user ? <div><p className="mb-4">로그인 후 주문 내역을 확인할 수 있어요.</p><Link to="/login" onClick={() => rememberReturnTo('/orders')} className="inline-block bg-eden-ink px-7 py-3 text-eden-paper rounded-full transition-colors hover:bg-eden-ink-2">로그인하기</Link></div>
+    {loading ? <p>로그인 상태 확인 중…</p> : !user ? <div><p className="mb-4">로그인 후 주문 내역을 확인할 수 있어요.</p><Link to="/login" onClick={() => rememberReturnTo('/orders')} className="inline-block bg-eden-accent px-7 py-3 text-white rounded-[3px] transition-colors hover:bg-eden-accent-d">로그인하기</Link></div>
       : busy ? <p>불러오는 중…</p> : error ? <p role="alert">주문 내역을 불러오지 못했습니다: {error}</p>
       : <MyOrdersBody name={customerName(user)} email={user.email ?? ''} orders={orders} onSaveName={saveName} onCancel={cancelOrder} onSignOut={() => void supabase.auth.signOut()} />}
   </main><SiteFooter /></div>

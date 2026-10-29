@@ -51,19 +51,19 @@ function AdminDashboard({ userId, isSuper }: { userId: string; isSuper: boolean 
   }
 
   return (
-    <div className="grid grid-cols-1 overflow-hidden rounded-card shadow-soft md:grid-cols-[200px_1fr]">
-      <nav className="flex gap-1 overflow-x-auto bg-eden-ink-2 p-3 md:block md:space-y-1 md:p-4">
+    <div>
+      <nav className="mb-6 flex gap-1 overflow-x-auto border-b border-eden-line">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`block shrink-0 rounded-[10px] px-4 py-3 text-left text-sm md:w-full ${tab === t.id ? 'bg-eden-sand/15 text-eden-sand' : 'text-[rgba(237,236,227,0.68)] hover:text-eden-paper'}`}
+            className={`-mb-px shrink-0 border-b-2 px-4 py-3 text-[0.95rem] ${tab === t.id ? 'border-eden-ink font-bold' : 'border-transparent font-medium text-eden-mute hover:text-eden-ink'}`}
           >
             {t.label}
           </button>
         ))}
       </nav>
-      <div className="min-w-0 bg-eden-paper-dim p-5 md:p-8">
+      <div className="min-w-0 border border-eden-line bg-white p-5 md:p-8">
         {tab === 'orders' ? (
           <OrdersPanel />
         ) : tab === 'customers' ? (
@@ -88,23 +88,24 @@ function AdminPage() {
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
-      <section className="px-6 pb-24 pt-14 md:px-8">
-        <h1 className="mb-3 font-serif text-3xl font-semibold">관리자 페이지</h1>
-        <p className="mb-10 text-[15px] text-eden-sage-dim">주문 · 고객 · 문의 · 메뉴 · 글귀 · 관리자를 한곳에서 관리해요.</p>
+      <section className="px-6 pb-24 pt-[clamp(48px,7vw,96px)] md:px-8">
+        <p className="eyebrow mb-3">ADMIN</p>
+        <h1 className="mb-3 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">관리자 페이지</h1>
+        <p className="mb-10 text-[15px] text-eden-mute">주문 · 고객 · 문의 · 메뉴 · 글귀 · 관리자를 한곳에서 관리해요.</p>
 
         {loading ? (
           <div className="h-24 w-full max-w-3xl animate-pulse rounded-card bg-eden-line" />
         ) : !user ? (
           <div className="max-w-sm">
-            <p className="mb-4 text-sm text-eden-sage-dim">관리자 계정으로 로그인해주세요.</p>
-            <Link to="/login" onClick={() => rememberReturnTo('/admin')} className="inline-block rounded-full bg-eden-ink px-7 py-3 text-sm font-semibold text-eden-paper hover:bg-eden-ink-2">
+            <p className="mb-4 text-sm text-eden-mute">관리자 계정으로 로그인해주세요.</p>
+            <Link to="/login" onClick={() => rememberReturnTo('/admin')} className="inline-block rounded-[3px] bg-eden-accent px-7 py-3 text-sm font-semibold text-white hover:bg-eden-accent-d">
               로그인
             </Link>
           </div>
         ) : !isStaff ? (
           <div className="max-w-md rounded-card bg-eden-paper-dim p-6 shadow-soft">
             <p className="mb-2">{user.email} 계정에는 관리자 권한이 없어요.</p>
-            <p className="mb-4 text-sm text-eden-sage-dim">기존 관리자에게 관리자 페이지 → 관리자 탭에서 이 이메일을 추가해달라고 요청해주세요.</p>
+            <p className="mb-4 text-sm text-eden-mute">기존 관리자에게 관리자 페이지 → 관리자 탭에서 이 이메일을 추가해달라고 요청해주세요.</p>
             <button type="button" onClick={() => void supabase.auth.signOut()} className="text-sm underline">
               다른 계정으로 로그인
             </button>

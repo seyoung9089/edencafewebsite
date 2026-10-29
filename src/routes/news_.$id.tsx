@@ -22,21 +22,21 @@ function NewsDetailPage() {
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
-      <article className="px-6 pb-24 pt-14 md:px-8">
+      <article className="px-6 pb-24 pt-[clamp(48px,7vw,96px)] md:px-8">
         <div className="max-w-3xl">
-          <Link to="/support" className="mb-8 inline-flex items-center gap-1 text-sm text-eden-sage-dim hover:text-eden-sand">
+          <Link to="/support" className="mb-8 inline-flex items-center gap-1 text-sm text-eden-mute hover:text-eden-accent">
             <ChevronLeft size={16} />
             새소식 목록으로
           </Link>
           <div className="mb-4 flex items-center gap-3">
-            <span className="rounded-full bg-eden-sand/15 px-3 py-1 text-xs font-semibold text-eden-ink">{cv(`news.${id}.tag`)}</span>
-            <span className="text-sm text-eden-sage-dim">{cv(`news.${id}.date`)}</span>
+            <span className="rounded-full bg-eden-paper-dim px-3 py-1 text-xs font-semibold text-eden-ink">{cv(`news.${id}.tag`)}</span>
+            <span className="text-sm text-eden-mute">{cv(`news.${id}.date`)}</span>
           </div>
-          <h1 className="mb-8 border-b border-eden-line pb-8 font-serif text-3xl font-semibold">{cv(`news.${id}.title`)}</h1>
+          <h1 className="mb-8 border-b border-eden-line pb-8 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">{cv(`news.${id}.title`)}</h1>
           {body ? (
             <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{body}</p>
           ) : (
-            <p className="text-[15px] text-eden-sage-dim">자세한 내용은 준비 중이에요.</p>
+            <p className="text-[15px] text-eden-mute">자세한 내용은 준비 중이에요.</p>
           )}
         </div>
       </article>

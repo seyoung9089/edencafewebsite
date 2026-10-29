@@ -64,10 +64,10 @@ function MenuCard({
   const unpriced = isUnpriced(item)
   const max = maxQtyFor(item)
   return (
-    <div className={`flex flex-col rounded-card bg-eden-paper-dim p-3 shadow-soft ${qty > 0 ? 'ring-2 ring-eden-sand' : ''}`}>
+    <div className={`flex flex-col border bg-white p-3 transition-transform duration-200 hover:-translate-y-[3px] ${qty > 0 ? 'border-eden-accent ring-1 ring-eden-accent' : 'border-eden-line'}`}>
       {/* Photo and name both open the detail view: one big tap target. */}
       <button type="button" onClick={() => onOpen(item)} aria-label={`${item.name} 자세히 보기`} className="group text-left">
-        <div className="relative mb-3 flex aspect-[2/1] items-center justify-center overflow-hidden rounded-[10px] bg-eden-paper">
+        <div className="relative mb-3 flex aspect-[2/1] items-center justify-center overflow-hidden rounded-[2px] bg-eden-paper">
           {item.image_url ? (
             <img
               src={item.image_url}
@@ -76,10 +76,10 @@ function MenuCard({
               loading="lazy"
             />
           ) : (
-            <Icon size={28} strokeWidth={1.5} className={`text-eden-sage-dim ${soldOut ? 'opacity-50' : ''}`} />
+            <Icon size={28} strokeWidth={1.5} className={`text-eden-mute ${soldOut ? 'opacity-50' : ''}`} />
           )}
           {popular ? (
-            <span className="absolute right-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-eden-sand px-2 py-0.5 text-[11px] font-semibold text-eden-ink-2">
+            <span className="absolute right-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-eden-accent px-2 py-0.5 text-[11px] font-semibold text-white">
               <Flame size={11} strokeWidth={2} /> 인기
             </span>
           ) : null}
@@ -89,33 +89,33 @@ function MenuCard({
             </span>
           ) : null}
         </div>
-        <span className="flex items-start gap-0.5 font-serif text-[15px] font-semibold leading-snug group-hover:underline group-hover:underline-offset-4">
+        <span className="flex items-start gap-0.5 font-serif text-[15px] font-light leading-snug group-hover:underline group-hover:underline-offset-4">
           {item.name}
-          <ChevronRight size={16} strokeWidth={2} className="mt-0.5 shrink-0 text-eden-sage-dim" aria-hidden />
+          <ChevronRight size={16} strokeWidth={2} className="mt-0.5 shrink-0 text-eden-mute" aria-hidden />
         </span>
       </button>
       <div className="mb-3 mt-1 flex flex-wrap items-baseline justify-between gap-x-2">
-        <span className={unpriced ? 'text-sm text-eden-sage-dim' : 'font-semibold text-eden-ink'}>{unpriced ? '가격 준비 중' : won(item.price)}</span>
+        <span className={unpriced ? 'text-sm text-eden-mute' : 'font-semibold text-eden-ink'}>{unpriced ? '가격 준비 중' : won(item.price)}</span>
         {item.category === 'bakery' && item.stock !== null && item.stock > 0 ? (
-          <span className="text-xs text-eden-sage-dim">{item.stock}개 남음</span>
+          <span className="text-xs text-eden-mute">{item.stock}개 남음</span>
         ) : null}
       </div>
       <div className="mt-auto">
         {item.category === 'drink' ? (
-          <span className="flex h-10 items-center justify-center rounded-full border border-eden-line text-xs text-eden-sage-dim">
+          <span className="flex h-10 items-center justify-center rounded-[3px] border border-eden-line text-xs text-eden-mute">
             매장에서만 주문
           </span>
         ) : soldOut || unpriced ? (
-          <span className="flex h-10 items-center justify-center rounded-full border border-eden-line text-xs text-eden-sage-dim">
+          <span className="flex h-10 items-center justify-center rounded-[3px] border border-eden-line text-xs text-eden-mute">
             {soldOut ? '품절' : '준비 중'}
           </span>
         ) : qty > 0 ? (
-          <div className="flex h-10 items-center justify-between rounded-full bg-eden-ink px-1 text-eden-paper">
+          <div className="flex h-10 items-center justify-between rounded-[3px] bg-eden-accent px-1 text-white">
             <button
               type="button"
               onClick={() => (qty <= 1 ? onQty(item.name, 0) : onQty(item.name, qty - 1))}
               aria-label={`${item.name} 하나 빼기`}
-              className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-eden-ink-2"
+              className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-eden-accent-d"
             >
               <Minus size={15} />
             </button>
@@ -125,7 +125,7 @@ function MenuCard({
               onClick={() => onQty(item.name, qty + 1)}
               disabled={qty >= max}
               aria-label={`${item.name} 하나 더`}
-              className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-eden-ink-2 disabled:opacity-30"
+              className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-eden-accent-d disabled:opacity-30"
             >
               <Plus size={15} />
             </button>
@@ -134,7 +134,7 @@ function MenuCard({
           <button
             type="button"
             onClick={() => onAdd(item)}
-            className="h-10 w-full rounded-full border border-eden-ink text-sm font-semibold text-eden-ink transition-colors hover:bg-eden-ink hover:text-eden-paper"
+            className="h-10 w-full rounded-[3px] border border-eden-ink text-sm font-semibold text-eden-ink transition-colors hover:bg-eden-ink hover:text-eden-paper"
           >
             담기
           </button>
@@ -347,26 +347,36 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
-      <main className="mx-auto max-w-6xl px-4 pb-16 pt-10 md:px-8">
-        <div className="mb-6">
-          <h1 className="mb-2 font-serif text-3xl font-semibold">{parents ? '학부모 주문' : '마을 픽업 주문'}</h1>
-          <p className="text-[15px] text-eden-sage-dim">
+      <section className="pad border-b border-eden-line pb-10 pt-[clamp(40px,6vw,84px)]">
+        <p className="eyebrow">{parents ? 'PARENTS · FRIDAY' : 'VILLAGE PICKUP'}</p>
+        <h1 className="mb-3 mt-3 text-[clamp(1.75rem,3vw,2.6rem)] leading-[1.3]">
+          {parents ? (
+            <>
+              학부모 <em className="font-normal not-italic">금요일</em> 주문
+            </>
+          ) : (
+            <>
+              마을 <em className="font-normal not-italic">픽업</em> 주문
+            </>
+          )}
+        </h1>
+        <p className="text-[1.05rem] text-eden-mute">
             {parents
               ? '금요일에 학생이 하교하면서 찾아갈 빵을 주문해 주세요.'
               : '픽업 날짜를 먼저 고르고 빵을 담아 주세요.'}{' '}
             <Link to="/guide" className="whitespace-nowrap font-semibold text-eden-ink underline underline-offset-4">
               처음이신가요?
             </Link>
-          </p>
-        </div>
-
+        </p>
+      </section>
+      <main className="pad pb-16 pt-10">
         {parents ? (
-          <div className="mb-8 flex gap-3 rounded-card border-2 border-eden-sand bg-eden-sand/15 px-5 py-4">
-            <School size={24} strokeWidth={1.8} className="mt-0.5 shrink-0 text-eden-sand" aria-hidden />
+          <div className="mb-8 flex gap-3 rounded-card border-2 border-eden-accent bg-eden-paper-dim px-5 py-4">
+            <School size={24} strokeWidth={1.8} className="mt-0.5 shrink-0 text-eden-accent" aria-hidden />
             <p className="text-base font-semibold leading-relaxed text-eden-ink">{fridayNotice}</p>
           </div>
         ) : (
-          <p className="mb-8 text-sm text-eden-sage-dim">
+          <p className="mb-8 text-sm text-eden-mute">
             학생이 금요일에 찾아갈 빵은{' '}
             <Link to="/parents" className="font-semibold text-eden-ink underline underline-offset-4">
               학부모 주문
@@ -378,9 +388,10 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
         <div className="lg:grid lg:grid-cols-[1fr_320px] lg:items-start lg:gap-8">
           <div>
             <section>
-              <h2 className="mb-4 border-b border-eden-line pb-3 font-serif text-xl font-semibold">{parents ? '1. 금요일 고르기' : '1. 픽업 날짜 고르기'}</h2>
+              <p className="eyebrow">STEP 1</p>
+              <h2 className="mb-4 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">{parents ? '금요일 고르기' : '픽업 날짜 고르기'}</h2>
               {shownDays?.length && !parents ? (
-                <p className="mb-1 text-sm text-eden-sage-dim">
+                <p className="mb-1 text-sm text-eden-mute">
                   {pickupLabel(shownDays[0].iso)} ~ {pickupLabel(shownDays[shownDays.length - 1].iso)} 픽업
                 </p>
               ) : null}
@@ -394,20 +405,21 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
                 onSelect={choosePickup}
               />
               {parents ? null : (
-                <p className="mt-3 flex items-center gap-1.5 text-sm text-eden-sage-dim">
-                  <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-eden-sand" />
+                <p className="mt-3 flex items-center gap-1.5 text-sm text-eden-mute">
+                  <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-eden-accent" />
                   표시가 있는 금요일은 메뉴가 달라요.
                 </p>
               )}
             </section>
 
             <section ref={menuRef} className="mt-12 scroll-mt-[100px]">
-              <h2 className="mb-4 border-b border-eden-line pb-3 font-serif text-xl font-semibold">
-                2. 빵 고르기{pickup ? <span className="ml-2 font-sans text-base font-normal text-eden-sage-dim">{pickup.label} 메뉴</span> : null}
+              <p className="eyebrow">STEP 2</p>
+              <h2 className="mb-4 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">
+                빵 고르기{pickup ? <span className="ml-2 font-sans text-base font-normal text-eden-mute">{pickup.label} 메뉴</span> : null}
               </h2>
               {menuError ? <p className="text-sm text-destructive">메뉴를 불러오지 못했어요. 새로고침해주세요.</p> : null}
               {!pickup ? (
-                <p className="rounded-card border border-dashed border-eden-line px-5 py-10 text-center text-base text-eden-sage-dim">
+                <p className="rounded-card border border-dashed border-eden-line px-5 py-10 text-center text-base text-eden-mute">
                   위에서 픽업 날짜를 고르면 그날의 메뉴가 나와요.
                 </p>
               ) : !menuItems && !menuError ? (
@@ -417,7 +429,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
                   ))}
                 </div>
               ) : menuItems && sections.length === 0 ? (
-                <p className="text-sm text-eden-sage-dim">이날 주문할 수 있는 메뉴가 아직 없어요.</p>
+                <p className="text-sm text-eden-mute">이날 주문할 수 있는 메뉴가 아직 없어요.</p>
               ) : (
                 <div className="space-y-8">
                   {sections.map((sec) => {
@@ -426,15 +438,15 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
                     return (
                       <div key={sec.title}>
                         <div className="mb-3 flex flex-wrap items-baseline gap-x-3">
-                          <h3 className="font-serif text-lg font-semibold">{sec.title}</h3>
+                          <h3 className="font-serif text-lg font-light">{sec.title}</h3>
                           {cap !== null ? (
-                            <span className="text-sm text-eden-sage-dim">
+                            <span className="text-sm text-eden-mute">
                               맛 합계 {cap}개까지{total > 0 ? ` · 지금 ${total}개` : ''}
                             </span>
                           ) : null}
                         </div>
                         {cap !== null && total >= cap ? (
-                          <p className="mb-3 rounded-[10px] bg-eden-sand/15 px-4 py-3 text-sm font-semibold">{bulkMessage}</p>
+                          <p className="mb-3 rounded-[2px] bg-eden-paper-dim px-4 py-3 text-sm font-semibold">{bulkMessage}</p>
                         ) : null}
                         <div className={grid}>
                           {sec.items.map((item) => (
@@ -459,18 +471,19 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
             {/* Drinks can't be ordered here, so a short price list instead of big cards. */}
             {!parents && drinks.length > 0 ? (
               <section className="mt-12">
-                <h2 className="mb-1 border-b border-eden-line pb-3 font-serif text-xl font-semibold">음료</h2>
-                <p className="mb-3 mt-3 text-sm text-eden-sage-dim">음료는 온라인 주문이 안 돼요. 매장에서 바로 주문해 주세요.</p>
+                <p className="eyebrow">DRINKS</p>
+                <h2 className="mb-1 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">음료</h2>
+                <p className="mb-3 mt-3 text-sm text-eden-mute">음료는 온라인 주문이 안 돼요. 매장에서 바로 주문해 주세요.</p>
                 <ul className="grid gap-x-8 sm:grid-cols-2">
                   {drinks.map((item) => (
                     <li key={item.name}>
                       <button
                         type="button"
                         onClick={() => setDetailName(item.name)}
-                        className="flex w-full items-baseline justify-between gap-3 border-b border-dashed border-eden-line py-2.5 text-left text-[15px] hover:text-eden-sand"
+                        className="flex w-full items-baseline justify-between gap-3 border-b border-dashed border-eden-line py-2.5 text-left text-[15px] hover:text-eden-accent"
                       >
                         <span>{item.name}</span>
-                        <span className="text-eden-sage-dim">{isUnpriced(item) ? '가격 준비 중' : won(item.price)}</span>
+                        <span className="text-eden-mute">{isUnpriced(item) ? '가격 준비 중' : won(item.price)}</span>
                       </button>
                     </li>
                   ))}
@@ -479,7 +492,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
             ) : null}
           </div>
 
-          <aside className="sticky top-[94px] hidden lg:block">{receipt}</aside>
+          <aside className="sticky top-[84px] hidden lg:block">{receipt}</aside>
         </div>
       </main>
       <SiteFooter />
@@ -490,7 +503,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
-          className="flex h-12 w-full items-center justify-between rounded-full bg-eden-ink px-5 text-eden-paper"
+          className="flex h-12 w-full items-center justify-between rounded-[3px] bg-eden-accent px-5 text-white"
         >
           <span className="text-sm">
             {totalQty > 0 ? (

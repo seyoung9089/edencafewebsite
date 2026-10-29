@@ -1,7 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
-import { useContentImage, useContentValue, useSiteContent } from '@/lib/site-content'
-import { usePickupDates } from '@/lib/pickup'
+import { useContentImage } from '@/lib/site-content'
 
 /**
  * Home first screen, under the see-through header: a warm photo (or a
@@ -12,10 +11,6 @@ export function HeroSection() {
   const bgOnly = useContentImage('hero.bgPhoto')
   const photo = useContentImage('hero.photo')
   const bgPhoto = bgOnly ?? photo
-  const content = useSiteContent()
-  const cv = (key: string) => useContentValue(content, key)
-  const pickupTime = cv('pickup.time')
-  const earliest = usePickupDates()?.dates.find((d) => d.open)
 
   return (
     <section className="relative flex min-h-[88svh] flex-col justify-center overflow-hidden text-white">
@@ -45,16 +40,6 @@ export function HeroSection() {
             학부모 주문 (금요일) <ArrowRight size={18} />
           </Link>
         </div>
-        <ul className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-[0.95rem] text-white/90">
-          <li>월~금 픽업</li>
-          <li>픽업 2일 전 자정까지 주문</li>
-          {earliest ? (
-            <li>
-              가장 빠른 픽업 <strong className="text-white">{earliest.label}</strong>
-            </li>
-          ) : null}
-          {pickupTime ? <li>픽업 시간 {pickupTime}</li> : null}
-        </ul>
       </div>
     </section>
   )

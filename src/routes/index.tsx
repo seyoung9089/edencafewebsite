@@ -137,9 +137,9 @@ function HomePage() {
             <span className={`${go} border-white`} aria-hidden><ArrowRight size={20} /></span>
           </div>
         </Link>
-        <Link to="/parents" className={`${pane} bg-eden-blue text-eden-blue-ink`}>
+        <Link to="/parents" className={`${pane} bg-eden-pane text-eden-pane-ink`}>
           <div>
-            <p className="eyebrow !text-eden-blue-ink">PARENTS · FRIDAY</p>
+            <p className="eyebrow !text-eden-pane-ink">PARENTS · FRIDAY</p>
             <h2 className="mt-3 text-[clamp(1.7rem,2.6vw,2.4rem)] leading-[1.25]">학부모 주문</h2>
             <div className="mt-4 flex flex-col gap-1.5 text-[1rem]">
               <span className="flex items-center gap-2"><School size={17} strokeWidth={1.7} /> 금요일 하교할 때 학생이 찾아가요</span>
@@ -148,7 +148,7 @@ function HomePage() {
           </div>
           <div className="flex items-end justify-between gap-4">
             <span className="text-[0.95rem] opacity-90">그 주 수요일 자정까지 주문</span>
-            <span className={`${go} border-eden-blue-ink`} aria-hidden><ArrowRight size={20} /></span>
+            <span className={`${go} border-eden-pane-ink`} aria-hidden><ArrowRight size={20} /></span>
           </div>
         </Link>
       </section>

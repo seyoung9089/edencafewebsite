@@ -6,28 +6,29 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Palette from the reference design: warm ivory paper, deep brown ink,
-     one red accent. Kept as HSL so the shadcn tokens below can use them. */
+  /* Warm ivory paper and deep brown ink from the reference layout, with
+     Eden's green as the one accent. Kept as HSL so the shadcn tokens
+     below can use them. */
   --background: 43 41% 95%;
   --foreground: 18 18% 14%;
   --card: 0 0% 100%;
   --card-foreground: 18 18% 14%;
   --popover: 43 41% 95%;
   --popover-foreground: 18 18% 14%;
-  --primary: 359 66% 53%;
+  --primary: 144 18% 30%;
   --primary-foreground: 0 0% 100%;
   --secondary: 40 35% 91%;
   --secondary-foreground: 18 18% 14%;
   --muted: 40 35% 91%;
   --muted-foreground: 28 8% 39%;
-  --accent: 359 66% 53%;
+  --accent: 144 18% 30%;
   --accent-foreground: 0 0% 100%;
   --destructive: 359 60% 45%;
   --destructive-foreground: 0 0% 100%;
   --border: 35 18% 81%;
   --input: 35 18% 81%;
-  --ring: 359 66% 53%;
-  --chart-1: 359 66% 53%;
+  --ring: 144 18% 30%;
+  --chart-1: 144 18% 30%;
   --chart-2: 28 8% 39%;
   --chart-3: 18 18% 14%;
   --chart-4: 200 64% 57%;
@@ -35,12 +36,12 @@
   --radius: 0.1875rem;
   --sidebar: 18 18% 14%;
   --sidebar-foreground: 43 41% 95%;
-  --sidebar-primary: 359 66% 53%;
+  --sidebar-primary: 144 18% 30%;
   --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 28 8% 39%;
   --sidebar-accent-foreground: 43 41% 95%;
   --sidebar-border: 35 18% 81% / 0.2;
-  --sidebar-ring: 359 66% 53%;
+  --sidebar-ring: 144 18% 30%;
 
   /* brand aliases used directly in components */
   --eden-paper: 43 41% 95%;      /* #F8F5EE */
@@ -49,10 +50,10 @@
   --eden-ink-2: 20 9% 11%;       /* #1d1a18 */
   --eden-mute: 28 8% 39%;        /* a little darker than #7C736B for older eyes */
   --eden-mute-2: 30 12% 72%;     /* muted text on the dark sections */
-  --eden-accent: 359 66% 53%;    /* #D6383A */
-  --eden-accent-d: 359 60% 45%;  /* #B92E30 */
-  --eden-blue: 200 64% 57%;      /* #4aa8d8, the second pane */
-  --eden-blue-ink: 203 48% 12%;  /* #10222e */
+  --eden-accent: 144 18% 30%;    /* #3F5A4A, Eden's own green */
+  --eden-accent-d: 150 22% 21%;  /* darker green for hover */
+  --eden-pane: 138 12% 55%;      /* #7E9986, the second pane */
+  --eden-pane-ink: 159 24% 11%;  /* #16241F */
   --eden-green: 156 42% 21%;     /* #1F4B3A, the 이든카페 wordmark */
   --eden-ok: 154 45% 34%;        /* #2F7D5B */
   --eden-warn: 36 71% 42%;       /* #B8791F */
@@ -153,8 +154,8 @@
   --color-eden-mute-2: hsl(var(--eden-mute-2));
   --color-eden-accent: hsl(var(--eden-accent));
   --color-eden-accent-d: hsl(var(--eden-accent-d));
-  --color-eden-blue: hsl(var(--eden-blue));
-  --color-eden-blue-ink: hsl(var(--eden-blue-ink));
+  --color-eden-pane: hsl(var(--eden-pane));
+  --color-eden-pane-ink: hsl(var(--eden-pane-ink));
   --color-eden-green: hsl(var(--eden-green));
   --color-eden-ok: hsl(var(--eden-ok));
   --color-eden-warn: hsl(var(--eden-warn));

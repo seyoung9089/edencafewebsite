@@ -252,12 +252,11 @@ function HomePage() {
       <section className="pad bg-eden-ink py-[80px] text-eden-paper">
         <Reveal>
           <p className="eyebrow !text-eden-paper">ABOUT EDEN</p>
-          <h2 className="mb-7 mt-4 text-[clamp(1.5rem,2.6vw,2.3rem)] leading-[1.35]">
+          <h2 className="mb-9 mt-4 text-[clamp(1.5rem,2.6vw,2.3rem)] leading-[1.35]">
             학생들의 작은 시작이
             <br />
             협동조합 카페가 되었어요.
           </h2>
-          <p className="mb-8 max-w-[44ch] text-[1rem] text-eden-mute-2">{cv('hero.eyebrow')}</p>
           <Link to="/about" className="btn ivory">
             카페소개 보기 <ArrowRight size={18} />
           </Link>

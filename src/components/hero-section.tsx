@@ -32,12 +32,11 @@ export function HeroSection() {
 
       <div className="pad relative z-10 max-w-[1000px] pb-[70px] pt-[calc(4rem+40px)]">
         <p className="eyebrow !text-white">EDEN CAFE · 별무리마을</p>
-        <h1 className="mb-7 mt-4 text-[clamp(2.1rem,4.4vw,3.6rem)] leading-[1.3]">
+        <h1 className="mb-9 mt-4 text-[clamp(2.1rem,4.4vw,3.6rem)] leading-[1.3]">
           미리 주문하고,
           <br />
           <em className="font-normal not-italic">고른 날</em> 찾아가세요.
         </h1>
-        <p className="mb-8 max-w-[34ch] text-[1.05rem] leading-relaxed text-white/90">{cv('hero.eyebrow')}</p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link to="/order" className="btn">
             마을 픽업 주문 <ArrowRight size={18} />

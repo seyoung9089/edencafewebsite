@@ -16,7 +16,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import { MenuDetailDialog } from '@/components/menu-detail'
-import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School } from 'lucide-react'
+import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School, CalendarDays, Info } from 'lucide-react'
 import { toast } from 'sonner'
 
 /**
@@ -347,36 +347,24 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
-      <section className="pad border-b border-eden-line pb-10 pt-[clamp(40px,6vw,84px)]">
+      {/* Page top, then the pickup day on a dark band (the reference's 예약 layout). */}
+      <section className="pad pb-12 pt-[clamp(48px,7vw,100px)]">
         <p className="eyebrow">{parents ? 'PARENTS · FRIDAY' : 'VILLAGE PICKUP'}</p>
-        <h1 className="mb-3 mt-3 text-[clamp(1.75rem,3vw,2.6rem)] leading-[1.3]">
-          {parents ? (
-            <>
-              학부모 <em className="font-normal not-italic">금요일</em> 주문
-            </>
-          ) : (
-            <>
-              마을 <em className="font-normal not-italic">픽업</em> 주문
-            </>
-          )}
+        <h1 className="mb-4 mt-3 text-[clamp(1.75rem,3vw,2.6rem)] leading-[1.3]">
+          {parents ? '금요일에 찾아갈 빵을' : '고른 날 찾아갈 빵을'}
+          <br />
+          <em className="font-normal italic">미리 주문하세요.</em>
         </h1>
         <p className="text-[1.05rem] text-eden-mute">
-            {parents
-              ? '금요일에 학생이 하교하면서 찾아갈 빵을 주문해 주세요.'
-              : '픽업 날짜를 먼저 고르고 빵을 담아 주세요.'}{' '}
-            <Link to="/guide" className="whitespace-nowrap font-semibold text-eden-ink underline underline-offset-4">
-              처음이신가요?
-            </Link>
+          {parents
+            ? '학부모님이 주문하고, 학생이 금요일 하교할 때 찾아가요.'
+            : '픽업 날짜를 먼저 고르고 빵을 담아 주세요.'}{' '}
+          <Link to="/guide" className="whitespace-nowrap font-semibold text-eden-ink underline underline-offset-4">
+            처음이신가요?
+          </Link>
         </p>
-      </section>
-      <main className="pad pb-16 pt-10">
-        {parents ? (
-          <div className="mb-8 flex gap-3 rounded-card border-2 border-eden-accent bg-eden-paper-dim px-5 py-4">
-            <School size={24} strokeWidth={1.8} className="mt-0.5 shrink-0 text-eden-accent" aria-hidden />
-            <p className="text-base font-semibold leading-relaxed text-eden-ink">{fridayNotice}</p>
-          </div>
-        ) : (
-          <p className="mb-8 text-sm text-eden-mute">
+        {parents ? null : (
+          <p className="mt-1.5 text-[0.95rem] text-eden-mute">
             학생이 금요일에 찾아갈 빵은{' '}
             <Link to="/parents" className="font-semibold text-eden-ink underline underline-offset-4">
               학부모 주문
@@ -384,36 +372,70 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
             에서 주문해 주세요.
           </p>
         )}
+      </section>
 
-        <div className="lg:grid lg:grid-cols-[1fr_320px] lg:items-start lg:gap-8">
-          <div>
-            <section>
-              <p className="eyebrow">STEP 1</p>
-              <h2 className="mb-4 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">{parents ? '금요일 고르기' : '픽업 날짜 고르기'}</h2>
-              {shownDays?.length && !parents ? (
-                <p className="mb-1 text-sm text-eden-mute">
-                  {pickupLabel(shownDays[0].iso)} ~ {pickupLabel(shownDays[shownDays.length - 1].iso)} 픽업
-                </p>
-              ) : null}
-              <p className="mb-3 text-[15px] font-semibold">
-                {parents ? '금요일 픽업은 그 주 수요일 자정까지 주문해 주세요.' : '픽업 2일 전 자정까지 주문해 주세요.'}
+      <section className="pad grid gap-10 bg-eden-ink pb-[clamp(56px,7vw,100px)] pt-[clamp(56px,7vw,90px)] text-eden-paper lg:grid-cols-2 lg:gap-[8%]">
+        <div>
+          <p className="eyebrow !text-eden-paper">STEP 1 · PICKUP DAY</p>
+          <h2 className="mb-5 mt-4 text-[clamp(1.6rem,2.8vw,2.4rem)] leading-[1.3]">
+            {parents ? '금요일을' : '픽업 날짜를'}
+            <br />
+            골라주세요.
+          </h2>
+          <p className="text-[1.05rem] text-eden-mute-2">
+            {parents ? '금요일 픽업은 그 주 수요일 자정까지 주문해 주세요.' : '픽업 2일 전 자정까지 주문해 주세요.'}
+          </p>
+          {parents ? (
+            <div className="mt-6 flex max-w-md gap-3 border-t border-eden-paper/30 pt-5">
+              <School size={22} strokeWidth={1.7} className="mt-0.5 shrink-0" aria-hidden />
+              <p className="text-[1rem] leading-relaxed">{fridayNotice}</p>
+            </div>
+          ) : null}
+        </div>
+
+        <div className="min-w-0 bg-eden-paper p-[clamp(20px,3.2vw,44px)] text-eden-ink">
+          <div className="flex items-center justify-between gap-4 border-b border-eden-line pb-4">
+            <span className="flex items-center gap-2 text-[1rem] font-bold">
+              <CalendarDays size={18} strokeWidth={1.7} aria-hidden /> 날짜
+            </span>
+            <span className={`text-right text-[1.05rem] ${pickup ? 'font-bold' : 'text-eden-mute'}`}>
+              {pickup ? pickup.label : '아래에서 골라 주세요'}
+            </span>
+          </div>
+          <div className="pt-5">
+            <PickupDatePicker
+              days={shownDays}
+              markFriday={!parents}
+              selected={pickup?.iso ?? null}
+              onSelect={choosePickup}
+            />
+          </div>
+          <div className="mt-4 space-y-1.5 text-[0.9rem] text-eden-mute">
+            {shownDays?.length && !parents ? (
+              <p className="flex items-center gap-1.5">
+                <Info size={14} strokeWidth={1.7} aria-hidden />
+                {pickupLabel(shownDays[0].iso)} ~ {pickupLabel(shownDays[shownDays.length - 1].iso)} 픽업
               </p>
-              <PickupDatePicker
-                days={shownDays}
-                markFriday={!parents}
-                selected={pickup?.iso ?? null}
-                onSelect={choosePickup}
-              />
-              {parents ? null : (
-                <p className="mt-3 flex items-center gap-1.5 text-sm text-eden-mute">
-                  <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-eden-accent" />
-                  표시가 있는 금요일은 메뉴가 달라요.
-                </p>
-              )}
-            </section>
+            ) : null}
+            {parents ? null : (
+              <p className="flex items-center gap-1.5">
+                <span aria-hidden className="mx-[4px] h-1.5 w-1.5 rounded-full bg-eden-accent" />
+                표시가 있는 금요일은 메뉴가 달라요.
+              </p>
+            )}
+            <p className="flex items-center gap-1.5">
+              <Info size={14} strokeWidth={1.7} aria-hidden />
+              날짜를 고르면 아래에 그날 메뉴가 나와요.
+            </p>
+          </div>
+        </div>
+      </section>
 
-            <section ref={menuRef} className="mt-12 scroll-mt-[100px]">
-              <p className="eyebrow">STEP 2</p>
+      <main className="pad pb-16 pt-14">
+        <div className="lg:grid lg:grid-cols-[1fr_340px] lg:items-start lg:gap-10">
+          <div>
+            <section ref={menuRef} className="scroll-mt-[90px]">
+              <p className="eyebrow">STEP 2 · BREAD</p>
               <h2 className="mb-4 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">
                 빵 고르기{pickup ? <span className="ml-2 font-sans text-base font-normal text-eden-mute">{pickup.label} 메뉴</span> : null}
               </h2>
@@ -471,7 +493,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
             {/* Drinks can't be ordered here, so a short price list instead of big cards. */}
             {!parents && drinks.length > 0 ? (
               <section className="mt-12">
-                <p className="eyebrow">DRINKS</p>
+                <p className="eyebrow">DRINKS · 매장 전용</p>
                 <h2 className="mb-1 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">음료</h2>
                 <p className="mb-3 mt-3 text-sm text-eden-mute">음료는 온라인 주문이 안 돼요. 매장에서 바로 주문해 주세요.</p>
                 <ul className="grid gap-x-8 sm:grid-cols-2">

@@ -17,7 +17,7 @@ import { MacalyBridge } from '@macaly/bridge'
 // the CSS into every HTML file).
 import '../styles.css'
 import siteMetadata from '../metadata.json'
-import { CartProvider } from '@/lib/cart'
+import { CartProvider, GiftCartProvider } from '@/lib/cart'
 import { CustomerAuthProvider } from '@/lib/customer-auth'
 import { Toaster } from '@/components/ui/sonner'
 import { BackToTop } from '@/components/back-to-top'
@@ -61,11 +61,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <MacalyBridge>
         <body>
-          <CustomerAuthProvider><CartProvider>
+          <CustomerAuthProvider><CartProvider><GiftCartProvider>
             {children}
             <BackToTop />
             <Toaster />
-          </CartProvider></CustomerAuthProvider>
+          </GiftCartProvider></CartProvider></CustomerAuthProvider>
           <Scripts />
         </body>
       </MacalyBridge>

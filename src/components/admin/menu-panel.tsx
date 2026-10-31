@@ -7,7 +7,7 @@ import { removeSiteImage, uploadSiteImage } from '@/lib/storage'
 import { getErrorMessage } from '@/lib/errors'
 import { buttonClass, inputClass } from './use-staff'
 
-const CATEGORY_LABEL = { bakery: '베이커리', drink: '음료' } as const
+const CATEGORY_LABEL = { bakery: '베이커리', drink: '음료', gift: '답례품' } as const
 const DAY_LABEL: Record<PickupDay, string> = { weekday: '평일(월~목)', friday: '금요일' }
 
 export function MenuPanel() {
@@ -43,7 +43,10 @@ export function MenuPanel() {
         가격이 0원이면 "가격 준비 중"으로 보이고 주문은 안 돼요. 수량 숫자는 날짜 구분 없이 전체 남은 수량이라, 미리 주문받는 빵은 비워두는 걸 권해요.
       </p>
       <GroupsEditor groups={groups} onChanged={refresh} />
-      {(['bakery', 'drink'] as const).map((category) => (
+      <p className="mb-6 text-sm text-eden-sage-dim">
+        <strong>답례품</strong>은 "답례품 예약" 탭에만 나오고, 빵과 따로 주문받아요. 픽업 날짜는 마을 픽업 주문과 같은 규칙(월~금, 2일 전 자정 마감)이고, 한 주문에 한 종류당 50개까지 담을 수 있어요.
+      </p>
+      {(['bakery', 'gift', 'drink'] as const).map((category) => (
         <section key={category} className="mb-10">
           <h3 className="mb-3 border-b border-eden-line pb-2 font-serif text-lg font-semibold">{CATEGORY_LABEL[category]}</h3>
           <div className="space-y-3">
@@ -181,6 +184,7 @@ function MenuRow({
           <select aria-label="분류" value={category} onChange={(e) => setCategory(e.target.value as MenuItem['category'])} className={inputClass}>
             <option value="bakery">베이커리</option>
             <option value="drink">음료</option>
+            <option value="gift">답례품</option>
           </select>
         </div>
         <input aria-label="설명" placeholder="설명" value={description} onChange={(e) => setDescription(e.target.value)} className={`w-full ${inputClass}`} />
@@ -228,10 +232,12 @@ function MenuRow({
             <input type="checkbox" checked={soldOut} onChange={(e) => setSoldOut(e.target.checked)} />
             품절
           </label>
-          <label className="flex items-center gap-1">
-            <input type="checkbox" checked={featured} onChange={(e) => toggleFeatured(e.target.checked)} />
-            인기 메뉴 추천
-          </label>
+          {category === 'bakery' ? (
+            <label className="flex items-center gap-1">
+              <input type="checkbox" checked={featured} onChange={(e) => toggleFeatured(e.target.checked)} />
+              인기 메뉴 추천
+            </label>
+          ) : null}
           {item.stock === 0 ? <span className="text-xs text-destructive">수량 소진</span> : null}
           <div className="ml-auto flex gap-2">
             <button type="button" disabled={busy} onClick={() => void remove()} className="rounded-full px-3 py-2 text-sm text-eden-sage-dim hover:text-destructive">
@@ -282,6 +288,7 @@ function NewMenuForm({ nextSortOrder, onAdded }: { nextSortOrder: number; onAdde
       <select aria-label="분류" value={category} onChange={(e) => setCategory(e.target.value as MenuItem['category'])} className={inputClass}>
         <option value="bakery">베이커리</option>
         <option value="drink">음료</option>
+        <option value="gift">답례품</option>
       </select>
       <input aria-label="가격" placeholder="가격(원)" inputMode="numeric" value={price} onChange={(e) => setPrice(e.target.value)} className={`w-28 ${inputClass}`} />
       <button disabled={busy} className={buttonClass}>

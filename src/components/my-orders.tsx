@@ -15,6 +15,9 @@ export type CustomerOrder = {
   student_name: string | null
   payment_method: 'transfer' | 'onsite'
   payment_status: 'pending' | 'confirmed' | 'onsite'
+  /** 답례품 예약 orders: 'gift' (missing before 20261031_gift_orders.sql) */
+  order_type?: 'village' | 'parents' | 'gift'
+  request_note?: string | null
 }
 
 export type MyOrdersProps = {
@@ -146,6 +149,12 @@ function OrderCard({ order, onCancel, highlight = false }: { order: CustomerOrde
           {orderedOn(order.created_at)} 주문 · {pickupLabel(order.pickup_date)} 픽업
         </span>
       </div>
+      {order.order_type === 'gift' ? (
+        <p className="mb-2 text-sm">
+          <span className="rounded-full bg-eden-sage-dim px-2 py-0.5 text-xs font-semibold text-eden-paper">답례품</span>
+          {order.request_note ? <span className="ml-2 text-eden-sage-dim">{order.request_note}</span> : null}
+        </p>
+      ) : null}
       {order.student_name ? (
         <p className="mb-2 text-sm">
           <span className="text-eden-sage-dim">학생 이름</span> <strong>{order.student_name}</strong> ·{' '}

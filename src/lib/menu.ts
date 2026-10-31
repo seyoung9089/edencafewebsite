@@ -9,7 +9,7 @@ export type MenuItem = {
   sold_out: boolean
   /** Remaining quantity; null means no limit. */
   stock: number | null
-  category: 'bakery' | 'drink'
+  category: 'bakery' | 'drink' | 'gift'
   description: string
   sort_order: number
   image_url: string | null
@@ -35,7 +35,7 @@ export function toMenuItem(row: Record<string, unknown>): MenuItem {
     price: Number(row.price),
     sold_out: Boolean(row.sold_out),
     stock: typeof row.stock === 'number' ? row.stock : null,
-    category: row.category === 'drink' ? 'drink' : 'bakery',
+    category: row.category === 'drink' || row.category === 'gift' ? row.category : 'bakery',
     description: typeof row.description === 'string' ? row.description : '',
     sort_order: typeof row.sort_order === 'number' ? row.sort_order : 0,
     image_url: typeof row.image_url === 'string' && row.image_url ? row.image_url : null,

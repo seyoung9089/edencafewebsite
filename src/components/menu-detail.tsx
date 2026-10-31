@@ -1,9 +1,9 @@
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogClose } from '@/components/ui/dialog'
 import { isSoldOut, isUnpriced, type MenuItem } from '@/lib/menu'
 import { maxQtyFor } from '@/lib/cart'
-import { Coffee, Croissant, Flame, Minus, Plus, X } from 'lucide-react'
+import { Coffee, Croissant, Flame, Gift, Minus, Plus, X } from 'lucide-react'
 
-const CATEGORY_ICON = { bakery: Croissant, drink: Coffee } as const
+const CATEGORY_ICON = { bakery: Croissant, drink: Coffee, gift: Gift } as const
 const won = (n: number) => `${n.toLocaleString('ko-KR')}원`
 
 type Props = {
@@ -34,7 +34,7 @@ export function MenuDetailDialog({ item, popular, qty, onAdd, onQty, onClose }: 
 
 function Body({ item, popular, qty, onAdd, onQty }: Omit<Props, 'item' | 'onClose'> & { item: MenuItem }) {
   const Icon = CATEGORY_ICON[item.category]
-  const soldOut = item.category === 'bakery' && isSoldOut(item)
+  const soldOut = item.category !== 'drink' && isSoldOut(item)
   const unpriced = isUnpriced(item)
   const max = maxQtyFor(item)
   return (
@@ -65,7 +65,7 @@ function Body({ item, popular, qty, onAdd, onQty }: Omit<Props, 'item' | 'onClos
           <DialogTitle className="font-serif text-2xl font-semibold leading-snug">{item.name}</DialogTitle>
           <div className="mt-2 flex flex-wrap items-baseline justify-between gap-x-3">
             <span className={unpriced ? 'text-lg text-eden-sage-dim' : 'text-xl font-semibold'}>{unpriced ? '가격 준비 중' : won(item.price)}</span>
-            {item.category === 'bakery' && !soldOut && item.stock !== null ? (
+            {item.category !== 'drink' && !soldOut && item.stock !== null ? (
               <span className="text-base text-eden-sage-dim">{item.stock}개 남음</span>
             ) : null}
           </div>

@@ -123,3 +123,27 @@ describe("overGroupLimit", () => {
     expect(overGroupLimit([{ name: "기본 휘낭시에", price: 4000, qty: 20 }], byName, groups)).toBeNull()
   })
 })
+
+describe("답례품 cart", () => {
+  const gift = bread({ name: "답례 쿠키 세트", category: "gift", sale_days: [] })
+
+  it("allows up to 50 of one gift", () => {
+    expect(maxQtyFor(gift)).toBe(50)
+    expect(maxQtyFor({ ...gift, stock: 30 })).toBe(30)
+  })
+
+  it("keeps gifts and drops bread in the gift cart, whatever the day", () => {
+    const cart = [
+      { name: "답례 쿠키 세트", price: 4000, qty: 40 },
+      { name: "이든 소금빵", price: 4000, qty: 1 },
+    ]
+    const { next, removed } = reconcileCart(cart, [gift, bread()], "friday", "gift")
+    expect(next).toEqual([{ name: "답례 쿠키 세트", price: 4000, qty: 40 }])
+    expect(removed).toEqual(["이든 소금빵"])
+  })
+
+  it("drops gifts from the bread cart", () => {
+    const { removed } = reconcileCart([{ name: "답례 쿠키 세트", price: 4000, qty: 1 }], [gift], null)
+    expect(removed).toEqual(["답례 쿠키 세트"])
+  })
+})

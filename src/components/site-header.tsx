@@ -7,8 +7,12 @@ const NAV_LINKS = [
   { to: '/about', label: '카페소개' },
   { to: '/order', label: '마을 픽업 주문' },
   { to: '/parents', label: '학부모 주문' },
+  // 답례품 is a side service: same shape as the others, quieter colour.
+  { to: '/gifts', label: '답례품 예약', quiet: true },
   { to: '/support', label: '문의사항' },
-] as const
+] as const satisfies readonly { to: string; label: string; quiet?: boolean }[]
+
+const isQuiet = (l: (typeof NAV_LINKS)[number]) => 'quiet' in l && l.quiet
 
 export function SiteHeader() {
   const { totalQty } = useCart()
@@ -45,13 +49,13 @@ export function SiteHeader() {
       }`}
     >
       <div className="mx-auto flex h-[78px] max-w-6xl items-center justify-between px-6 md:px-8">
-        <Link to="/" className="flex items-baseline gap-2 font-logo text-xl font-bold text-eden-ink" onClick={() => setMobileOpen(false)}>
+        <Link to="/" className="flex shrink-0 items-baseline gap-2 font-logo text-xl font-bold text-eden-ink" onClick={() => setMobileOpen(false)}>
           이든카페
-          <span className="font-sans text-[10px] font-normal tracking-[0.16em] text-eden-sage-dim">EDEN CAFE</span>
+          <span className="font-sans text-[10px] font-normal tracking-[0.16em] text-eden-sage-dim md:hidden lg:inline">EDEN CAFE</span>
         </Link>
         <nav className="hidden items-center gap-1 text-sm font-medium text-eden-ink md:flex">
           {NAV_LINKS.map((l) => (
-            <Link key={l.to} to={l.to} className="rounded-full px-4 py-2 hover:bg-eden-paper-dim" activeProps={{ className: 'bg-eden-paper-dim' }}>{l.label}</Link>
+            <Link key={l.to} to={l.to} className={`whitespace-nowrap rounded-full px-2.5 py-2 hover:bg-eden-paper-dim lg:px-4 ${isQuiet(l) ? 'text-eden-sage-dim' : ''}`} activeProps={{ className: 'bg-eden-paper-dim' }}>{l.label}</Link>
           ))}
         </nav>
         <div className="flex items-center gap-4">
@@ -90,7 +94,7 @@ export function SiteHeader() {
               key={l.to}
               to={l.to}
               onClick={() => setMobileOpen(false)}
-              className="border-b border-eden-line py-3.5 text-[15px] text-eden-ink last:border-b-0 hover:text-eden-sand"
+              className={`border-b border-eden-line py-3.5 text-[15px] last:border-b-0 hover:text-eden-sand ${isQuiet(l) ? 'text-eden-sage-dim' : 'text-eden-ink'}`}
             >
               {l.label}
             </Link>

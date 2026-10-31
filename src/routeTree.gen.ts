@@ -19,6 +19,7 @@ import { Route as NewsRouteImport } from './routes/news'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as GuideRouteImport } from './routes/guide'
+import { Route as GiftsRouteImport } from './routes/gifts'
 import { Route as CustomerManagementRouteImport } from './routes/customer-management'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -76,6 +77,11 @@ const GuideRoute = GuideRouteImport.update({
   path: '/guide',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GiftsRoute = GiftsRouteImport.update({
+  id: '/gifts',
+  path: '/gifts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CustomerManagementRoute = CustomerManagementRouteImport.update({
   id: '/customer-management',
   path: '/customer-management',
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/cart': typeof CartRoute
   '/customer-management': typeof CustomerManagementRoute
+  '/gifts': typeof GiftsRoute
   '/guide': typeof GuideRoute
   '/login': typeof LoginRoute
   '/menu': typeof MenuRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/cart': typeof CartRoute
   '/customer-management': typeof CustomerManagementRoute
+  '/gifts': typeof GiftsRoute
   '/guide': typeof GuideRoute
   '/login': typeof LoginRoute
   '/menu': typeof MenuRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/cart': typeof CartRoute
   '/customer-management': typeof CustomerManagementRoute
+  '/gifts': typeof GiftsRoute
   '/guide': typeof GuideRoute
   '/login': typeof LoginRoute
   '/menu': typeof MenuRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/cart'
     | '/customer-management'
+    | '/gifts'
     | '/guide'
     | '/login'
     | '/menu'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/cart'
     | '/customer-management'
+    | '/gifts'
     | '/guide'
     | '/login'
     | '/menu'
@@ -206,6 +217,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/cart'
     | '/customer-management'
+    | '/gifts'
     | '/guide'
     | '/login'
     | '/menu'
@@ -225,6 +237,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   CartRoute: typeof CartRoute
   CustomerManagementRoute: typeof CustomerManagementRoute
+  GiftsRoute: typeof GiftsRoute
   GuideRoute: typeof GuideRoute
   LoginRoute: typeof LoginRoute
   MenuRoute: typeof MenuRoute
@@ -310,6 +323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuideRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gifts': {
+      id: '/gifts'
+      path: '/gifts'
+      fullPath: '/gifts'
+      preLoaderRoute: typeof GiftsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/customer-management': {
       id: '/customer-management'
       path: '/customer-management'
@@ -361,6 +381,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   CartRoute: CartRoute,
   CustomerManagementRoute: CustomerManagementRoute,
+  GiftsRoute: GiftsRoute,
   GuideRoute: GuideRoute,
   LoginRoute: LoginRoute,
   MenuRoute: MenuRoute,

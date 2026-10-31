@@ -21,7 +21,7 @@ function OrdersPage() {
   useEffect(() => {
     if (!user) { setOrders([]); setBusy(false); return }
     let active = true
-    void supabase.from('orders').select('id,items,total,status,pickup_date,created_at,student_name,payment_method,payment_status').eq('user_id', user.id).order('created_at', { ascending: false }).then(({ data, error }) => {
+    void supabase.from('orders').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).then(({ data, error }) => {
       if (active) { setOrders((data ?? []) as CustomerOrder[]); setError(error?.message ?? ''); setBusy(false) }
     })
     return () => { active = false }

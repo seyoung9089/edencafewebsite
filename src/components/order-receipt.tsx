@@ -157,8 +157,6 @@ export function OrderReceipt({
               {pickup.label}
               {pickupTime && !parents ? <span className="ml-1.5 font-sans text-sm font-normal text-eden-mute">{pickupTime}</span> : null}
             </div>
-            {parents ? <p className="mt-1 text-xs leading-relaxed text-eden-mute">학생이 금요일 하교할 때 찾아가요.</p> : null}
-            <p className="mt-1 text-xs text-eden-mute">주문 마감 {pickup.deadlineLabel} 밤 11시 59분</p>
           </>
         ) : (
           <div className="font-semibold text-eden-accent">먼저 픽업 날짜를 골라 주세요</div>

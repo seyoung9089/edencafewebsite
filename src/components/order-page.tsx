@@ -372,9 +372,15 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
       <section className="pad pb-12 pt-[clamp(48px,7vw,100px)]">
         <p className="eyebrow">{parents ? 'PARENTS · FRIDAY' : gift ? 'GIFTS · 답례품' : 'VILLAGE PICKUP'}</p>
         <h1 className="mb-4 mt-3 text-[clamp(1.75rem,3vw,2.6rem)] leading-[1.3]">
-          {parents ? '금요일에 찾아갈 빵을' : gift ? '모임과 행사에 나눌 답례품을' : '고른 날 찾아갈 빵을'}
-          <br />
-          <em className="font-normal italic">{gift ? '미리 예약하세요.' : '미리 주문하세요.'}</em>
+          {parents || gift ? (
+            <>
+              {parents ? '금요일에 찾아갈 빵을' : '모임과 행사에 나눌 답례품을'}
+              <br />
+              <em className="font-normal italic">{gift ? '미리 예약하세요.' : '미리 주문하세요.'}</em>
+            </>
+          ) : (
+            '마을 픽업 주문'
+          )}
         </h1>
         <p className="text-[1.05rem] text-eden-mute">
           {parents
@@ -439,12 +445,6 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
                 {pickupLabel(shownDays[0].iso)} ~ {pickupLabel(shownDays[shownDays.length - 1].iso)} 픽업
               </p>
             ) : null}
-            {parents || gift ? null : (
-              <p className="flex items-center gap-1.5">
-                <span aria-hidden className="mx-[4px] h-1.5 w-1.5 rounded-full bg-eden-accent" />
-                표시가 있는 금요일은 메뉴가 달라요.
-              </p>
-            )}
             <p className="flex items-center gap-1.5">
               <Info size={14} strokeWidth={1.7} aria-hidden />
               {gift ? '날짜를 고르면 아래에 답례품이 나와요.' : '날짜를 고르면 아래에 그날 메뉴가 나와요.'}

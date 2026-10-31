@@ -127,7 +127,7 @@ export function listCalendarDays(nowMs: number, only: PickupDay | null = null, c
       day,
       open: i <= PICKUP_WINDOW_DAYS,
       // Past the two-week window: it opens as the days move along.
-      closedNote: i <= PICKUP_WINDOW_DAYS ? null : i === PICKUP_WINDOW_DAYS + 1 ? '내일부터' : '아직 주문 전',
+      closedNote: i <= PICKUP_WINDOW_DAYS ? null : i === PICKUP_WINDOW_DAYS + 1 ? '내일부터' : '주문 열기 전',
     })
   }
   return days

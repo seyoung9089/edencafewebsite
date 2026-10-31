@@ -159,7 +159,7 @@ export function OrderReceipt({
             </div>
           </>
         ) : (
-          <div className="font-semibold text-eden-accent">먼저 찾아가실 날짜를 고르시면 됩니다</div>
+          <div className="font-semibold text-eden-accent">먼저 픽업 날짜를 고르시면 됩니다</div>
         )}
       </div>
 

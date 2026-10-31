@@ -38,7 +38,7 @@ function orderErrorMessage(e: unknown, maxQty: number): string {
   const message = getErrorMessage(e, '주문에 실패했습니다.')
   if (message.includes('Unavailable menu item') || message.includes('Only available bakery items'))
     return `방금 품절되었거나 지금 주문할 수 없는 메뉴가 있습니다: ${message.split(':').pop()?.trim()}. 그 메뉴를 주문 내역에서 빼신 뒤 다시 주문하시면 됩니다.`
-  if (message.includes('Invalid quantity')) return `한 메뉴는 ${maxQty}개까지 주문할 수 있습니다. 수량을 줄이시면 주문할 수 있습니다.`
+  if (message.includes('Invalid quantity')) return `한 메뉴는 ${maxQty}개까지 주문할 수 있습니다. 수량을 줄여서 다시 눌러 주시기 바랍니다.`
   if (message.includes('Invalid order')) return '담은 메뉴가 없거나 너무 많습니다. 주문 내역을 확인하신 뒤 다시 주문하시면 됩니다.'
   if (message.includes('Login required')) return '로그인이 필요합니다.'
   return message
@@ -268,7 +268,7 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
 
   // What still stops the order, in the order a customer would fix it.
   const blocker = !pickup
-    ? '먼저 찾아가실 날짜를 고르시면 됩니다.'
+    ? '먼저 픽업 날짜를 고르시면 됩니다.'
     : !menuItems || menuError
       ? '메뉴를 불러오는 중입니다.'
       : overGroupLimit(items, menuByName, groups)
@@ -389,8 +389,8 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
           {parents
             ? '학부모님이 주문하고, 학생이 금요일 하교할 때 찾아갑니다.'
             : gift
-              ? '찾아가실 날짜를 먼저 고르고 답례품을 담으시면 됩니다.'
-              : '찾아가실 날짜를 먼저 고르고 빵을 담으시면 됩니다.'}{' '}
+              ? '픽업 날짜를 고르고 답례품을 담으시면 됩니다.'
+              : '픽업 날짜를 고르고 빵을 담으시면 됩니다.'}{' '}
           <Link to="/guide" className="whitespace-nowrap font-semibold text-eden-ink underline underline-offset-4">
             처음이신가요?
           </Link>
@@ -401,12 +401,12 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
         <div>
           <p className="eyebrow !text-eden-paper">1단계 · 날짜</p>
           <h2 className="mb-5 mt-4 text-[clamp(1.6rem,2.8vw,2.4rem)] leading-[1.3]">
-            {parents ? '찾아갈 금요일을' : '찾아가실 날짜를'}
+            {parents ? '픽업할 금요일을' : '픽업 날짜를'}
             <br />
             골라 주시기 바랍니다.
           </h2>
           <p className="text-[1.05rem] text-eden-mute-2">
-            {parents ? '금요일 픽업은 그 주 수요일까지입니다.' : '찾아가시는 날 2일 전 밤 11시 59분까지 주문할 수 있습니다.'}
+            {parents ? '금요일 픽업은 그 주 수요일까지입니다.' : '마감은 픽업 2일 전 밤 11시 59분입니다. 금요일 픽업이면 수요일까지입니다.'}
           </p>
           {parents ? (
             <div className="mt-6 flex max-w-md gap-3 border-t border-eden-paper/30 pt-5">
@@ -583,7 +583,7 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
 
       <Dialog open={!!placed} onOpenChange={(open) => !open && setPlaced(null)}>
         <DialogContent className="max-w-[400px] rounded-card bg-eden-paper">
-          <DialogTitle className="sr-only">주문 완료</DialogTitle>
+          <DialogTitle className="sr-only">주문 접수</DialogTitle>
           <DialogDescription className="sr-only">결제 안내와 픽업 정보</DialogDescription>
           {placed ? (
             <OrderCompleteBody

@@ -37,8 +37,7 @@ function Buttons({ onClose, onOrders }: { onClose: () => void; onOrders: () => v
 
 const StatusNote = () => (
   <p className="text-xs text-eden-mute">
-    입금 확인, 픽업 준비 같은 주문 상태는 <strong className="text-eden-ink">내 주문</strong>에서 확인할 수 있습니다.
-    <br />이 화면을 캡처해 두시면 계좌와 찾아가실 날짜를 다시 보기 편합니다.
+    주문 상태는 <strong className="text-eden-ink">내 주문</strong>에서 언제든 다시 볼 수 있습니다.
   </p>
 )
 
@@ -51,7 +50,8 @@ export function OrderCompleteBody({ order, onClose, onOrders }: BodyProps) {
         <Check size={34} strokeWidth={2.5} />
       </div>
       <div>
-        <h2 className="font-serif text-xl font-light">주문 완료!</h2>
+        <h2 className="font-serif text-xl font-light">주문이 접수되었습니다</h2>
+        {order.paymentMethod === 'onsite' ? null : <p className="mt-2 text-sm text-eden-mute">입금이 확인되면 주문이 확정됩니다.</p>}
       </div>
       {order.paymentMethod === 'onsite' ? (
         <div className="rounded-card bg-eden-paper-dim px-5 py-5">

@@ -122,7 +122,7 @@ function NameLine({ name, onSave, className = '', suffix = '님' }: { name: stri
             취소
           </button>
         ) : (
-          <span className="text-xs opacity-70">빵을 찾아가실 때 확인할 이름입니다.</span>
+          <span className="text-xs opacity-70">픽업할 때 확인할 이름입니다.</span>
         )}
       </form>
     )

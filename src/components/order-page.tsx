@@ -17,7 +17,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import { MenuDetailDialog } from '@/components/menu-detail'
-import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School, CalendarDays, Info, Gift, Clock } from 'lucide-react'
+import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School, CalendarDays, Info, Gift } from 'lucide-react'
 import { toast } from 'sonner'
 
 /**
@@ -431,14 +431,6 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
               onSelect={choosePickup}
             />
           </div>
-          {pickup ? (
-            <p className="mt-4 flex items-start gap-2 bg-eden-paper-dim px-4 py-3 text-[1rem] leading-relaxed">
-              <Clock size={18} strokeWidth={1.7} className="mt-0.5 shrink-0 text-eden-accent" aria-hidden />
-              <span>
-                <strong>{pickup.label}</strong> 픽업은 <strong>{pickup.deadlineLabel} 밤 11시 59분</strong>까지 주문할 수 있어요.
-              </span>
-            </p>
-          ) : null}
           <div className="mt-4 space-y-1.5 text-[0.9rem] text-eden-mute">
             <p className="flex items-center gap-1.5">
               <Info size={14} strokeWidth={1.7} aria-hidden />

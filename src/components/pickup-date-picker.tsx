@@ -40,9 +40,9 @@ export function PickupDatePicker({
             type="button"
             disabled={!open}
             aria-pressed={active}
-            aria-label={`${d.weekLabel} ${d.month}월 ${d.date}일 ${d.weekday}요일${open ? '' : `, ${d.closedNote ?? '주문할 수 없음'}`}`}
+            aria-label={`${d.month}월 ${d.date}일 ${d.weekday}요일${open ? '' : `, ${d.closedNote ?? '주문할 수 없음'}`}`}
             onClick={() => onSelect(d.iso)}
-            className={`relative flex h-[104px] flex-col items-center justify-center gap-0.5 rounded-[2px] border px-1 transition-colors ${
+            className={`relative flex h-[88px] flex-col items-center justify-center gap-0.5 rounded-[2px] border px-1 transition-colors ${
               active
                 ? 'border-eden-accent bg-eden-accent text-white'
                 : open
@@ -50,7 +50,6 @@ export function PickupDatePicker({
                   : 'cursor-not-allowed border-transparent bg-eden-line/25 text-eden-mute/45'
             }`}
           >
-            <span className={`text-[13px] ${active ? 'text-eden-paper/75' : open ? 'text-eden-mute' : ''}`}>{d.weekLabel}</span>
             <span className="text-2xl font-medium leading-tight">{d.weekday}</span>
             <span className="text-sm font-semibold">
               {d.month}/{d.date}

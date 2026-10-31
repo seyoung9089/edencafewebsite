@@ -377,7 +377,7 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
             <>
               모임과 행사에 나눌 답례품을
               <br />
-              <em className="font-normal italic">미리 예약하십시오.</em>
+              <em className="font-normal italic">미리 예약하실 수 있습니다.</em>
             </>
           ) : parents ? (
             '학부모 주문'
@@ -403,7 +403,7 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
           <h2 className="mb-5 mt-4 text-[clamp(1.6rem,2.8vw,2.4rem)] leading-[1.3]">
             {parents ? '금요일을' : '픽업 날짜를'}
             <br />
-            골라 주십시오.
+            골라 주시기 바랍니다.
           </h2>
           <p className="text-[1.05rem] text-eden-mute-2">
             {parents ? '금요일 픽업은 그 주 수요일까지입니다.' : '픽업 2일 전 밤 11시 59분까지 주문해 주시기 바랍니다.'}
@@ -422,7 +422,7 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
               <CalendarDays size={18} strokeWidth={1.7} aria-hidden /> 날짜
             </span>
             <span className={`text-right text-[1.05rem] ${pickup ? 'font-bold' : 'text-eden-mute'}`}>
-              {pickup ? pickup.label : '아래에서 골라 주십시오'}
+              {pickup ? pickup.label : '아래에서 골라 주시기 바랍니다'}
             </span>
           </div>
           <div className="pt-5">

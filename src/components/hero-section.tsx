@@ -30,7 +30,7 @@ export function HeroSection() {
         <h1 className="mb-9 mt-4 text-[clamp(2.1rem,4.4vw,3.6rem)] leading-[1.3]">
           미리 주문하고,
           <br />
-          <em className="font-normal not-italic">고른 날</em> 찾아가십시오.
+          <em className="font-normal not-italic">고른 날</em> 찾아가실 수 있습니다.
         </h1>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link to="/order" className="btn">

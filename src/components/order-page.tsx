@@ -395,8 +395,7 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
         </p>
       </section>
 
-      {/* Guidance : picker = 1 : 1.618, so the picker carries the band instead of an empty half. */}
-      <section className="pad grid gap-10 bg-eden-ink py-[clamp(40px,5vw,64px)] text-eden-paper lg:grid-cols-[1fr_1.618fr] lg:items-center lg:gap-[6%]">
+      <section className="pad grid gap-10 bg-eden-ink py-[clamp(40px,5vw,64px)] text-eden-paper lg:grid-cols-2 lg:items-center lg:gap-[8%]">
         <div>
           <p className="eyebrow !text-eden-paper">1단계 · 날짜</p>
           <h2 className="mb-5 mt-4 text-[clamp(1.6rem,2.8vw,2.4rem)] leading-[1.3]">

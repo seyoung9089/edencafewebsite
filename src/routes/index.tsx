@@ -82,13 +82,6 @@ function StructuredData({ menuItems }: { menuItems: HomeMenuItem[] }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
 }
 
-/** Three points from the 카페소개 history, so the about band isn't half empty. */
-const ABOUT_MILESTONES = [
-  ['2021', 'history.h1'],
-  ['2023', 'history.h3'],
-  ['2026', 'history.h5'],
-] as const
-
 function HomePage() {
   const { menuItems } = Route.useLoaderData()
   const content = useSiteContent()
@@ -120,8 +113,8 @@ function HomePage() {
       <SiteHeader overlay />
       <HeroSection />
 
-      {/* Two ways to order, side by side; 마을 픽업 is the main one, so it gets the golden share (1.618 : 1). */}
-      <section className="grid md:grid-cols-[1.618fr_1fr]">
+      {/* Two ways to order, side by side */}
+      <section className="grid md:grid-cols-2">
         <Link to="/order" className={`${pane} bg-eden-accent text-white`}>
           <div>
             <p className="eyebrow !text-white">월~금 픽업</p>
@@ -176,74 +169,70 @@ function HomePage() {
         </section>
       ) : null}
 
-      {/* Pickup basics with the days open for orders: heading and buttons left, facts and dates right, 3 : 7. */}
-      <section className="pad grid gap-x-[6%] gap-y-9 bg-eden-accent py-[90px] text-white lg:grid-cols-[3fr_7fr]">
+      {/* Pickup basics on red, with the days open for orders */}
+      <section className="pad bg-eden-accent py-[90px] text-white">
+        <p className="eyebrow !text-white">픽업 안내</p>
         <Reveal>
-          <p className="eyebrow !text-white">픽업 안내</p>
-          <h2 className="mt-4 text-[clamp(1.5rem,2.6vw,2.3rem)] leading-[1.35]">
+          <h2 className="mb-9 mt-4 text-[clamp(1.5rem,2.6vw,2.3rem)] leading-[1.35]">
             주문 마감과
             <br />
             픽업 시간이에요.
           </h2>
         </Reveal>
-        <div className="lg:row-span-2">
-          <Reveal className="mb-9 grid gap-5 md:grid-cols-3">
-            <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
-              <CalendarDays size={28} strokeWidth={1.6} />
-              <b className="font-serif text-[1.25rem] font-normal">픽업 2일 전 밤 11시 59분까지</b>
-              <span className="text-[0.95rem] opacity-90">주문 마감</span>
-            </div>
-            <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
-              <Store size={28} strokeWidth={1.6} />
-              <b className="font-serif text-[1.25rem] font-normal">월요일 ~ 금요일</b>
-              <span className="text-[0.95rem] opacity-90">2주 뒤 픽업까지 미리 주문할 수 있어요</span>
-            </div>
-            <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
-              <Clock size={28} strokeWidth={1.6} />
-              <b className="font-serif text-[1.25rem] font-normal">{pickupTime || '매장 운영 시간'}</b>
-              <span className="text-[0.95rem] opacity-90">픽업 시간</span>
-            </div>
-          </Reveal>
-          {calendar?.days.length ? (
-            <div>
-              <p className="mb-3 text-[0.95rem] opacity-90">지금 주문할 수 있는 픽업 날짜</p>
-              <div className="grid grid-cols-5 gap-2">
-                {calendar.days.map((d) => (
-                  <Link
-                    key={d.iso}
-                    to="/order"
-                    search={{ date: d.iso }}
-                    className={`flex h-[88px] flex-col items-center justify-center gap-0.5 rounded-[2px] border border-white/45 px-1 hover:bg-white/10 ${d.open ? '' : 'pointer-events-none opacity-50'}`}
-                  >
-                    {/* Same type as the date picker on the order page. */}
-                    <span className="text-2xl font-medium leading-tight">{d.weekday}</span>
-                    <span className="text-sm font-semibold">
-                      {d.month}/{d.date}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          ) : null}
-        </div>
-        <div className="lg:self-end">
-          <p className="mb-6 flex items-start gap-2 text-[1rem]">
-            <Bell size={17} strokeWidth={1.7} className="mt-1 shrink-0" /> 주문을 마치면 입금할 계좌와 금액이 바로 나와요.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link to="/order" className="btn ivory">
-              주문하러 가기 <ArrowRight size={18} />
-            </Link>
-            <Link to="/guide" className="btn ghost">
-              이용방법 자세히 보기
-            </Link>
+        <Reveal className="mb-9 grid gap-5 md:grid-cols-3">
+          <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
+            <CalendarDays size={28} strokeWidth={1.6} />
+            <b className="font-serif text-[1.25rem] font-normal">픽업 2일 전 밤 11시 59분까지</b>
+            <span className="text-[0.95rem] opacity-90">주문 마감</span>
           </div>
+          <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
+            <Store size={28} strokeWidth={1.6} />
+            <b className="font-serif text-[1.25rem] font-normal">월요일 ~ 금요일</b>
+            <span className="text-[0.95rem] opacity-90">2주 뒤 픽업까지 미리 주문할 수 있어요</span>
+          </div>
+          <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
+            <Clock size={28} strokeWidth={1.6} />
+            <b className="font-serif text-[1.25rem] font-normal">{pickupTime || '매장 운영 시간'}</b>
+            <span className="text-[0.95rem] opacity-90">픽업 시간</span>
+          </div>
+        </Reveal>
+        {calendar?.days.length ? (
+          <div className="mb-9">
+            <p className="mb-3 text-[0.95rem] opacity-90">지금 주문할 수 있는 픽업 날짜</p>
+            <div className="grid grid-cols-5 gap-2">
+              {calendar.days.map((d) => (
+                <Link
+                  key={d.iso}
+                  to="/order"
+                  search={{ date: d.iso }}
+                  className={`flex h-[88px] flex-col items-center justify-center gap-0.5 rounded-[2px] border border-white/45 px-1 hover:bg-white/10 ${d.open ? '' : 'pointer-events-none opacity-50'}`}
+                >
+                  {/* Same type as the date picker on the order page. */}
+                  <span className="text-2xl font-medium leading-tight">{d.weekday}</span>
+                  <span className="text-sm font-semibold">
+                    {d.month}/{d.date}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ) : null}
+        <p className="mb-6 flex items-center gap-2 text-[1rem]">
+          <Bell size={17} strokeWidth={1.7} /> 주문을 마치면 입금할 계좌와 금액이 바로 나와요.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Link to="/order" className="btn ivory">
+            주문하러 가기 <ArrowRight size={18} />
+          </Link>
+          <Link to="/guide" className="btn ghost">
+            이용방법 자세히 보기
+          </Link>
         </div>
       </section>
 
       {/* News */}
-      <section id="news" className="pad grid gap-x-[6%] gap-y-6 pb-[90px] pt-[70px] lg:grid-cols-[3fr_7fr]">
-        <div className="flex flex-wrap items-end justify-between gap-4 lg:flex-col lg:items-start lg:justify-start">
+      <section id="news" className="pad pb-[90px] pt-[70px]">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="eyebrow">소식</p>
             <h2 className="mt-3 text-[clamp(1.4rem,2.1vw,1.9rem)]">새소식</h2>
@@ -266,7 +255,7 @@ function HomePage() {
       </section>
 
       {/* About teaser */}
-      <section className="pad grid items-end gap-x-[8%] gap-y-10 bg-eden-ink py-[80px] text-eden-paper lg:grid-cols-[1.618fr_1fr]">
+      <section className="pad bg-eden-ink py-[80px] text-eden-paper">
         <Reveal>
           <p className="eyebrow !text-eden-paper">카페 이야기</p>
           <h2 className="mb-9 mt-4 text-[clamp(1.5rem,2.6vw,2.3rem)] leading-[1.35]">
@@ -277,14 +266,6 @@ function HomePage() {
           <Link to="/about" className="btn ivory">
             카페소개 보기 <ArrowRight size={18} />
           </Link>
-        </Reveal>
-        <Reveal className="flex flex-col">
-          {ABOUT_MILESTONES.map(([year, key]) => (
-            <div key={year} className="grid grid-cols-[4rem_1fr] gap-3 border-t border-eden-paper/25 py-4">
-              <b className="font-serif text-[1.15rem] font-normal">{year}</b>
-              <span className="text-[0.95rem] leading-relaxed text-eden-mute-2">{cv(key)}</span>
-            </div>
-          ))}
         </Reveal>
       </section>
 

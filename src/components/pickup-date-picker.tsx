@@ -50,12 +50,12 @@ export function PickupDatePicker({
                   : 'cursor-not-allowed border-transparent bg-eden-line/25 text-eden-mute/45'
             }`}
           >
-            <span className={`text-[11px] ${active ? 'text-eden-paper/75' : open ? 'text-eden-mute' : ''}`}>{d.weekLabel}</span>
+            <span className={`text-[13px] ${active ? 'text-eden-paper/75' : open ? 'text-eden-mute' : ''}`}>{d.weekLabel}</span>
             <span className="text-2xl font-medium leading-tight">{d.weekday}</span>
             <span className="text-sm font-semibold">
               {d.month}/{d.date}
             </span>
-            {!open && d.closedNote ? <span className="text-xs font-semibold text-eden-mute">{d.closedNote}</span> : null}
+            {!open && d.closedNote ? <span className="text-[13px] font-semibold text-eden-mute">{d.closedNote}</span> : null}
             {markFriday && d.day === 'friday' && open ? (
               <span aria-hidden className={`absolute right-2 top-2 h-2 w-2 rounded-full ${active ? 'bg-eden-paper' : 'bg-eden-accent'}`} />
             ) : null}

@@ -57,7 +57,7 @@ function GuidePage() {
     <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-6 pb-24 pt-[clamp(48px,7vw,96px)] md:px-8">
-        <p className="eyebrow mb-3">HOW TO ORDER</p>
+        <p className="eyebrow mb-3">처음이신 분께</p>
         <h1 className="mb-3 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">픽업 주문 이용방법</h1>
         <p className="mb-8 text-[15px] text-eden-mute">픽업 날짜를 골라 미리 주문하고, 그날 매장에서 찾아가요. 네 단계면 충분해요.</p>
 

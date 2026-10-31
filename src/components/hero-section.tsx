@@ -26,7 +26,7 @@ export function HeroSection() {
       <div aria-hidden className="absolute inset-0 bg-[linear-gradient(90deg,rgba(27,20,16,.7),rgba(27,20,16,.25)_75%)]" />
 
       <div className="pad relative z-10 max-w-[1000px] pb-[70px] pt-[calc(4rem+40px)]">
-        <p className="eyebrow !text-white">EDEN CAFE · 별무리마을</p>
+        <p className="eyebrow !text-white">이든카페 · 별무리마을</p>
         <h1 className="mb-9 mt-4 text-[clamp(2.1rem,4.4vw,3.6rem)] leading-[1.3]">
           미리 주문하고,
           <br />

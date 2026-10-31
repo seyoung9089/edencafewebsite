@@ -6,7 +6,7 @@ import { OrderReceipt, type PaymentMethod } from '@/components/order-receipt'
 import { PickupDatePicker } from '@/components/pickup-date-picker'
 import { OrderCompleteBody, type PlacedOrder } from '@/components/order-complete'
 import { GIFT_MAX_QTY, MAX_QTY, groupTotals, maxQtyFor, overGroupLimit, reconcileCart, useCart, useGiftCart } from '@/lib/cart'
-import { pickupLabel, usePickupDates } from '@/lib/pickup'
+import { usePickupDates } from '@/lib/pickup'
 import { useCustomerAuth } from '@/lib/customer-auth'
 import { isPlaceholder, useContentValue, useSiteContent } from '@/lib/site-content'
 import { useMenu, isSoldOut, isUnpriced, fetchPopularity, type MenuGroup, type MenuItem } from '@/lib/menu'
@@ -81,17 +81,17 @@ function MenuCard({
             <Icon size={28} strokeWidth={1.5} className={`text-eden-mute ${soldOut ? 'opacity-50' : ''}`} />
           )}
           {popular ? (
-            <span className="absolute right-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-eden-accent px-2 py-0.5 text-[11px] font-semibold text-white">
-              <Flame size={11} strokeWidth={2} /> 인기
+            <span className="absolute right-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-eden-accent px-2 py-0.5 text-xs font-semibold text-white">
+              <Flame size={12} strokeWidth={2} /> 인기
             </span>
           ) : null}
           {soldOut ? (
-            <span className="absolute left-1.5 top-1.5 rounded-full bg-eden-ink-2/90 px-2 py-0.5 text-[11px] font-semibold text-eden-paper">
+            <span className="absolute left-1.5 top-1.5 rounded-full bg-eden-ink-2/90 px-2 py-0.5 text-xs font-semibold text-eden-paper">
               품절
             </span>
           ) : null}
         </div>
-        <span className="flex items-start gap-0.5 font-serif text-[15px] font-light leading-snug group-hover:underline group-hover:underline-offset-4">
+        <span className="flex items-start gap-0.5 text-base font-medium leading-snug group-hover:underline group-hover:underline-offset-4">
           {item.name}
           <ChevronRight size={16} strokeWidth={2} className="mt-0.5 shrink-0 text-eden-mute" aria-hidden />
         </span>
@@ -99,16 +99,15 @@ function MenuCard({
       <div className="mb-3 mt-1 flex flex-wrap items-baseline justify-between gap-x-2">
         <span className={unpriced ? 'text-sm text-eden-mute' : 'font-semibold text-eden-ink'}>{unpriced ? '가격 준비 중' : won(item.price)}</span>
         {item.category !== 'drink' && item.stock !== null && item.stock > 0 ? (
-          <span className="text-xs text-eden-mute">{item.stock}개 남음</span>
+          <span className="text-sm text-eden-mute">{item.stock}개 남음</span>
         ) : null}
       </div>
       <div className="mt-auto">
         {item.category === 'drink' ? (
-          <span className="flex h-10 items-center justify-center rounded-[3px] border border-eden-line text-xs text-eden-mute">
-            매장에서만 주문
-          </span>
+          <span className="flex h-10 items-center justify-center text-sm text-eden-mute">매장에서만 주문</span>
         ) : soldOut || unpriced ? (
-          <span className="flex h-10 items-center justify-center rounded-[3px] border border-eden-line text-xs text-eden-mute">
+          // Plain text, no box: it must not look like a button.
+          <span className="flex h-10 items-center justify-center text-sm text-eden-mute">
             {soldOut ? '품절' : '준비 중'}
           </span>
         ) : qty > 0 ? (
@@ -165,7 +164,7 @@ function store(key: string, value: string) {
 }
 
 /** The order page, shared by the 마을 픽업 주문, 학부모 주문 and 답례품 예약 tabs. */
-export function OrderPage({ audience }: { audience: OrderAudience }) {
+export function OrderPage({ audience, initialDate }: { audience: OrderAudience; initialDate?: string }) {
   const { items: menuItems, groups, error: menuError } = useMenu()
   // 답례품 has its own cart, so gifts and bread never go into one order.
   const breadCart = useCart()
@@ -203,7 +202,9 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
 
   useEffect(() => {
     rememberOrderTab(parents ? '/parents' : '/order')
-    setPickupIso(readStored(PICKUP_KEY[audience]) || null)
+    // A date picked on the home page wins over the one remembered from last time.
+    if (initialDate) store(PICKUP_KEY[audience], initialDate)
+    setPickupIso(initialDate || readStored(PICKUP_KEY[audience]) || null)
     setStudentName(readStored(STUDENT_KEY))
   }, [])
 
@@ -369,8 +370,8 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
     <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
       {/* Page top, then the pickup day on a dark band (the reference's 예약 layout). */}
-      <section className="pad pb-12 pt-[clamp(48px,7vw,100px)]">
-        <p className="eyebrow">{parents ? 'PARENTS · FRIDAY' : gift ? 'GIFTS · 답례품' : 'VILLAGE PICKUP'}</p>
+      <section className="pad pb-8 pt-[clamp(36px,5vw,64px)]">
+        <p className="eyebrow">{parents ? '금요일 픽업' : gift ? '답례품' : '월~금 픽업'}</p>
         <h1 className="mb-4 mt-3 text-[clamp(1.75rem,3vw,2.6rem)] leading-[1.3]">
           {parents || gift ? (
             <>
@@ -394,9 +395,9 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
         </p>
       </section>
 
-      <section className="pad grid gap-10 bg-eden-ink pb-[clamp(56px,7vw,100px)] pt-[clamp(56px,7vw,90px)] text-eden-paper lg:grid-cols-2 lg:gap-[8%]">
+      <section className="pad grid gap-10 bg-eden-ink py-[clamp(40px,5vw,64px)] text-eden-paper lg:grid-cols-2 lg:items-center lg:gap-[8%]">
         <div>
-          <p className="eyebrow !text-eden-paper">STEP 1 · PICKUP DAY</p>
+          <p className="eyebrow !text-eden-paper">1단계 · 날짜</p>
           <h2 className="mb-5 mt-4 text-[clamp(1.6rem,2.8vw,2.4rem)] leading-[1.3]">
             {parents ? '금요일을' : '픽업 날짜를'}
             <br />
@@ -439,12 +440,6 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
             </p>
           ) : null}
           <div className="mt-4 space-y-1.5 text-[0.9rem] text-eden-mute">
-            {shownDays?.length && !parents ? (
-              <p className="flex items-center gap-1.5">
-                <Info size={14} strokeWidth={1.7} aria-hidden />
-                {pickupLabel(shownDays[0].iso)} ~ {pickupLabel(shownDays[shownDays.length - 1].iso)} 픽업
-              </p>
-            ) : null}
             <p className="flex items-center gap-1.5">
               <Info size={14} strokeWidth={1.7} aria-hidden />
               {gift ? '날짜를 고르면 아래에 답례품이 나와요.' : '날짜를 고르면 아래에 그날 메뉴가 나와요.'}
@@ -458,7 +453,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
         <div className="lg:grid lg:grid-cols-[1fr_340px] lg:items-start lg:gap-10">
           <div>
             <section ref={menuRef} className="scroll-mt-[90px]">
-              <p className="eyebrow">{gift ? 'STEP 2 · GIFTS' : 'STEP 2 · BREAD'}</p>
+              <p className="eyebrow">{gift ? '2단계 · 답례품' : '2단계 · 빵'}</p>
               <h2 className="mb-4 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">
                 {gift ? '답례품 고르기' : '빵 고르기'}
                 {pickup && !gift ? <span className="ml-2 font-sans text-base font-normal text-eden-mute">{pickup.label} 메뉴</span> : null}
@@ -516,7 +511,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
 
             {!parents && !gift && drinks.length > 0 ? (
               <section className="mt-12">
-                <p className="eyebrow">DRINKS · 매장 전용</p>
+                <p className="eyebrow">매장 전용</p>
                 <h2 className="mb-1 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">음료</h2>
                 <p className="mb-3 mt-3 text-sm text-eden-mute">음료는 온라인 주문이 안 돼요. 매장에서 바로 주문해 주세요.</p>
                 <ul className="grid gap-x-8 sm:grid-cols-2">

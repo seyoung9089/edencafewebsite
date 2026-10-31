@@ -72,7 +72,7 @@ export const CONTENT_SCHEMA: ContentField[] = [
   { group: '핵심가치', key: 'value.rest.desc', label: '편안함 - 설명', type: 'textarea', default: '에덴의 안식을 닮은, 순수하게 편안한 자리를 지향합니다.' },
   { group: '핵심가치', key: 'values.tagline', label: '하단 태그라인', type: 'input', default: '건강한 재료 + 정직한 마음 = 이든의 커피' },
 
-  { group: '메뉴 섹션', key: 'menuHome.title', label: '섹션 제목', type: 'input', default: '오늘의 메뉴' },
+  { group: '메뉴 섹션', key: 'menuHome.title', label: '섹션 제목', type: 'input', default: '이번 주 빵' },
   { group: '메뉴 섹션', key: 'menuHome.subtitle', label: '섹션 부제', type: 'input', default: '베이커리실에서 직접 굽는 빵과, 이든만의 방식으로 내리는 음료입니다.' },
 
   { group: '히스토리', key: 'history.title', label: '섹션 제목', type: 'input', default: '이든의 시간' },

@@ -10,14 +10,6 @@ import { usePickupDates } from '@/lib/pickup'
 import { Slider } from '@/components/slider'
 import { ArrowRight, CalendarDays, Clock, Info, School, Store, Bell } from 'lucide-react'
 
-// Warm stand-ins for menu photos that haven't been uploaded yet.
-const SLIDE_TONES = [
-  'linear-gradient(135deg,#C99A62,#7A4E2C)',
-  'linear-gradient(135deg,#E2C296,#A8743F)',
-  'linear-gradient(135deg,#B98B5E,#5A3B2A)',
-  'linear-gradient(135deg,#D9B78A,#8C5F38)',
-]
-
 // Fetched server-side (during SSR / static prerender) so the structured
 // data below is present in the raw HTML — not only after client JS runs.
 // Most AI crawlers (and many that read via a browsing tool) fetch pages
@@ -97,13 +89,13 @@ function HomePage() {
   const calendar = usePickupDates()
   const pickupTime = cv('pickup.time')
 
-  // Breads with a photo first, then the rest, six at most.
-  const bakery = menuItems.filter((m) => m.category === 'bakery' && !m.soldOut && m.price > 0)
-  const showcase = [...bakery.filter((m) => m.image), ...bakery.filter((m) => !m.image)].slice(0, 6)
-  const slides = showcase.map((m, i) => (
+  // Only breads with a photo: a slide without one is just a big empty panel.
+  // With no photos yet the section stays hidden.
+  const showcase = menuItems.filter((m) => m.category === 'bakery' && !m.soldOut && m.price > 0 && m.image).slice(0, 6)
+  const slides = showcase.map((m) => (
     <div
-      className="relative flex aspect-[4/3] min-h-[240px] items-end bg-cover bg-center sm:aspect-[21/9]"
-      style={{ backgroundImage: m.image ? `url("${m.image}")` : SLIDE_TONES[i % SLIDE_TONES.length] }}
+      className="relative flex aspect-[4/3] min-h-[240px] items-end bg-cover bg-center sm:aspect-[3/1]"
+      style={{ backgroundImage: `url("${m.image}")` }}
     >
       <div className="flex w-full flex-col bg-[linear-gradient(0deg,rgba(27,20,16,.65),transparent)] px-6 py-5 text-white">
         <b className="font-serif text-[clamp(1.25rem,1.9vw,1.6rem)] font-normal">{m.name}</b>
@@ -125,7 +117,7 @@ function HomePage() {
       <section className="grid md:grid-cols-2">
         <Link to="/order" className={`${pane} bg-eden-accent text-white`}>
           <div>
-            <p className="eyebrow !text-white">VILLAGE PICKUP</p>
+            <p className="eyebrow !text-white">월~금 픽업</p>
             <h2 className="mt-3 text-[clamp(1.7rem,2.6vw,2.4rem)] leading-[1.25]">마을 픽업 주문</h2>
             <div className="mt-4 flex flex-col gap-1.5 text-[1rem]">
               <span className="flex items-center gap-2"><CalendarDays size={17} strokeWidth={1.7} /> 월요일부터 금요일까지 픽업</span>
@@ -139,7 +131,7 @@ function HomePage() {
         </Link>
         <Link to="/parents" className={`${pane} bg-eden-pane text-eden-pane-ink`}>
           <div>
-            <p className="eyebrow !text-eden-pane-ink">PARENTS · FRIDAY</p>
+            <p className="eyebrow !text-eden-pane-ink">금요일 픽업</p>
             <h2 className="mt-3 text-[clamp(1.7rem,2.6vw,2.4rem)] leading-[1.25]">학부모 주문</h2>
             <div className="mt-4 flex flex-col gap-1.5 text-[1rem]">
               <span className="flex items-center gap-2"><School size={17} strokeWidth={1.7} /> 금요일 하교할 때 학생이 찾아가요</span>
@@ -157,7 +149,7 @@ function HomePage() {
         className="pad group flex flex-wrap items-center justify-between gap-4 border-b border-eden-line bg-eden-paper-dim py-7 transition-colors hover:bg-[#E9E2D4]"
       >
         <span className="flex flex-wrap items-baseline gap-x-5 gap-y-1">
-          <span className="eyebrow">GIFTS</span>
+          <span className="eyebrow">답례품</span>
           <span className="font-serif text-[clamp(1.2rem,1.8vw,1.5rem)]">모임과 행사에 나눌 답례품도 미리 예약받아요</span>
         </span>
         <span className="inline-flex items-center gap-1.5 text-[1rem] font-bold text-eden-accent group-hover:underline group-hover:underline-offset-4">
@@ -168,7 +160,7 @@ function HomePage() {
       {/* The breads */}
       {slides.length ? (
         <section className="pad bg-eden-paper-dim pb-20 pt-[70px]">
-          <p className="eyebrow">THE BREAD</p>
+          <p className="eyebrow">메뉴</p>
           <h2 className="mb-7 mt-3 text-[clamp(1.4rem,2.1vw,1.9rem)]">{cv('menuHome.title')}</h2>
           <Slider slides={slides} label="이든카페 빵" />
           <p className="mt-5 flex items-center gap-1.5 text-[0.9rem] text-eden-mute">
@@ -179,12 +171,12 @@ function HomePage() {
 
       {/* Pickup basics on red, with the days open for orders */}
       <section className="pad bg-eden-accent py-[90px] text-white">
-        <p className="eyebrow !text-white">PICKUP</p>
+        <p className="eyebrow !text-white">픽업 안내</p>
         <Reveal>
           <h2 className="mb-9 mt-4 text-[clamp(1.5rem,2.6vw,2.3rem)] leading-[1.35]">
-            미리 주문하고
+            주문 마감과
             <br />
-            고른 날 찾아가세요.
+            픽업 시간이에요.
           </h2>
         </Reveal>
         <Reveal className="mb-9 grid gap-5 md:grid-cols-3">
@@ -212,6 +204,7 @@ function HomePage() {
                 <Link
                   key={d.iso}
                   to="/order"
+                  search={{ date: d.iso }}
                   className={`rounded-[2px] border border-white/45 px-1 py-3 text-center text-[0.85rem] hover:bg-white/10 ${d.open ? '' : 'pointer-events-none opacity-50'}`}
                 >
                   {d.weekLabel}
@@ -240,7 +233,7 @@ function HomePage() {
       <section id="news" className="pad pb-[90px] pt-[70px]">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="eyebrow">NEWS</p>
+            <p className="eyebrow">소식</p>
             <h2 className="mt-3 text-[clamp(1.4rem,2.1vw,1.9rem)]">새소식</h2>
           </div>
           <Link to="/support" className="inline-flex items-center gap-1 text-[0.95rem] font-bold text-eden-accent hover:underline hover:underline-offset-4">
@@ -263,7 +256,7 @@ function HomePage() {
       {/* About teaser */}
       <section className="pad bg-eden-ink py-[80px] text-eden-paper">
         <Reveal>
-          <p className="eyebrow !text-eden-paper">ABOUT EDEN</p>
+          <p className="eyebrow !text-eden-paper">카페 이야기</p>
           <h2 className="mb-9 mt-4 text-[clamp(1.5rem,2.6vw,2.3rem)] leading-[1.35]">
             학생들의 작은 시작이
             <br />

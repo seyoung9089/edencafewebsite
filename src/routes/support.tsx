@@ -37,7 +37,7 @@ function SupportPage() {
     setTitle(''); setContent(''); toast.success('문의가 접수되었습니다.'); void load(user.id)
   }
   return <div className="min-h-screen bg-eden-paper text-eden-ink"><SiteHeader /><main className="mx-auto max-w-5xl px-6 pb-24 pt-[clamp(48px,7vw,96px)]">
-    <p className="eyebrow mb-3">NEWS & QUESTIONS</p>
+    <p className="eyebrow mb-3">새소식 · 문의</p>
         <h1 className="mb-3 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">문의사항</h1>
     <p className="mb-10 text-[15px] text-eden-mute">이든의 새소식을 먼저 확인하시고, 궁금한 점은 아래에 남겨주세요.</p>
 

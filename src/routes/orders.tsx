@@ -55,7 +55,7 @@ function OrdersPage() {
   }
 
   return <div className="min-h-screen bg-eden-paper text-eden-ink"><SiteHeader /><main className="mx-auto max-w-4xl px-6 pb-24 pt-[clamp(48px,7vw,96px)]">
-    <p className="eyebrow mb-3">MY ORDERS</p>
+    <p className="eyebrow mb-3">픽업 주문</p>
         <h1 className="mb-8 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">내 주문</h1>
     {user && totalQty > 0 ? <div className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-card border-2 border-eden-accent bg-eden-paper-dim px-5 py-4">
       <p className="text-base font-semibold">담아 둔 빵 {totalQty}개가 아직 주문 전이에요.</p>

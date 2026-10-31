@@ -32,7 +32,7 @@ function AboutPage() {
     <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
       <section className="px-6 pb-6 pt-[clamp(48px,7vw,96px)] md:px-8">
-        <p className="eyebrow mb-3">ABOUT EDEN</p>
+        <p className="eyebrow mb-3">별무리마을 협동조합</p>
         <h1 className="mb-3 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">카페소개</h1>
         <p className="text-[15px] text-eden-mute">이든이 걸어온 마음과 지키는 가치, 지나온 시간과 오시는 길까지 한 곳에 담았습니다.</p>
       </section>

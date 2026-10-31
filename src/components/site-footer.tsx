@@ -44,7 +44,6 @@ export function SiteFooter() {
           <Link to="/guide" className="hover:text-eden-ink">이용방법</Link>
           <Link to="/orders" className="hover:text-eden-ink">내 주문</Link>
           <Link to="/privacy" className="hover:text-eden-ink">개인정보처리방침</Link>
-          <Link to="/admin" className="hover:text-eden-ink">관리자 페이지</Link>
         </span>
       </div>
     </footer>

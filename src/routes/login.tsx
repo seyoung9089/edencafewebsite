@@ -63,7 +63,7 @@ function LoginPage() {
 
   const input = 'mb-5 h-14 w-full rounded-[2px] border border-eden-line bg-eden-paper px-4 text-base'
   return <div className="min-h-screen bg-eden-paper text-eden-ink"><SiteHeader /><main className="mx-auto max-w-md px-6 py-14">
-    <p className="eyebrow mb-3">MY ACCOUNT</p>
+    <p className="eyebrow mb-3">이든카페 계정</p>
         <h1 className="mb-3 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">{mode === 'signup' ? '회원가입' : mode === 'reset' ? '비밀번호 찾기' : '로그인'}</h1>
     <p className="mb-8 text-[15px] text-eden-mute">
       {mode === 'signup' ? '이메일과 비밀번호만 있으면 가입할 수 있어요.' : mode === 'reset' ? '가입한 이메일로 비밀번호를 다시 정하는 메일을 보내 드려요.' : '주문하려면 로그인이 필요해요. 처음이시면 아래에서 회원가입을 먼저 해 주세요.'}

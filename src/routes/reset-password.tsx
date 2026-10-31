@@ -16,6 +16,6 @@ function ResetPasswordPage() {
     if (!error) { setPassword(''); await supabase.auth.signOut() }
     setBusy(false)
   }
-  return <div className="min-h-screen bg-eden-paper text-eden-ink"><SiteHeader /><main className="mx-auto max-w-md px-6 py-16"><p className="eyebrow mb-3">MY ACCOUNT</p>
+  return <div className="min-h-screen bg-eden-paper text-eden-ink"><SiteHeader /><main className="mx-auto max-w-md px-6 py-16"><p className="eyebrow mb-3">이든카페 계정</p>
         <h1 className="mb-6 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">비밀번호 재설정</h1><form onSubmit={event => void submit(event)}><label htmlFor="new-password" className="mb-2 block">새 비밀번호</label><input id="new-password" type="password" minLength={6} required autoComplete="new-password" value={password} onChange={event => setPassword(event.target.value)} className="mb-5 w-full rounded-[2px] border border-eden-line bg-eden-paper p-3" /><button disabled={busy} className="bg-eden-accent px-7 py-3 text-white rounded-[3px] transition-colors hover:bg-eden-accent-d">변경하기</button></form>{message && <p role="status" className="mt-5">{message}</p>}<Link to="/login" className="mt-6 inline-block underline">로그인으로 돌아가기</Link></main><SiteFooter /></div>
 }

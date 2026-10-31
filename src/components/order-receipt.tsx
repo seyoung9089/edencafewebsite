@@ -67,7 +67,7 @@ function FridayFields({
           autoComplete="off"
           className="mt-1.5 h-12 w-full rounded-[2px] border border-eden-line bg-eden-paper-dim px-3 text-base text-eden-ink placeholder:text-eden-mute/70"
         />
-        <span className="mt-1 block text-xs text-eden-mute">금요일 하교할 때 이 이름으로 찾아가요.</span>
+        <span className="mt-1 block text-sm text-eden-mute">금요일 하교할 때 이 이름으로 찾아가요.</span>
       </label>
 
       <fieldset>
@@ -141,7 +141,7 @@ export function OrderReceipt({
     <div className="border border-eden-line bg-white p-5">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="eyebrow">YOUR ORDER</p>
+          <p className="eyebrow">3단계 · 주문</p>
           <h2 className="mt-1.5 text-[1.35rem]">주문 내역</h2>
         </div>
         <Link to="/guide" className="rounded-[3px] border border-eden-line px-3 py-1.5 text-sm font-semibold text-eden-ink hover:bg-eden-paper">
@@ -150,7 +150,7 @@ export function OrderReceipt({
       </div>
 
       <div className="mt-3 border-y border-eden-line py-3">
-        <div className="text-xs text-eden-mute">픽업 날짜</div>
+        <div className="text-sm text-eden-mute">픽업 날짜</div>
         {pickup ? (
           <>
             <div className="font-serif text-base font-light text-eden-ink">
@@ -267,7 +267,7 @@ export function OrderReceipt({
               type="button"
               onClick={onCheckout}
               disabled={Boolean(blocker) || items.length === 0 || submitting}
-              className="h-14 w-full rounded-[3px] bg-eden-accent text-base font-semibold text-white transition-colors hover:bg-eden-accent-d disabled:opacity-40"
+              className="h-14 w-full rounded-[3px] bg-eden-accent text-base font-semibold text-white transition-colors enabled:hover:bg-eden-accent-d disabled:border disabled:border-eden-line disabled:bg-eden-paper-dim disabled:text-eden-mute"
             >
               {submitting ? '주문하는 중…' : `${pickup ? `${shortDate(pickup.iso)} 픽업 ` : ''}${gift ? '예약하기' : '주문하기'}`}
             </button>
@@ -281,11 +281,11 @@ export function OrderReceipt({
             >
               {gift ? '로그인하고 예약하기' : '로그인하고 주문하기'}
             </Link>
-            <p className="mt-2 text-center text-xs text-eden-mute">처음이시면 회원가입부터 해요. 담은 {gift ? '답례품' : '빵'}은 그대로 남아 있어요.</p>
+            <p className="mt-2 text-center text-sm text-eden-mute">처음이시면 회원가입부터 해요. 담은 {gift ? '답례품' : '빵'}은 그대로 남아 있어요.</p>
           </>
         )}
         {loggedIn && (!parents || paymentMethod === 'transfer') ? (
-          <p className="mt-2 text-center text-xs text-eden-mute">주문하면 입금할 계좌를 바로 알려드려요.</p>
+          <p className="mt-2 text-center text-sm text-eden-mute">주문하면 입금할 계좌를 바로 알려드려요.</p>
         ) : null}
       </div>
     </div>

@@ -11,7 +11,7 @@ import { lastOrderTab } from '@/lib/return-to'
 export function BackToTop() {
   const [visible, setVisible] = useState(false)
   const pathname = useRouterState({ select: (state) => state.location.pathname })
-  // The order pages have a fixed order bar at the bottom on small screens; sit above it.
+  // The order pages have a fixed order bar at the bottom on small screens.
   const onOrder = pathname === '/order' || pathname === '/parents' || pathname === '/gifts'
   const { totalQty, totalPrice } = useCart()
   const [cartTab, setCartTab] = useState<'/order' | '/parents'>('/order')
@@ -31,16 +31,13 @@ export function BackToTop() {
   }
 
   return (
-    <div
-      className={`pointer-events-none fixed right-4 z-50 flex w-[min(260px,calc(100vw-32px))] flex-col items-end gap-2 ${
-        onOrder ? 'bottom-24 lg:bottom-4' : 'bottom-4'
-      }`}
-    >
+    <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex w-[min(260px,calc(100vw-32px))] flex-col items-end gap-2">
+      {/* On a phone the order bar already fills the bottom; a second floating button there covers the page. */}
       <button
         type="button"
         onClick={scrollToTop}
         aria-label="맨 위로 이동"
-        className={`flex h-11 w-11 items-center justify-center rounded-[3px] bg-eden-ink text-eden-paper shadow-lift transition-all duration-300 hover:bg-eden-ink-2 ${
+        className={`flex h-11 w-11 items-center justify-center rounded-[3px] bg-eden-ink text-eden-paper shadow-lift transition-all duration-300 hover:bg-eden-ink-2 ${onOrder ? 'max-lg:hidden' : ''} ${
           visible ? 'pointer-events-auto translate-y-0 opacity-100' : 'translate-y-3 opacity-0'
         }`}
       >
@@ -55,7 +52,7 @@ export function BackToTop() {
             <ShoppingBag size={20} strokeWidth={1.7} />
           </span>
           <span className="min-w-0">
-            <b className="block text-[0.75rem] tracking-[0.1em] text-eden-accent">담은 빵 {totalQty}개</b>
+            <b className="block text-[0.85rem] tracking-[0.05em] text-eden-accent">담은 빵 {totalQty}개</b>
             <span className="block truncate text-[0.95rem]">{totalPrice.toLocaleString('ko-KR')}원 · 주문 이어 하기</span>
           </span>
         </Link>

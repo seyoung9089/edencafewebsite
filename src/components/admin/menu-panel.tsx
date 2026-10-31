@@ -44,7 +44,7 @@ export function MenuPanel() {
       </p>
       <GroupsEditor groups={groups} onChanged={refresh} />
       <p className="mb-6 text-sm text-eden-sage-dim">
-        <strong>답례품</strong>은 "답례품 예약" 탭에만 나오고, 빵과 따로 주문받아요. 픽업 날짜는 마을 픽업 주문과 같은 규칙(월~금, 2일 전 자정 마감)이고, 한 주문에 한 종류당 50개까지 담을 수 있어요.
+        <strong>답례품</strong>은 "답례품 예약" 탭에만 나오고, 빵과 따로 주문받아요. 픽업 날짜는 마을 픽업 주문과 같은 규칙(월~금, 2일 전 밤 11시 59분 마감)이고, 한 주문에 한 종류당 50개까지 담을 수 있어요.
       </p>
       {(['bakery', 'gift', 'drink'] as const).map((category) => (
         <section key={category} className="mb-10">

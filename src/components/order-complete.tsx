@@ -37,6 +37,7 @@ function Buttons({ onClose, onOrders }: { onClose: () => void; onOrders: () => v
 const StatusNote = () => (
   <p className="text-xs text-eden-sage-dim">
     입금 확인, 픽업 준비 같은 주문 상태는 <strong className="text-eden-ink">내 주문</strong>에서 확인할 수 있어요.
+    <br />이 화면을 캡처해 두시면 계좌와 픽업 날짜를 다시 보기 편해요.
   </p>
 )
 

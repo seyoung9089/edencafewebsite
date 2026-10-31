@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import { MenuDetailDialog } from '@/components/menu-detail'
-import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School, Gift } from 'lucide-react'
+import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School, Gift, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 
 /**
@@ -408,7 +408,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
                 </p>
               ) : null}
               <p className="mb-3 text-[15px] font-semibold">
-                {parents ? '금요일 픽업은 그 주 수요일 자정까지 주문해 주세요.' : '픽업 2일 전 자정까지 주문해 주세요.'}
+                {parents ? '금요일 픽업은 그 주 수요일 밤 11시 59분까지 주문해 주세요.' : '픽업 2일 전 밤 11시 59분까지 주문해 주세요.'}
               </p>
               <PickupDatePicker
                 days={shownDays}
@@ -416,6 +416,14 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
                 selected={pickup?.iso ?? null}
                 onSelect={choosePickup}
               />
+              {pickup ? (
+                <p className="mt-3 flex items-start gap-2 rounded-[10px] bg-eden-paper-dim px-4 py-3 text-[15px] leading-relaxed">
+                  <Clock size={18} strokeWidth={1.8} className="mt-0.5 shrink-0 text-eden-sage-dim" aria-hidden />
+                  <span>
+                    <strong>{pickup.label}</strong> 픽업은 <strong>{pickup.deadlineLabel} 밤 11시 59분</strong>까지 주문할 수 있어요.
+                  </span>
+                </p>
+              ) : null}
               {parents || gift ? null : (
                 <p className="mt-3 flex items-center gap-1.5 text-sm text-eden-sage-dim">
                   <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-eden-sand" />

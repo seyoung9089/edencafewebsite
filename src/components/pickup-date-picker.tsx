@@ -40,7 +40,7 @@ export function PickupDatePicker({
             type="button"
             disabled={!open}
             aria-pressed={active}
-            aria-label={`${d.weekLabel} ${d.month}월 ${d.date}일 ${d.weekday}요일${open ? '' : ', 주문할 수 없음'}`}
+            aria-label={`${d.weekLabel} ${d.month}월 ${d.date}일 ${d.weekday}요일${open ? '' : `, ${d.closedNote ?? '주문할 수 없음'}`}`}
             onClick={() => onSelect(d.iso)}
             className={`relative flex h-[104px] flex-col items-center justify-center gap-0.5 rounded-[10px] border px-1 transition-colors ${
               active
@@ -55,6 +55,7 @@ export function PickupDatePicker({
             <span className="text-sm font-semibold">
               {d.month}/{d.date}
             </span>
+            {!open && d.closedNote ? <span className="text-xs font-semibold text-eden-sage-dim">{d.closedNote}</span> : null}
             {markFriday && d.day === 'friday' && open ? (
               <span aria-hidden className={`absolute right-2 top-2 h-2 w-2 rounded-full ${active ? 'bg-eden-paper' : 'bg-eden-sand'}`} />
             ) : null}

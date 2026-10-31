@@ -6,6 +6,11 @@ import type { PickupDate } from '@/lib/pickup'
 import { CopyLabel, usePayment } from '@/components/payment-info'
 
 const won = (n: number) => `${n.toLocaleString('ko-KR')}원`
+/** "11/2(월)" for the order button. */
+const shortDate = (iso: string) => {
+  const d = new Date(`${iso}T00:00:00Z`)
+  return `${d.getUTCMonth() + 1}/${d.getUTCDate()}(${'일월화수목금토'[d.getUTCDay()]})`
+}
 
 export type PaymentMethod = 'transfer' | 'onsite'
 
@@ -144,6 +149,7 @@ export function OrderReceipt({
               {pickupTime && !parents ? <span className="ml-1.5 font-sans text-sm font-normal text-eden-sage-dim">{pickupTime}</span> : null}
             </div>
             {parents ? <p className="mt-1 text-xs leading-relaxed text-eden-sage-dim">학생이 금요일 하교할 때 찾아가요.</p> : null}
+            <p className="mt-1 text-xs text-eden-sage-dim">주문 마감 {pickup.deadlineLabel} 밤 11시 59분</p>
           </>
         ) : (
           <div className="font-semibold text-eden-sand">먼저 픽업 날짜를 골라 주세요</div>
@@ -233,13 +239,30 @@ export function OrderReceipt({
         ) : loggedIn ? (
           <>
             {blocker && items.length > 0 ? <p className="mb-2 text-center text-sm font-semibold text-eden-sand">{blocker}</p> : null}
+            {!blocker && items.length > 0 && pickup ? (
+              <ul className="mb-3 space-y-1 rounded-[10px] bg-eden-paper px-4 py-3 text-sm leading-relaxed">
+                <li>
+                  <span className="text-eden-sage-dim">픽업</span> <strong>{pickup.label}</strong>
+                  {pickupTime && !parents ? ` ${pickupTime}` : ''}
+                </li>
+                <li>
+                  <span className="text-eden-sage-dim">결제</span>{' '}
+                  <strong>{parents && paymentMethod === 'onsite' ? '현장결제' : '계좌이체'}</strong>
+                </li>
+                <li className="text-eden-sage-dim">
+                  {parents && paymentMethod === 'onsite'
+                    ? '준비가 시작되기 전까지 내 주문에서 취소할 수 있어요.'
+                    : '입금이 확인되기 전까지 내 주문에서 취소할 수 있어요.'}
+                </li>
+              </ul>
+            ) : null}
             <button
               type="button"
               onClick={onCheckout}
               disabled={Boolean(blocker) || items.length === 0 || submitting}
               className="h-14 w-full rounded-full bg-eden-ink text-base font-semibold text-eden-paper transition-colors hover:bg-eden-ink-2 disabled:opacity-40"
             >
-              {submitting ? '주문하는 중…' : gift ? '예약하기' : '주문하기'}
+              {submitting ? '주문하는 중…' : `${pickup ? `${shortDate(pickup.iso)} 픽업 ` : ''}${gift ? '예약하기' : '주문하기'}`}
             </button>
           </>
         ) : (

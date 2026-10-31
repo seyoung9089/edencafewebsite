@@ -205,12 +205,13 @@ function HomePage() {
                   key={d.iso}
                   to="/order"
                   search={{ date: d.iso }}
-                  className={`rounded-[2px] border border-white/45 px-1 py-3 text-center text-[0.85rem] hover:bg-white/10 ${d.open ? '' : 'pointer-events-none opacity-50'}`}
+                  className={`flex h-[88px] flex-col items-center justify-center gap-0.5 rounded-[2px] border border-white/45 px-1 hover:bg-white/10 ${d.open ? '' : 'pointer-events-none opacity-50'}`}
                 >
-                  {d.weekLabel}
-                  <b className="block text-[1.1rem] font-medium leading-snug">
-                    {d.month}/{d.date} ({d.weekday})
-                  </b>
+                  {/* Same type as the date picker on the order page. */}
+                  <span className="text-2xl font-medium leading-tight">{d.weekday}</span>
+                  <span className="text-sm font-semibold">
+                    {d.month}/{d.date}
+                  </span>
                 </Link>
               ))}
             </div>

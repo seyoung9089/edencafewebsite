@@ -24,7 +24,7 @@ export function PickupDatePicker({
     return (
       <div className={grid}>
         {Array.from({ length: 5 }, (_, i) => (
-          <div key={i} className="h-[104px] animate-pulse rounded-[10px] bg-eden-paper-dim" />
+          <div key={i} className="h-[104px] animate-pulse rounded-[2px] bg-eden-paper-dim" />
         ))}
       </div>
     )
@@ -42,22 +42,22 @@ export function PickupDatePicker({
             aria-pressed={active}
             aria-label={`${d.weekLabel} ${d.month}월 ${d.date}일 ${d.weekday}요일${open ? '' : `, ${d.closedNote ?? '주문할 수 없음'}`}`}
             onClick={() => onSelect(d.iso)}
-            className={`relative flex h-[104px] flex-col items-center justify-center gap-0.5 rounded-[10px] border px-1 transition-colors ${
+            className={`relative flex h-[104px] flex-col items-center justify-center gap-0.5 rounded-[2px] border px-1 transition-colors ${
               active
-                ? 'border-eden-ink bg-eden-ink text-eden-paper'
+                ? 'border-eden-accent bg-eden-accent text-white'
                 : open
-                  ? 'border-eden-sage-dim/40 bg-eden-paper text-eden-ink shadow-soft hover:border-eden-ink'
-                  : 'cursor-not-allowed border-transparent bg-eden-line/25 text-eden-sage-dim/45'
+                  ? 'border-eden-line bg-white text-eden-ink hover:border-eden-ink'
+                  : 'cursor-not-allowed border-transparent bg-eden-line/25 text-eden-mute/45'
             }`}
           >
-            <span className={`text-[11px] ${active ? 'text-eden-paper/75' : open ? 'text-eden-sage-dim' : ''}`}>{d.weekLabel}</span>
-            <span className="font-serif text-2xl font-semibold leading-tight">{d.weekday}</span>
+            <span className={`text-[11px] ${active ? 'text-eden-paper/75' : open ? 'text-eden-mute' : ''}`}>{d.weekLabel}</span>
+            <span className="text-2xl font-medium leading-tight">{d.weekday}</span>
             <span className="text-sm font-semibold">
               {d.month}/{d.date}
             </span>
-            {!open && d.closedNote ? <span className="text-xs font-semibold text-eden-sage-dim">{d.closedNote}</span> : null}
+            {!open && d.closedNote ? <span className="text-xs font-semibold text-eden-mute">{d.closedNote}</span> : null}
             {markFriday && d.day === 'friday' && open ? (
-              <span aria-hidden className={`absolute right-2 top-2 h-2 w-2 rounded-full ${active ? 'bg-eden-paper' : 'bg-eden-sand'}`} />
+              <span aria-hidden className={`absolute right-2 top-2 h-2 w-2 rounded-full ${active ? 'bg-eden-paper' : 'bg-eden-accent'}`} />
             ) : null}
           </button>
         )

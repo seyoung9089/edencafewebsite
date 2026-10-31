@@ -116,9 +116,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const old = merged.get(row.name)
         merged.set(row.name, { ...row, qty: Math.min(MAX_QTY, row.qty + (old?.qty ?? 0)) })
       }
-      window.localStorage.removeItem(STORAGE_KEY)
-      setItems([...merged.values()])
+      const next = [...merged.values()]
+      setItems(next)
       setReadyFor(user.id)
+      // Save the merged cart right away, and only then forget the guest copy,
+      // so a reload straight after logging in can't lose what was added.
+      if (!guest.length) return
+      void supabase.rpc('set_cart', { p_items: next.map(({ name, qty }) => ({ name, qty })) }).then(({ error: saveError }) => {
+        if (!saveError) window.localStorage.removeItem(STORAGE_KEY)
+      })
     })
     return () => { active = false }
   }, [user?.id, loading])

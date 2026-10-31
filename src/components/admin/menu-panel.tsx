@@ -28,27 +28,27 @@ export function MenuPanel() {
     void refresh()
   }, [])
 
-  if (!items) return <p className="text-sm text-eden-sage-dim">불러오는 중…</p>
+  if (!items) return <p className="text-sm text-eden-mute">불러오는 중…</p>
 
   const featuredCount = items.filter((i) => i.is_featured).length
 
   return (
     <div>
-      <p className="mb-6 text-sm text-eden-sage-dim">
+      <p className="mb-6 text-sm text-eden-mute">
         베이커리만 온라인 픽업 주문을 받습니다. 음료는 메뉴에 표시되지만 장바구니에 담을 수 없어요. 베이커리 수량을 비워두면 제한 없이 주문받고, 숫자를 넣으면 주문될 때마다 줄어들어 0개가 되면 자동으로 품절이 돼요.
         손님용 메뉴 페이지 맨 위 "인기 메뉴"에는 여기서 직접 고른 메뉴 최대 2개 + 손님이 실제로 가장 많이 산 베이커리 1개, 총 3개가 떠요.
       </p>
-      <p className="mb-6 text-sm text-eden-sage-dim">
+      <p className="mb-6 text-sm text-eden-mute">
         베이커리는 <strong>판매 요일</strong>에 체크한 날의 주문 페이지에만 나와요(평일 = 월~목 픽업, 금요일 = 금 픽업). 아무 요일도 체크하지 않으면 주문 페이지에서 빠져요.
         가격이 0원이면 "가격 준비 중"으로 보이고 주문은 안 돼요. 수량 숫자는 날짜 구분 없이 전체 남은 수량이라, 미리 주문받는 빵은 비워두는 걸 권해요.
       </p>
       <GroupsEditor groups={groups} onChanged={refresh} />
-      <p className="mb-6 text-sm text-eden-sage-dim">
+      <p className="mb-6 text-sm text-eden-mute">
         <strong>답례품</strong>은 "답례품 예약" 탭에만 나오고, 빵과 따로 주문받아요. 픽업 날짜는 마을 픽업 주문과 같은 규칙(월~금, 2일 전 밤 11시 59분 마감)이고, 한 주문에 한 종류당 50개까지 담을 수 있어요.
       </p>
       {(['bakery', 'gift', 'drink'] as const).map((category) => (
         <section key={category} className="mb-10">
-          <h3 className="mb-3 border-b border-eden-line pb-2 font-serif text-lg font-semibold">{CATEGORY_LABEL[category]}</h3>
+          <h3 className="mb-3 border-b border-eden-line pb-2 font-serif text-lg font-light">{CATEGORY_LABEL[category]}</h3>
           <div className="space-y-3">
             {items
               .filter((i) => i.category === category)
@@ -161,9 +161,9 @@ function MenuRow({
   }
 
   return (
-    <div className="grid gap-4 rounded-[10px] border border-eden-line bg-eden-paper p-4 md:grid-cols-[120px_1fr]">
+    <div className="grid gap-4 rounded-[2px] border border-eden-line bg-eden-paper p-4 md:grid-cols-[120px_1fr]">
       <div>
-        <div className="mb-2 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-[10px] bg-eden-paper-dim text-xs text-eden-sage-dim">
+        <div className="mb-2 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-[2px] bg-eden-paper-dim text-xs text-eden-mute">
           {item.image_url ? <img src={item.image_url} alt="" className="h-full w-full object-cover" /> : '사진 없음'}
         </div>
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => void setPhoto(e.target.files?.[0] ?? null)} />
@@ -172,7 +172,7 @@ function MenuRow({
             {item.image_url ? '사진 변경' : '사진 올리기'}
           </button>
           {item.image_url ? (
-            <button type="button" disabled={busy} onClick={() => void setPhoto(null)} className="text-eden-sage-dim underline">
+            <button type="button" disabled={busy} onClick={() => void setPhoto(null)} className="text-eden-mute underline">
               삭제
             </button>
           ) : null}
@@ -240,7 +240,7 @@ function MenuRow({
           ) : null}
           {item.stock === 0 ? <span className="text-xs text-destructive">수량 소진</span> : null}
           <div className="ml-auto flex gap-2">
-            <button type="button" disabled={busy} onClick={() => void remove()} className="rounded-full px-3 py-2 text-sm text-eden-sage-dim hover:text-destructive">
+            <button type="button" disabled={busy} onClick={() => void remove()} className="rounded-[3px] px-3 py-2 text-sm text-eden-mute hover:text-destructive">
               삭제
             </button>
             <button type="button" disabled={busy} onClick={() => void save()} className={buttonClass}>
@@ -281,7 +281,7 @@ function NewMenuForm({ nextSortOrder, onAdded }: { nextSortOrder: number; onAdde
         e.preventDefault()
         void add()
       }}
-      className="flex flex-wrap items-center gap-2 rounded-[10px] border border-dashed border-eden-line p-4"
+      className="flex flex-wrap items-center gap-2 rounded-[2px] border border-dashed border-eden-line p-4"
     >
       <strong className="mr-2 text-sm">새 메뉴</strong>
       <input aria-label="새 메뉴 이름" placeholder="메뉴 이름" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
@@ -317,8 +317,8 @@ function GroupsEditor({ groups, onChanged }: { groups: MenuGroup[]; onChanged: (
 
   return (
     <section className="mb-10">
-      <h3 className="mb-1 border-b border-eden-line pb-2 font-serif text-lg font-semibold">빵 종류 · 수량 제한</h3>
-      <p className="mb-3 mt-2 text-sm text-eden-sage-dim">
+      <h3 className="mb-1 border-b border-eden-line pb-2 font-serif text-lg font-light">빵 종류 · 수량 제한</h3>
+      <p className="mb-3 mt-2 text-sm text-eden-mute">
         주문 페이지에서 같은 종류의 맛들을 한데 묶어 보여줘요. "한 주문 최대"를 넣으면 그 종류의 맛을 모두 합쳐 그 개수까지만 담을 수 있어요(예: 9 → 10개 이상은 별도 문의).
       </p>
       <div className="space-y-2">
@@ -370,7 +370,7 @@ function GroupRow({ group, onChanged }: { group: MenuGroup; onChanged: () => Pro
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-[10px] border border-eden-line bg-eden-paper px-4 py-2 text-sm">
+    <div className="flex flex-wrap items-center gap-3 rounded-[2px] border border-eden-line bg-eden-paper px-4 py-2 text-sm">
       <strong className="min-w-24">{group.name}</strong>
       <label className="flex items-center gap-1">
         순서
@@ -382,7 +382,7 @@ function GroupRow({ group, onChanged }: { group: MenuGroup; onChanged: () => Pro
         개
       </label>
       <div className="ml-auto flex gap-2">
-        <button type="button" disabled={busy} onClick={() => void remove()} className="rounded-full px-3 py-2 text-sm text-eden-sage-dim hover:text-destructive">
+        <button type="button" disabled={busy} onClick={() => void remove()} className="rounded-[3px] px-3 py-2 text-sm text-eden-mute hover:text-destructive">
           삭제
         </button>
         <button type="button" disabled={busy} onClick={() => void save()} className={buttonClass}>

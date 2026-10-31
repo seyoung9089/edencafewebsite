@@ -52,22 +52,22 @@ export function StaffPanel({ currentUserId, isSuper }: { currentUserId: string; 
     void refresh()
   }
 
-  if (!staff) return <p className="text-sm text-eden-sage-dim">불러오는 중…</p>
+  if (!staff) return <p className="text-sm text-eden-mute">불러오는 중…</p>
   return (
     <div>
-      <p className="mb-5 text-sm text-eden-sage-dim">
+      <p className="mb-5 text-sm text-eden-mute">
         관리자는 이 관리자 페이지 전체(주문, 문의, 메뉴, 글귀, 관리자)를 쓸 수 있어요.{' '}
         <strong className="text-eden-ink">최고 관리자</strong>만 관리자를 추가·해제하고 다른 관리자를 최고 관리자로 지정할 수 있어요.
         추가할 사람은 먼저 사이트에서 이메일로 회원가입해야 해요.
       </p>
-      <ul className="mb-6 divide-y divide-eden-line rounded-[10px] border border-eden-line bg-eden-paper">
+      <ul className="mb-6 divide-y divide-eden-line rounded-[2px] border border-eden-line bg-eden-paper">
         {staff.map((s) => (
           <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm">
             <span className="flex items-center gap-2">
               {s.email}
-              {s.id === currentUserId ? <span className="text-xs text-eden-sage-dim">(나)</span> : null}
+              {s.id === currentUserId ? <span className="text-xs text-eden-mute">(나)</span> : null}
               {s.isSuper ? (
-                <span className="rounded-full bg-eden-sand/20 px-2.5 py-0.5 text-xs font-semibold text-eden-sand">최고 관리자</span>
+                <span className="rounded-full bg-eden-accent/20 px-2.5 py-0.5 text-xs font-semibold text-eden-accent">최고 관리자</span>
               ) : null}
             </span>
             {isSuper ? (
@@ -75,11 +75,11 @@ export function StaffPanel({ currentUserId, isSuper }: { currentUserId: string; 
                 <button
                   type="button"
                   onClick={() => void setSuper(s.id, s.email, !s.isSuper)}
-                  className="text-xs text-eden-sage-dim underline hover:text-eden-sand"
+                  className="text-xs text-eden-mute underline hover:text-eden-accent"
                 >
                   {s.isSuper ? '최고 관리자 해제' : '최고 관리자로 지정'}
                 </button>
-                <button type="button" onClick={() => void remove(s.id, s.email)} className="text-xs text-eden-sage-dim underline hover:text-destructive">
+                <button type="button" onClick={() => void remove(s.id, s.email)} className="text-xs text-eden-mute underline hover:text-destructive">
                   해제
                 </button>
               </span>
@@ -101,7 +101,7 @@ export function StaffPanel({ currentUserId, isSuper }: { currentUserId: string; 
           </button>
         </form>
       ) : (
-        <p className="text-sm text-eden-sage-dim">관리자 추가·해제는 최고 관리자만 할 수 있어요.</p>
+        <p className="text-sm text-eden-mute">관리자 추가·해제는 최고 관리자만 할 수 있어요.</p>
       )}
     </div>
   )

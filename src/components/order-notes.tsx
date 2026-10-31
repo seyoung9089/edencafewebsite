@@ -57,16 +57,16 @@ export function OrderNotes({
             </>,
           ]
   return (
-    <details className={`group rounded-card border border-eden-line bg-eden-paper ${className}`}>
+    <details className={`group rounded-card border border-eden-line bg-white ${className}`}>
       <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3.5 text-[15px] font-semibold [&::-webkit-details-marker]:hidden">
         주문 전에 알아두세요
-        <ChevronDown size={18} className="shrink-0 text-eden-sage-dim transition-transform group-open:rotate-180" aria-hidden />
+        <ChevronDown size={18} className="shrink-0 text-eden-mute transition-transform group-open:rotate-180" aria-hidden />
       </summary>
       <div className="border-t border-eden-line px-4 pb-4 pt-3">
         <ul className="space-y-2 text-sm leading-relaxed">
           {notes.map((note, i) => (
             <li key={i} className="flex gap-2">
-              <span aria-hidden className="mt-2 h-1 w-1 shrink-0 rounded-full bg-eden-sage-dim" />
+              <span aria-hidden className="mt-2 h-1 w-1 shrink-0 rounded-full bg-eden-mute" />
               <span>{note}</span>
             </li>
           ))}

@@ -49,21 +49,21 @@ export function CustomersPanel() {
     })()
   }, [])
 
-  if (!rows) return <p className="text-sm text-eden-sage-dim">불러오는 중…</p>
+  if (!rows) return <p className="text-sm text-eden-mute">불러오는 중…</p>
   const q = query.trim().toLowerCase()
   const shown = q ? rows.filter((r) => r.name.toLowerCase().includes(q) || r.email.toLowerCase().includes(q)) : rows
 
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-eden-sage-dim">
+        <p className="text-sm text-eden-mute">
           가입한 고객 {rows.length}명 · 이름은 고객이 가입할 때나 내 주문에서 입력해요.
         </p>
         <input aria-label="고객 검색" placeholder="이름 · 이메일 검색" value={query} onChange={(e) => setQuery(e.target.value)} className={`w-56 ${inputClass}`} />
       </div>
-      <div className="overflow-x-auto rounded-[10px] border border-eden-line bg-eden-paper">
+      <div className="overflow-x-auto rounded-[2px] border border-eden-line bg-eden-paper">
         <table className="w-full min-w-[560px] text-sm">
-          <thead className="border-b border-eden-line text-left text-xs text-eden-sage-dim">
+          <thead className="border-b border-eden-line text-left text-xs text-eden-mute">
             <tr>
               <th className="px-4 py-3 font-normal">이름</th>
               <th className="px-4 py-3 font-normal">이메일</th>
@@ -76,17 +76,17 @@ export function CustomersPanel() {
           <tbody className="divide-y divide-eden-line">
             {shown.map((r) => (
               <tr key={r.id}>
-                <td className="px-4 py-3 font-semibold">{r.name || <span className="font-normal text-eden-sage-dim">(이름 없음)</span>}</td>
+                <td className="px-4 py-3 font-semibold">{r.name || <span className="font-normal text-eden-mute">(이름 없음)</span>}</td>
                 <td className="px-4 py-3">{r.email}</td>
                 <td className="px-4 py-3 text-right">{r.orders}건</td>
                 <td className="px-4 py-3 text-right">{r.spent.toLocaleString('ko-KR')}원</td>
-                <td className="px-4 py-3 text-eden-sage-dim">{r.favorite ?? '-'}</td>
-                <td className="px-4 py-3 text-right text-eden-sage-dim">{r.lastOrder ? new Date(r.lastOrder).toLocaleDateString('ko-KR') : '-'}</td>
+                <td className="px-4 py-3 text-eden-mute">{r.favorite ?? '-'}</td>
+                <td className="px-4 py-3 text-right text-eden-mute">{r.lastOrder ? new Date(r.lastOrder).toLocaleDateString('ko-KR') : '-'}</td>
               </tr>
             ))}
           </tbody>
         </table>
-        {shown.length === 0 ? <p className="py-6 text-center text-sm text-eden-sage-dim">해당하는 고객이 없어요.</p> : null}
+        {shown.length === 0 ? <p className="py-6 text-center text-sm text-eden-mute">해당하는 고객이 없어요.</p> : null}
       </div>
     </div>
   )

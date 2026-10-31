@@ -42,7 +42,7 @@ export const Route = createRootRoute({
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
       {
         rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&family=Gowun+Dodum&family=Nanum+Myeongjo:wght@700&family=Gowun+Batang:wght@700&display=swap',
+        href: 'https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@300;400;700&display=swap',
       },
     ],
   }),
@@ -64,7 +64,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <CustomerAuthProvider><CartProvider><GiftCartProvider>
             {children}
             <BackToTop />
-            <Toaster />
+            <Toaster
+              position="bottom-center"
+              style={{ '--normal-bg': '#2A211D', '--normal-text': '#fff', '--normal-border': '#2A211D', '--border-radius': '4px' } as React.CSSProperties}
+            />
           </GiftCartProvider></CartProvider></CustomerAuthProvider>
           <Scripts />
         </body>

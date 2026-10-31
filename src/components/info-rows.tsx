@@ -8,10 +8,10 @@ export function InfoRows({ rows, className = '' }: { rows: InfoRow[]; className?
     <dl className={`divide-y divide-eden-line text-left text-[15px] ${className}`}>
       {rows.map((row) => (
         <div key={row.label} className="grid grid-cols-[4.5rem_1fr] gap-3 py-2.5">
-          <dt className="text-eden-sage-dim">{row.label}</dt>
+          <dt className="text-eden-mute">{row.label}</dt>
           <dd>
             <span className="font-semibold">{row.value}</span>
-            {row.note ? <span className="mt-0.5 block text-sm text-eden-sage-dim">{row.note}</span> : null}
+            {row.note ? <span className="mt-0.5 block text-sm text-eden-mute">{row.note}</span> : null}
           </dd>
         </div>
       ))}

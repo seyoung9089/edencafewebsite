@@ -41,8 +41,8 @@ export function ContentPanel() {
 
   return (
     <div>
-      <h3 className="mb-2 font-serif text-lg font-semibold">이미지</h3>
-      <p className="mb-4 text-xs text-eden-sage-dim">사진을 올리면 바로 반영돼요. 사진이 없으면 기본 일러스트가 보여요.</p>
+      <h3 className="mb-2 font-serif text-lg font-light">이미지</h3>
+      <p className="mb-4 text-xs text-eden-mute">사진을 올리면 바로 반영돼요. 사진이 없으면 기본 일러스트가 보여요.</p>
       <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {IMAGE_SLOTS.map((slot) => (
           <ImageSlot key={slot.key} slotKey={slot.key} label={slot.label} desc={slot.desc} current={stored?.[slot.key] || null} />
@@ -50,29 +50,29 @@ export function ContentPanel() {
       </div>
 
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-serif text-lg font-semibold">글귀</h3>
+        <h3 className="font-serif text-lg font-light">글귀</h3>
         <button onClick={() => void save()} disabled={saving || !initialized.current} className={buttonClass}>
           {saving ? '저장 중…' : '전체 저장'}
         </button>
       </div>
-      <div className="space-y-8 rounded-[10px] border border-eden-line bg-eden-paper p-5">
+      <div className="space-y-8 rounded-[2px] border border-eden-line bg-eden-paper p-5">
         {[...groups].map(([group, fields]) => (
           <div key={group}>
-            <div className="mb-3 border-b border-eden-line pb-1.5 font-serif text-sm font-semibold text-eden-sand">{group}</div>
+            <div className="mb-3 border-b border-eden-line pb-1.5 font-serif text-sm font-light text-eden-accent">{group}</div>
             {fields.map((f) => (
               <label key={f.key} className="mb-3 block">
-                <span className="mb-1 block text-xs text-eden-sage-dim">{f.label}</span>
+                <span className="mb-1 block text-xs text-eden-mute">{f.label}</span>
                 {f.type === 'textarea' ? (
                   <textarea
                     value={values[f.key] ?? ''}
                     onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
-                    className="min-h-20 w-full rounded-[10px] border border-eden-line bg-eden-paper-dim px-3 py-2 text-sm"
+                    className="min-h-20 w-full rounded-[2px] border border-eden-line bg-eden-paper-dim px-3 py-2 text-sm"
                   />
                 ) : (
                   <input
                     value={values[f.key] ?? ''}
                     onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
-                    className="w-full rounded-[10px] border border-eden-line bg-eden-paper-dim px-3 py-2 text-sm"
+                    className="w-full rounded-[2px] border border-eden-line bg-eden-paper-dim px-3 py-2 text-sm"
                   />
                 )}
               </label>
@@ -111,10 +111,10 @@ function ImageSlot({ slotKey, label, desc, current }: { slotKey: string; label: 
   }
 
   return (
-    <div className="rounded-[10px] border border-eden-line bg-eden-paper p-4">
-      <h4 className="font-serif text-sm font-semibold">{label}</h4>
-      <p className="mb-3 text-xs text-eden-sage-dim">{desc}</p>
-      <div className="mb-3 flex h-28 items-center justify-center overflow-hidden rounded-[10px] border border-dashed border-eden-line bg-eden-paper-dim text-xs text-eden-sage-dim">
+    <div className="rounded-[2px] border border-eden-line bg-eden-paper p-4">
+      <h4 className="font-serif text-sm font-light">{label}</h4>
+      <p className="mb-3 text-xs text-eden-mute">{desc}</p>
+      <div className="mb-3 flex h-28 items-center justify-center overflow-hidden rounded-[2px] border border-dashed border-eden-line bg-eden-paper-dim text-xs text-eden-mute">
         {current ? <img src={current} alt="" className="h-full w-full object-cover" /> : '사진 없음'}
       </div>
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => void setImage(e.target.files?.[0] ?? null)} />
@@ -123,7 +123,7 @@ function ImageSlot({ slotKey, label, desc, current }: { slotKey: string; label: 
           {busy ? '저장 중…' : current ? '사진 변경' : '사진 올리기'}
         </button>
         {current ? (
-          <button type="button" disabled={busy} onClick={() => void setImage(null)} className="text-eden-sage-dim underline">
+          <button type="button" disabled={busy} onClick={() => void setImage(null)} className="text-eden-mute underline">
             삭제
           </button>
         ) : null}

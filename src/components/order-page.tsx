@@ -1,6 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
+import { OrderNotes } from '@/components/order-notes'
 import { OrderReceipt, type PaymentMethod } from '@/components/order-receipt'
 import { PickupDatePicker } from '@/components/pickup-date-picker'
 import { OrderCompleteBody, type PlacedOrder } from '@/components/order-complete'
@@ -355,6 +356,10 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
     />
   )
 
+  const notes = (
+    <OrderNotes audience={audience} bulkMessage={bulkMessage} studentDepositNote={studentDepositNote} giftMaxQty={GIFT_MAX_QTY} />
+  )
+
   const grid = 'grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 xl:grid-cols-4'
 
   return (
@@ -380,23 +385,9 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
             <School size={24} strokeWidth={1.8} className="mt-0.5 shrink-0 text-eden-sand" aria-hidden />
             <p className="text-base font-semibold leading-relaxed text-eden-ink">{fridayNotice}</p>
           </div>
-        ) : gift ? (
-          <p className="mb-8 text-sm text-eden-sage-dim">
-            답례품은 빵 주문과 따로 담겨요. 빵은{' '}
-            <Link to="/order" className="font-semibold text-eden-ink underline underline-offset-4">
-              마을 픽업 주문
-            </Link>
-            에서 주문해 주세요.
-          </p>
-        ) : (
-          <p className="mb-8 text-sm text-eden-sage-dim">
-            학생이 금요일에 찾아갈 빵은{' '}
-            <Link to="/parents" className="font-semibold text-eden-ink underline underline-offset-4">
-              학부모 주문
-            </Link>
-            에서 주문해 주세요.
-          </p>
-        )}
+        ) : null}
+
+        <div className="mb-8 lg:hidden">{notes}</div>
 
         <div className="lg:grid lg:grid-cols-[1fr_320px] lg:items-start lg:gap-8">
           <div>
@@ -501,29 +492,38 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
             ) : null}
           </div>
 
-          <aside className="sticky top-[94px] hidden lg:block">{receipt}</aside>
+          <aside className="sticky top-[94px] hidden space-y-3 lg:block">
+            {receipt}
+            {notes}
+          </aside>
         </div>
       </main>
       <SiteFooter />
       {/* Room for the fixed bottom bar on small screens */}
       <div className="h-20 lg:hidden" />
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-eden-line bg-eden-paper/95 px-4 py-3 shadow-[0_-8px_24px_-12px_rgba(14,27,22,0.35)] backdrop-blur lg:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-eden-line bg-eden-paper/95 px-4 py-3 shadow-[0_-8px_24px_-12px_rgba(14,27,22,0.35)] backdrop-blur lg:hidden">
+        <Link
+          to="/guide"
+          className="flex h-12 shrink-0 items-center rounded-full border border-eden-line bg-eden-paper px-4 text-sm font-semibold text-eden-ink"
+        >
+          이용방법
+        </Link>
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
-          className="flex h-12 w-full items-center justify-between rounded-full bg-eden-ink px-5 text-eden-paper"
+          className="flex h-12 min-w-0 flex-1 items-center justify-between gap-2 rounded-full bg-eden-ink px-5 text-eden-paper"
         >
-          <span className="text-sm">
+          <span className="truncate text-sm">
             {totalQty > 0 ? (
               <>
                 {totalQty}개 담음 · <strong className="font-serif text-base">{won(totalPrice)}</strong>
               </>
             ) : (
-              '아직 담은 메뉴가 없어요'
+              '담은 메뉴 없음'
             )}
           </span>
-          <span className="flex items-center gap-1 text-sm font-semibold">
+          <span className="flex shrink-0 items-center gap-1 text-sm font-semibold">
             주문 내역 <ChevronUp size={16} />
           </span>
         </button>
@@ -534,6 +534,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
           <SheetTitle className="sr-only">주문 내역</SheetTitle>
           <SheetDescription className="sr-only">담은 메뉴와 합계, 픽업 날짜를 확인하고 주문해요.</SheetDescription>
           {receipt}
+          <div className="mt-3">{notes}</div>
         </SheetContent>
       </Sheet>
 

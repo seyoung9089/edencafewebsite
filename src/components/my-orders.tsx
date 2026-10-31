@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Pencil } from 'lucide-react'
+import { InfoRows } from '@/components/info-rows'
 import { PaymentInfo } from '@/components/payment-info'
 import { kstTodayIso, pickupLabel } from '@/lib/pickup'
 import { useContentValue, useSiteContent } from '@/lib/site-content'
@@ -184,9 +185,7 @@ function OrderCard({ order, onCancel, highlight = false }: { order: CustomerOrde
     <article className={`rounded-card bg-eden-paper-dim p-5 shadow-soft ${highlight && order.status !== 'cancelled' ? 'border border-eden-sand/60' : ''} ${order.status === 'cancelled' ? 'opacity-60' : ''}`}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <strong className={order.status === 'wait' ? 'text-eden-sand' : ''}>{statusLabel(order)}</strong>
-        <span className="text-sm text-eden-sage-dim">
-          {orderedOn(order.created_at)} 주문 · {pickupLabel(order.pickup_date)} 픽업
-        </span>
+        <span className="text-sm text-eden-sage-dim">{orderedOn(order.created_at)} 주문</span>
       </div>
       <StatusSteps order={order} />
       {next ? <p className="mb-4 rounded-[10px] bg-eden-paper px-4 py-3 text-[15px] font-semibold leading-relaxed">{next}</p> : null}
@@ -196,12 +195,14 @@ function OrderCard({ order, onCancel, highlight = false }: { order: CustomerOrde
           {order.request_note ? <span className="ml-2 text-eden-sage-dim">{order.request_note}</span> : null}
         </p>
       ) : null}
-      {order.student_name ? (
-        <p className="mb-2 text-sm">
-          <span className="text-eden-sage-dim">학생 이름</span> <strong>{order.student_name}</strong> ·{' '}
-          {order.payment_method === 'onsite' ? '현장결제' : '계좌이체'}
-        </p>
-      ) : null}
+      <InfoRows
+        className="mb-3"
+        rows={[
+          { label: '픽업', value: pickupLabel(order.pickup_date), note: order.student_name ? '학생이 하교할 때 찾아가요' : pickupTime || undefined },
+          ...(order.student_name ? [{ label: '학생', value: order.student_name }] : []),
+          { label: '결제', value: order.payment_method === 'onsite' ? '현장결제' : '계좌이체' },
+        ]}
+      />
       {order.items.map((i) => (
         <div key={i.name} className="flex justify-between text-sm">
           <span>

@@ -138,7 +138,12 @@ export function OrderReceipt({
 }: ReceiptProps) {
   return (
     <div className="rounded-card bg-eden-paper-dim p-5 shadow-soft">
-      <h2 className="font-serif text-lg font-semibold">주문 내역</h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="font-serif text-lg font-semibold">주문 내역</h2>
+        <Link to="/guide" className="rounded-full border border-eden-line px-3 py-1 text-sm font-semibold text-eden-ink hover:bg-eden-paper">
+          이용방법
+        </Link>
+      </div>
 
       <div className="mt-3 rounded-[10px] bg-eden-sand/15 px-4 py-3">
         <div className="text-xs text-eden-sage-dim">픽업 날짜</div>

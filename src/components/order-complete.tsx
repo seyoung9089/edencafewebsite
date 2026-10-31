@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react'
+import { InfoRows } from '@/components/info-rows'
 import { CopyLabel, usePayment } from '@/components/payment-info'
 import type { PaymentMethod } from '@/components/order-receipt'
 
@@ -51,9 +52,6 @@ export function OrderCompleteBody({ order, onClose, onOrders }: BodyProps) {
       </div>
       <div>
         <h2 className="font-serif text-xl font-semibold">주문 완료!</h2>
-        <p className="mt-1 text-sm text-eden-sage-dim">
-          {pickupText(order)} 픽업{order.studentName ? ` · ${order.studentName} 학생` : ''}
-        </p>
       </div>
       {order.paymentMethod === 'onsite' ? (
         <div className="rounded-card bg-eden-paper-dim px-5 py-5">
@@ -87,9 +85,14 @@ export function OrderCompleteBody({ order, onClose, onOrders }: BodyProps) {
           <p className="mt-3 text-xs text-eden-sage-dim">{pay.note}</p>
         </div>
       )}
-      <p className="text-xs text-eden-sage-dim">
-        {itemsText(order)} · 주문번호 {order.id.slice(0, 8)}
-      </p>
+      <InfoRows
+        rows={[
+          { label: '픽업', value: pickupText(order) },
+          ...(order.studentName ? [{ label: '학생', value: order.studentName }] : []),
+          { label: '메뉴', value: itemsText(order) },
+          { label: '주문번호', value: order.id.slice(0, 8) },
+        ]}
+      />
       <StatusNote />
       <Buttons onClose={onClose} onOrders={onOrders} />
     </div>

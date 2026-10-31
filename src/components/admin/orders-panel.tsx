@@ -15,6 +15,9 @@ type Order = {
   student_name: string | null
   payment_method: 'transfer' | 'onsite'
   payment_status: 'pending' | 'confirmed' | 'onsite'
+  /** Missing on rows read before 20261031_gift_orders.sql ran */
+  order_type?: 'village' | 'parents' | 'gift'
+  request_note?: string | null
 }
 
 const PAYMENT_METHOD_LABEL = { transfer: '계좌이체', onsite: '현장결제' } as const
@@ -62,7 +65,7 @@ export function OrdersPanel() {
 
   const refresh = async () => {
     const [{ data, error }, map] = await Promise.all([
-      supabase.from('orders').select('id,user_id,items,total,status,pickup_date,created_at,student_name,payment_method,payment_status').order('created_at', { ascending: false }),
+      supabase.from('orders').select('*').order('created_at', { ascending: false }),
       fetchCustomerLabels(),
     ])
     if (error) toast.error(error.message)
@@ -171,6 +174,11 @@ export function OrdersPanel() {
           <section key={iso} className="mb-10 last:mb-0">
             <div className="mb-3 flex flex-wrap items-baseline gap-3 border-b-2 border-eden-ink pb-3">
               <h3 className="font-serif text-lg font-light">{dateLabel(iso)} 픽업</h3>
+              {active.some((o) => o.order_type === 'gift') ? (
+                <span className="rounded-full bg-eden-mute px-2.5 py-0.5 text-xs font-semibold text-eden-paper">
+                  답례품 {active.filter((o) => o.order_type === 'gift').length}건
+                </span>
+              ) : null}
               {friday ? (
                 <span className="rounded-full bg-eden-accent px-2.5 py-0.5 text-xs font-semibold text-white">
                   학부모 주문 {active.filter((o) => o.student_name).length}건
@@ -205,9 +213,15 @@ export function OrdersPanel() {
                         {o.student_name} <span className="font-sans text-xs font-normal text-eden-mute">학생 · 주문 {customers.get(o.user_id) ?? o.user_id.slice(0, 8)}</span>
                       </p>
                     ) : (
-                      <p className="text-sm font-semibold">{customers.get(o.user_id) ?? o.user_id.slice(0, 8)}</p>
+                      <p className="text-sm font-semibold">
+                        {o.order_type === 'gift' ? (
+                          <span className="mr-2 rounded-full bg-eden-mute px-2 py-0.5 text-xs text-eden-paper">답례품</span>
+                        ) : null}
+                        {customers.get(o.user_id) ?? o.user_id.slice(0, 8)}
+                      </p>
                     )}
                     <p className="text-sm">{o.items.map((i) => `${i.name} × ${i.qty}`).join(', ')}</p>
+                    {o.request_note ? <p className="mt-1 whitespace-pre-wrap text-sm text-eden-mute">요청사항: {o.request_note}</p> : null}
                   </div>
                   <span className="font-semibold">
                     {o.total.toLocaleString('ko-KR')}원 <span className="text-xs font-normal text-eden-mute">{PAYMENT_METHOD_LABEL[o.payment_method]}</span>

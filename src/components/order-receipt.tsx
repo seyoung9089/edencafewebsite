@@ -18,6 +18,10 @@ type ReceiptProps = {
   pickup: PickupDate | null
   /** 학부모 주문 tab: student name and payment choice */
   parents: boolean
+  /** 답례품 예약 tab: an optional request note */
+  gift: boolean
+  requestNote: string
+  onRequestNote: (note: string) => void
   pickupTime: string
   /** null while the login state is still loading */
   loggedIn: boolean | null
@@ -112,6 +116,9 @@ export function OrderReceipt({
   totalPrice,
   pickup,
   parents,
+  gift,
+  requestNote,
+  onRequestNote,
   pickupTime,
   loggedIn,
   submitting,
@@ -206,6 +213,22 @@ export function OrderReceipt({
         />
       ) : null}
 
+      {gift ? (
+        <label className="mt-4 block">
+          <span className="text-sm font-semibold">
+            요청사항 <span className="font-normal text-eden-mute">(선택)</span>
+          </span>
+          <textarea
+            value={requestNote}
+            onChange={(e) => onRequestNote(e.target.value)}
+            maxLength={300}
+            rows={3}
+            placeholder="예: 포장 문구, 행사 이름, 연락받을 번호"
+            className="mt-1.5 w-full rounded-[2px] border border-eden-line bg-eden-paper px-3 py-2 text-base text-eden-ink placeholder:text-eden-mute/70"
+          />
+        </label>
+      ) : null}
+
       <div className="mt-5">
         {loggedIn === null ? (
           <div className="h-14 w-full animate-pulse rounded-[3px] bg-eden-line" />
@@ -218,7 +241,7 @@ export function OrderReceipt({
               disabled={Boolean(blocker) || items.length === 0 || submitting}
               className="h-14 w-full rounded-[3px] bg-eden-accent text-base font-semibold text-white transition-colors hover:bg-eden-accent-d disabled:opacity-40"
             >
-              {submitting ? '주문하는 중…' : '주문하기'}
+              {submitting ? '주문하는 중…' : gift ? '예약하기' : '주문하기'}
             </button>
           </>
         ) : (
@@ -228,9 +251,9 @@ export function OrderReceipt({
               onClick={() => rememberReturnTo(parents ? '/parents' : '/order')}
               className="flex h-14 w-full items-center justify-center rounded-[3px] bg-eden-accent text-base font-semibold text-white transition-colors hover:bg-eden-accent-d"
             >
-              로그인하고 주문하기
+              {gift ? '로그인하고 예약하기' : '로그인하고 주문하기'}
             </Link>
-            <p className="mt-2 text-center text-xs text-eden-mute">처음이시면 회원가입부터 해요. 담은 빵은 그대로 남아 있어요.</p>
+            <p className="mt-2 text-center text-xs text-eden-mute">처음이시면 회원가입부터 해요. 담은 {gift ? '답례품' : '빵'}은 그대로 남아 있어요.</p>
           </>
         )}
         {loggedIn && (!parents || paymentMethod === 'transfer') ? (

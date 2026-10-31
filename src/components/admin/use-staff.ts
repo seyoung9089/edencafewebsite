@@ -49,6 +49,6 @@ export async function fetchCustomerLabels(): Promise<Map<string, string>> {
   return new Map(customers.map((c) => [c.id, c.name ? `${c.name} (${c.email})` : c.email]))
 }
 
-export const inputClass = 'rounded-[10px] border border-eden-line bg-eden-paper px-3 py-2 text-sm'
+export const inputClass = 'rounded-[2px] border border-eden-line bg-eden-paper px-3 py-2 text-sm'
 export const buttonClass =
   'rounded-[3px] bg-eden-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-eden-accent-d disabled:opacity-50'

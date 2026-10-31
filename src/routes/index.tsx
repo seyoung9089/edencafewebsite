@@ -152,6 +152,18 @@ function HomePage() {
           </div>
         </Link>
       </section>
+      <Link
+        to="/gifts"
+        className="pad group flex flex-wrap items-center justify-between gap-4 border-b border-eden-line bg-eden-paper-dim py-7 transition-colors hover:bg-[#E9E2D4]"
+      >
+        <span className="flex flex-wrap items-baseline gap-x-5 gap-y-1">
+          <span className="eyebrow">GIFTS</span>
+          <span className="font-serif text-[clamp(1.2rem,1.8vw,1.5rem)]">모임과 행사에 나눌 답례품도 미리 예약받아요</span>
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-[1rem] font-bold text-eden-accent group-hover:underline group-hover:underline-offset-4">
+          답례품 예약 <ArrowRight size={17} />
+        </span>
+      </Link>
 
       {/* The breads */}
       {slides.length ? (

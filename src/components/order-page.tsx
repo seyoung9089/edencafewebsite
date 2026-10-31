@@ -4,7 +4,7 @@ import { SiteFooter } from '@/components/site-footer'
 import { OrderReceipt, type PaymentMethod } from '@/components/order-receipt'
 import { PickupDatePicker } from '@/components/pickup-date-picker'
 import { OrderCompleteBody, type PlacedOrder } from '@/components/order-complete'
-import { MAX_QTY, groupTotals, maxQtyFor, overGroupLimit, reconcileCart, useCart } from '@/lib/cart'
+import { GIFT_MAX_QTY, MAX_QTY, groupTotals, maxQtyFor, overGroupLimit, reconcileCart, useCart, useGiftCart } from '@/lib/cart'
 import { pickupLabel, usePickupDates } from '@/lib/pickup'
 import { useCustomerAuth } from '@/lib/customer-auth'
 import { isPlaceholder, useContentValue, useSiteContent } from '@/lib/site-content'
@@ -16,27 +16,28 @@ import { useEffect, useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import { MenuDetailDialog } from '@/components/menu-detail'
-import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School, CalendarDays, Info } from 'lucide-react'
+import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School, CalendarDays, Info, Gift } from 'lucide-react'
 import { toast } from 'sonner'
 
 /**
  * Who a tab is for. 마을 픽업 주문: villagers order for Mon–Thu and pick up
  * themselves. 학부모 주문: parents order for Friday and the student picks up
- * after school (student name, 계좌이체/현장결제).
+ * after school (student name, 계좌이체/현장결제). 답례품 예약: gifts for an
+ * event, picked up like 마을 픽업, with their own cart and a request note.
  */
-export type OrderAudience = 'village' | 'parents'
+export type OrderAudience = 'village' | 'parents' | 'gift'
 
-const CATEGORY_ICON = { bakery: Croissant, drink: Coffee } as const
+const CATEGORY_ICON = { bakery: Croissant, drink: Coffee, gift: Gift } as const
 
 /** Max staff-curated picks marked 인기 (see menu-panel.tsx). */
 const FEATURED_COUNT = 2
 
 /** Turns database errors from place_order into something a customer can act on. */
-function orderErrorMessage(e: unknown): string {
+function orderErrorMessage(e: unknown, maxQty: number): string {
   const message = getErrorMessage(e, '주문에 실패했습니다.')
   if (message.includes('Unavailable menu item') || message.includes('Only available bakery items'))
     return `방금 품절되었거나 지금 주문할 수 없는 메뉴가 있어요: ${message.split(':').pop()?.trim()}. 주문 내역에서 빼고 다시 주문해주세요.`
-  if (message.includes('Invalid quantity')) return `한 메뉴는 ${MAX_QTY}개까지 주문할 수 있어요. 수량을 줄여주세요.`
+  if (message.includes('Invalid quantity')) return `한 메뉴는 ${maxQty}개까지 주문할 수 있어요. 수량을 줄여주세요.`
   if (message.includes('Invalid order')) return '담은 메뉴가 없거나 너무 많아요. 확인 후 다시 주문해주세요.'
   if (message.includes('Login required')) return '로그인이 필요해요.'
   return message
@@ -60,7 +61,7 @@ function MenuCard({
   onOpen: (item: MenuItem) => void
 }) {
   const Icon = CATEGORY_ICON[item.category]
-  const soldOut = item.category === 'bakery' && isSoldOut(item)
+  const soldOut = item.category !== 'drink' && isSoldOut(item)
   const unpriced = isUnpriced(item)
   const max = maxQtyFor(item)
   return (
@@ -96,7 +97,7 @@ function MenuCard({
       </button>
       <div className="mb-3 mt-1 flex flex-wrap items-baseline justify-between gap-x-2">
         <span className={unpriced ? 'text-sm text-eden-mute' : 'font-semibold text-eden-ink'}>{unpriced ? '가격 준비 중' : won(item.price)}</span>
-        {item.category === 'bakery' && item.stock !== null && item.stock > 0 ? (
+        {item.category !== 'drink' && item.stock !== null && item.stock > 0 ? (
           <span className="text-xs text-eden-mute">{item.stock}개 남음</span>
         ) : null}
       </div>
@@ -144,7 +145,7 @@ function MenuCard({
   )
 }
 
-const PICKUP_KEY = { village: 'edenPickupDate', parents: 'edenParentsPickupDate' } as const
+const PICKUP_KEY = { village: 'edenPickupDate', parents: 'edenParentsPickupDate', gift: 'edenGiftPickupDate' } as const
 const STUDENT_KEY = 'edenStudentName'
 
 function readStored(key: string): string {
@@ -162,10 +163,14 @@ function store(key: string, value: string) {
   }
 }
 
-/** The order page, shared by the 마을 픽업 주문 and 학부모 주문 tabs. */
+/** The order page, shared by the 마을 픽업 주문, 학부모 주문 and 답례품 예약 tabs. */
 export function OrderPage({ audience }: { audience: OrderAudience }) {
   const { items: menuItems, groups, error: menuError } = useMenu()
-  const { items, addItem, updateQty, removeItem, clear, replaceItems, totalQty, totalPrice } = useCart()
+  // 답례품 has its own cart, so gifts and bread never go into one order.
+  const breadCart = useCart()
+  const giftCart = useGiftCart()
+  const gift = audience === 'gift'
+  const { items, addItem, updateQty, removeItem, clear, replaceItems, totalQty, totalPrice } = gift ? giftCart : breadCart
   const calendar = usePickupDates()
   const { user, loading } = useCustomerAuth()
   const navigate = useNavigate()
@@ -184,6 +189,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
   const [pickupIso, setPickupIso] = useState<string | null>(null)
   const [studentName, setStudentName] = useState('')
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null)
+  const [requestNote, setRequestNote] = useState('')
   const menuRef = useRef<HTMLElement>(null)
 
   // 마을 픽업: every pickup day (월~금). 학부모: Fridays only.
@@ -217,7 +223,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
   // the order fail later.
   useEffect(() => {
     if (!menuItems || menuError) return
-    const { next, removed, offDay, reduced, changed } = reconcileCart(items, menuItems, pickup?.day ?? null)
+    const { next, removed, offDay, reduced, changed } = reconcileCart(items, menuItems, pickup?.day ?? null, gift ? 'gift' : 'bakery')
     if (!changed) return
     replaceItems(next)
     if (removed.length) toast.info(`품절되었거나 지금 주문할 수 없는 메뉴라 주문 내역에서 뺐어요: ${removed.join(', ')}`)
@@ -238,7 +244,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
   }
 
   const add = (item: MenuItem) => {
-    if (item.category !== 'bakery' || isSoldOut(item) || isUnpriced(item)) return
+    if (item.category !== (gift ? 'gift' : 'bakery') || isSoldOut(item) || isUnpriced(item)) return
     if (capHit(item.name, qtyOf(item.name) + 1)) return void toast.error(bulkMessage, { duration: 8000 })
     addItem({ name: item.name, price: item.price, qty: 1 })
   }
@@ -283,6 +289,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
         p_student_name: student,
         p_payment_method: method,
         p_order_type: audience,
+        p_request_note: gift ? requestNote.trim() || null : null,
       })
       if (error) throw error
       // The server priced the order; read the saved total back for the transfer amount.
@@ -299,8 +306,9 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
         studentDepositNote,
       })
       clear()
+      setRequestNote('')
     } catch (e) {
-      toast.error(orderErrorMessage(e))
+      toast.error(orderErrorMessage(e, gift ? GIFT_MAX_QTY : MAX_QTY))
     } finally {
       setSubmitting(false)
     }
@@ -314,10 +322,15 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
     .filter((i) => !i.is_featured && (popularity.get(i.name) ?? 0) > 0)
     .sort((a, b) => (popularity.get(b.name) ?? 0) - (popularity.get(a.name) ?? 0))[0]
   const popular = new Set([...featured, ...(bestBakery ? [bestBakery] : [])].map((i) => i.name))
-  const sections: { group: MenuGroup | null; title: string; items: MenuItem[] }[] = [
-    ...groups.map((g) => ({ group: g, title: g.name, items: dayBakery.filter((i) => i.group_name === g.name) })),
-    { group: null, title: '그 밖의 빵', items: dayBakery.filter((i) => !i.group_name || !groupByName.has(i.group_name)) },
-  ].filter((sec) => sec.items.length > 0)
+  const gifts = (menuItems ?? []).filter((i) => i.category === 'gift')
+  const sections: { group: MenuGroup | null; title: string; items: MenuItem[] }[] = (
+    gift
+      ? [{ group: null, title: '답례품', items: pickup ? gifts : [] }]
+      : [
+          ...groups.map((g) => ({ group: g, title: g.name, items: dayBakery.filter((i) => i.group_name === g.name) })),
+          { group: null, title: '그 밖의 빵', items: dayBakery.filter((i) => !i.group_name || !groupByName.has(i.group_name)) },
+        ]
+  ).filter((sec) => sec.items.length > 0)
   const drinks = (menuItems ?? []).filter((i) => i.category === 'drink')
 
   const receipt = (
@@ -327,6 +340,9 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
       totalPrice={totalPrice}
       pickup={pickup}
       parents={parents}
+      gift={gift}
+      requestNote={requestNote}
+      onRequestNote={setRequestNote}
       pickupTime={pickupTime}
       loggedIn={loading ? null : Boolean(user)}
       submitting={submitting}
@@ -349,21 +365,31 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
       <SiteHeader />
       {/* Page top, then the pickup day on a dark band (the reference's 예약 layout). */}
       <section className="pad pb-12 pt-[clamp(48px,7vw,100px)]">
-        <p className="eyebrow">{parents ? 'PARENTS · FRIDAY' : 'VILLAGE PICKUP'}</p>
+        <p className="eyebrow">{parents ? 'PARENTS · FRIDAY' : gift ? 'GIFTS · 답례품' : 'VILLAGE PICKUP'}</p>
         <h1 className="mb-4 mt-3 text-[clamp(1.75rem,3vw,2.6rem)] leading-[1.3]">
-          {parents ? '금요일에 찾아갈 빵을' : '고른 날 찾아갈 빵을'}
+          {parents ? '금요일에 찾아갈 빵을' : gift ? '모임과 행사에 나눌 답례품을' : '고른 날 찾아갈 빵을'}
           <br />
-          <em className="font-normal italic">미리 주문하세요.</em>
+          <em className="font-normal italic">{gift ? '미리 예약하세요.' : '미리 주문하세요.'}</em>
         </h1>
         <p className="text-[1.05rem] text-eden-mute">
           {parents
             ? '학부모님이 주문하고, 학생이 금요일 하교할 때 찾아가요.'
-            : '픽업 날짜를 먼저 고르고 빵을 담아 주세요.'}{' '}
+            : gift
+              ? '픽업 날짜를 먼저 고르고 답례품을 담아 주세요.'
+              : '픽업 날짜를 먼저 고르고 빵을 담아 주세요.'}{' '}
           <Link to="/guide" className="whitespace-nowrap font-semibold text-eden-ink underline underline-offset-4">
             처음이신가요?
           </Link>
         </p>
-        {parents ? null : (
+        {parents ? null : gift ? (
+          <p className="mt-1.5 text-[0.95rem] text-eden-mute">
+            답례품은 빵 주문과 따로 담겨요. 빵은{' '}
+            <Link to="/order" className="font-semibold text-eden-ink underline underline-offset-4">
+              마을 픽업 주문
+            </Link>
+            에서 주문해 주세요.
+          </p>
+        ) : (
           <p className="mt-1.5 text-[0.95rem] text-eden-mute">
             학생이 금요일에 찾아갈 빵은{' '}
             <Link to="/parents" className="font-semibold text-eden-ink underline underline-offset-4">
@@ -405,7 +431,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
           <div className="pt-5">
             <PickupDatePicker
               days={shownDays}
-              markFriday={!parents}
+              markFriday={!parents && !gift}
               selected={pickup?.iso ?? null}
               onSelect={choosePickup}
             />
@@ -417,7 +443,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
                 {pickupLabel(shownDays[0].iso)} ~ {pickupLabel(shownDays[shownDays.length - 1].iso)} 픽업
               </p>
             ) : null}
-            {parents ? null : (
+            {parents || gift ? null : (
               <p className="flex items-center gap-1.5">
                 <span aria-hidden className="mx-[4px] h-1.5 w-1.5 rounded-full bg-eden-accent" />
                 표시가 있는 금요일은 메뉴가 달라요.
@@ -425,7 +451,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
             )}
             <p className="flex items-center gap-1.5">
               <Info size={14} strokeWidth={1.7} aria-hidden />
-              날짜를 고르면 아래에 그날 메뉴가 나와요.
+              {gift ? '날짜를 고르면 아래에 답례품이 나와요.' : '날짜를 고르면 아래에 그날 메뉴가 나와요.'}
             </p>
           </div>
         </div>
@@ -435,14 +461,15 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
         <div className="lg:grid lg:grid-cols-[1fr_340px] lg:items-start lg:gap-10">
           <div>
             <section ref={menuRef} className="scroll-mt-[90px]">
-              <p className="eyebrow">STEP 2 · BREAD</p>
+              <p className="eyebrow">{gift ? 'STEP 2 · GIFTS' : 'STEP 2 · BREAD'}</p>
               <h2 className="mb-4 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">
-                빵 고르기{pickup ? <span className="ml-2 font-sans text-base font-normal text-eden-mute">{pickup.label} 메뉴</span> : null}
+                {gift ? '답례품 고르기' : '빵 고르기'}
+                {pickup && !gift ? <span className="ml-2 font-sans text-base font-normal text-eden-mute">{pickup.label} 메뉴</span> : null}
               </h2>
               {menuError ? <p className="text-sm text-destructive">메뉴를 불러오지 못했어요. 새로고침해주세요.</p> : null}
               {!pickup ? (
                 <p className="rounded-card border border-dashed border-eden-line px-5 py-10 text-center text-base text-eden-mute">
-                  위에서 픽업 날짜를 고르면 그날의 메뉴가 나와요.
+                  {gift ? '위에서 픽업 날짜를 고르면 답례품이 나와요.' : '위에서 픽업 날짜를 고르면 그날의 메뉴가 나와요.'}
                 </p>
               ) : !menuItems && !menuError ? (
                 <div className={grid}>
@@ -451,7 +478,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
                   ))}
                 </div>
               ) : menuItems && sections.length === 0 ? (
-                <p className="text-sm text-eden-mute">이날 주문할 수 있는 메뉴가 아직 없어요.</p>
+                <p className="text-sm text-eden-mute">{gift ? '아직 준비된 답례품이 없어요. 곧 올라올 예정이에요.' : '이날 주문할 수 있는 메뉴가 아직 없어요.'}</p>
               ) : (
                 <div className="space-y-8">
                   {sections.map((sec) => {
@@ -490,8 +517,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
               )}
             </section>
 
-            {/* Drinks can't be ordered here, so a short price list instead of big cards. */}
-            {!parents && drinks.length > 0 ? (
+            {!parents && !gift && drinks.length > 0 ? (
               <section className="mt-12">
                 <p className="eyebrow">DRINKS · 매장 전용</p>
                 <h2 className="mb-1 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">음료</h2>

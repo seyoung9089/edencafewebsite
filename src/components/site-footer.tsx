@@ -40,6 +40,7 @@ export function SiteFooter() {
           ⓒ 2026 이든 협동조합 · Since 2021
         </span>
         <span className="flex flex-wrap gap-x-4 gap-y-1">
+          <Link to="/gifts" className="hover:text-eden-ink">답례품 예약</Link>
           <Link to="/guide" className="hover:text-eden-ink">이용방법</Link>
           <Link to="/orders" className="hover:text-eden-ink">내 주문</Link>
           <Link to="/privacy" className="hover:text-eden-ink">개인정보처리방침</Link>

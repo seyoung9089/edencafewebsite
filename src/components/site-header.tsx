@@ -8,8 +8,12 @@ const NAV_LINKS = [
   { to: '/about', label: '카페소개' },
   { to: '/order', label: '마을 픽업 주문' },
   { to: '/parents', label: '학부모 주문' },
+  // 답례품 is a side service: same shape as the others, quieter colour.
+  { to: '/gifts', label: '답례품 예약', quiet: true },
   { to: '/support', label: '문의사항' },
-] as const
+] as const satisfies readonly { to: string; label: string; quiet?: boolean }[]
+
+const isQuiet = (l: (typeof NAV_LINKS)[number]) => 'quiet' in l && l.quiet
 
 /** Also in the phone menu, where the header icons are easy to miss. */
 const MOBILE_EXTRA_LINKS = [
@@ -91,7 +95,7 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
               <Link
                 key={l.to}
                 to={l.to}
-                className="border-b-2 border-transparent px-3.5 py-1.5 text-[0.95rem] font-medium hover:opacity-70"
+                className={`whitespace-nowrap border-b-2 border-transparent px-3 py-1.5 text-[0.95rem] font-medium hover:opacity-70 xl:px-3.5 ${isQuiet(l) ? 'opacity-70' : ''}`}
                 activeProps={{ className: '!border-current font-bold' }}
               >
                 {l.label}
@@ -139,7 +143,7 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
                 key={l.to}
                 to={l.to}
                 onClick={() => setMobileOpen(false)}
-                className="border-b border-eden-line py-4 font-serif text-lg last:border-b-0 hover:text-eden-accent"
+                className={`border-b border-eden-line py-4 font-serif text-lg last:border-b-0 hover:text-eden-accent ${'quiet' in l && l.quiet ? 'text-eden-mute' : ''}`}
                 activeProps={{ className: 'text-eden-accent' }}
               >
                 {l.label}

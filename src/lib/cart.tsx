@@ -7,12 +7,15 @@ import { toast } from 'sonner'
 
 export type CartItem = { name: string; price: number; qty: number }
 
-/** Most of one item a single order can hold (place_order allows 1–20). */
+/** Most of one bread a single order can hold (place_order allows 1–20). */
 export const MAX_QTY = 20
+/** Most of one gift a single 답례품 order can hold (place_order allows 1–50). */
+export const GIFT_MAX_QTY = 50
 
 /** How many of this menu item can go in the cart right now. */
-export function maxQtyFor(item: Pick<MenuItem, 'stock'> | undefined): number {
-  return Math.min(MAX_QTY, item?.stock ?? MAX_QTY)
+export function maxQtyFor(item: Pick<MenuItem, 'stock' | 'category'> | undefined): number {
+  const max = item?.category === 'gift' ? GIFT_MAX_QTY : MAX_QTY
+  return Math.min(max, item?.stock ?? max)
 }
 
 /**
@@ -21,7 +24,7 @@ export function maxQtyFor(item: Pick<MenuItem, 'stock'> | undefined): number {
  * (`offDay`), lowers quantities above what's left, and updates prices.
  * `changed` is false when the cart already matched.
  */
-export function reconcileCart(items: CartItem[], menu: MenuItem[], day: PickupDay | null = null) {
+export function reconcileCart(items: CartItem[], menu: MenuItem[], day: PickupDay | null = null, category: 'bakery' | 'gift' = 'bakery') {
   const byName = new Map(menu.map((m) => [m.name, m]))
   const removed: string[] = []
   const offDay: string[] = []
@@ -30,12 +33,12 @@ export function reconcileCart(items: CartItem[], menu: MenuItem[], day: PickupDa
   const next: CartItem[] = []
   for (const it of items) {
     const m = byName.get(it.name)
-    if (!m || m.category !== 'bakery' || isSoldOut(m) || isUnpriced(m)) {
+    if (!m || m.category !== category || isSoldOut(m) || isUnpriced(m)) {
       removed.push(it.name)
       changed = true
       continue
     }
-    if (day && !m.sale_days.includes(day)) {
+    if (category === 'bakery' && day && !m.sale_days.includes(day)) {
       offDay.push(it.name)
       changed = true
       continue
@@ -143,32 +146,79 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, readyFor])
 
+  const actions = useCartActions(items, setItems, MAX_QTY)
+
+  return (
+    <CartContext.Provider value={actions}>
+      {children}
+    </CartContext.Provider>
+  )
+}
+
+/** Add/change/remove for one cart's items; `max` caps any one item. */
+function useCartActions(items: CartItem[], setItems: (fn: (prev: CartItem[]) => CartItem[]) => void, max: number): CartContextValue {
   const addItem = (item: CartItem) => {
     setItems((prev) => {
       const existing = prev.find((it) => it.name === item.name)
       if (existing) {
-        return prev.map((it) => (it.name === item.name ? { ...it, qty: Math.min(MAX_QTY, it.qty + item.qty) } : it))
+        return prev.map((it) => (it.name === item.name ? { ...it, qty: Math.min(max, it.qty + item.qty) } : it))
       }
-      return [...prev, { ...item, qty: Math.min(MAX_QTY, item.qty) }]
+      return [...prev, { ...item, qty: Math.min(max, item.qty) }]
     })
   }
   const updateQty = (name: string, qty: number) => {
-    setItems((prev) => prev.map((it) => (it.name === name ? { ...it, qty: Math.max(1, Math.min(MAX_QTY, qty)) } : it)))
+    setItems((prev) => prev.map((it) => (it.name === name ? { ...it, qty: Math.max(1, Math.min(max, qty)) } : it)))
   }
   const removeItem = (name: string) => {
     setItems((prev) => prev.filter((it) => it.name !== name))
   }
-  const clear = () => setItems([])
-  const replaceItems = (next: CartItem[]) => setItems(next)
+  const clear = () => setItems(() => [])
+  const replaceItems = (next: CartItem[]) => setItems(() => next)
 
   const totalQty = items.reduce((s, it) => s + it.qty, 0)
   const totalPrice = items.reduce((s, it) => s + it.price * it.qty, 0)
+  return { items, addItem, updateQty, removeItem, clear, replaceItems, totalQty, totalPrice }
+}
 
-  return (
-    <CartContext.Provider value={{ items, addItem, updateQty, removeItem, clear, replaceItems, totalQty, totalPrice }}>
-      {children}
-    </CartContext.Provider>
-  )
+const GiftCartContext = createContext<CartContextValue | null>(null)
+const GIFT_STORAGE_KEY = 'edenGiftCart'
+
+/**
+ * The 답례품 cart, kept apart from the bread cart so the two never end up in
+ * one order. It lives in this browser only (the saved cart in Supabase holds
+ * bread), which is enough for a one-off gift order.
+ */
+export function GiftCartProvider({ children }: { children: ReactNode }) {
+  const [items, setItems] = useState<CartItem[]>([])
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(GIFT_STORAGE_KEY)
+      setItems(raw ? JSON.parse(raw) : [])
+    } catch {
+      /* ignore storage failures */
+    }
+    setReady(true)
+  }, [])
+
+  useEffect(() => {
+    if (!ready) return
+    try {
+      window.localStorage.setItem(GIFT_STORAGE_KEY, JSON.stringify(items))
+    } catch {
+      /* ignore storage failures */
+    }
+  }, [items, ready])
+
+  const actions = useCartActions(items, setItems, GIFT_MAX_QTY)
+  return <GiftCartContext.Provider value={actions}>{children}</GiftCartContext.Provider>
+}
+
+export function useGiftCart() {
+  const ctx = useContext(GiftCartContext)
+  if (!ctx) throw new Error('useGiftCart must be used within GiftCartProvider')
+  return ctx
 }
 
 export function useCart() {

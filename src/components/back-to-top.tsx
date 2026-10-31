@@ -12,7 +12,7 @@ export function BackToTop() {
   const [visible, setVisible] = useState(false)
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   // The order pages have a fixed order bar at the bottom on small screens; sit above it.
-  const onOrder = pathname === '/order' || pathname === '/parents'
+  const onOrder = pathname === '/order' || pathname === '/parents' || pathname === '/gifts'
   const { totalQty, totalPrice } = useCart()
   const [cartTab, setCartTab] = useState<'/order' | '/parents'>('/order')
   useEffect(() => setCartTab(lastOrderTab()), [totalQty])

@@ -40,6 +40,10 @@ export function HeroSection() {
             학부모 주문 (금요일) <ArrowRight size={18} />
           </Link>
         </div>
+
+        <Link to="/gifts" className="mt-3 inline-flex items-center gap-1.5 text-[1rem] text-white/90 underline underline-offset-[5px] hover:text-white">
+          모임·행사 답례품도 예약받아요 <ArrowRight size={16} />
+        </Link>
       </div>
     </section>
   )

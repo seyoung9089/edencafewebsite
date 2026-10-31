@@ -1,6 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
+import { OrderNotes } from '@/components/order-notes'
 import { OrderReceipt, type PaymentMethod } from '@/components/order-receipt'
 import { PickupDatePicker } from '@/components/pickup-date-picker'
 import { OrderCompleteBody, type PlacedOrder } from '@/components/order-complete'
@@ -16,7 +17,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import { MenuDetailDialog } from '@/components/menu-detail'
-import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School, CalendarDays, Info, Gift } from 'lucide-react'
+import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School, CalendarDays, Info, Gift, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 
 /**
@@ -358,6 +359,10 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
     />
   )
 
+  const notes = (
+    <OrderNotes audience={audience} bulkMessage={bulkMessage} studentDepositNote={studentDepositNote} giftMaxQty={GIFT_MAX_QTY} />
+  )
+
   const grid = 'grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 xl:grid-cols-4'
 
   return (
@@ -367,9 +372,15 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
       <section className="pad pb-12 pt-[clamp(48px,7vw,100px)]">
         <p className="eyebrow">{parents ? 'PARENTS · FRIDAY' : gift ? 'GIFTS · 답례품' : 'VILLAGE PICKUP'}</p>
         <h1 className="mb-4 mt-3 text-[clamp(1.75rem,3vw,2.6rem)] leading-[1.3]">
-          {parents ? '금요일에 찾아갈 빵을' : gift ? '모임과 행사에 나눌 답례품을' : '고른 날 찾아갈 빵을'}
-          <br />
-          <em className="font-normal italic">{gift ? '미리 예약하세요.' : '미리 주문하세요.'}</em>
+          {parents || gift ? (
+            <>
+              {parents ? '금요일에 찾아갈 빵을' : '모임과 행사에 나눌 답례품을'}
+              <br />
+              <em className="font-normal italic">{gift ? '미리 예약하세요.' : '미리 주문하세요.'}</em>
+            </>
+          ) : (
+            '마을 픽업 주문'
+          )}
         </h1>
         <p className="text-[1.05rem] text-eden-mute">
           {parents
@@ -381,23 +392,6 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
             처음이신가요?
           </Link>
         </p>
-        {parents ? null : gift ? (
-          <p className="mt-1.5 text-[0.95rem] text-eden-mute">
-            답례품은 빵 주문과 따로 담겨요. 빵은{' '}
-            <Link to="/order" className="font-semibold text-eden-ink underline underline-offset-4">
-              마을 픽업 주문
-            </Link>
-            에서 주문해 주세요.
-          </p>
-        ) : (
-          <p className="mt-1.5 text-[0.95rem] text-eden-mute">
-            학생이 금요일에 찾아갈 빵은{' '}
-            <Link to="/parents" className="font-semibold text-eden-ink underline underline-offset-4">
-              학부모 주문
-            </Link>
-            에서 주문해 주세요.
-          </p>
-        )}
       </section>
 
       <section className="pad grid gap-10 bg-eden-ink pb-[clamp(56px,7vw,100px)] pt-[clamp(56px,7vw,90px)] text-eden-paper lg:grid-cols-2 lg:gap-[8%]">
@@ -409,7 +403,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
             골라주세요.
           </h2>
           <p className="text-[1.05rem] text-eden-mute-2">
-            {parents ? '금요일 픽업은 그 주 수요일 자정까지 주문해 주세요.' : '픽업 2일 전 자정까지 주문해 주세요.'}
+            {parents ? '금요일 픽업은 그 주 수요일 밤 11시 59분까지 주문해 주세요.' : '픽업 2일 전 밤 11시 59분까지 주문해 주세요.'}
           </p>
           {parents ? (
             <div className="mt-6 flex max-w-md gap-3 border-t border-eden-paper/30 pt-5">
@@ -436,6 +430,14 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
               onSelect={choosePickup}
             />
           </div>
+          {pickup ? (
+            <p className="mt-4 flex items-start gap-2 bg-eden-paper-dim px-4 py-3 text-[1rem] leading-relaxed">
+              <Clock size={18} strokeWidth={1.7} className="mt-0.5 shrink-0 text-eden-accent" aria-hidden />
+              <span>
+                <strong>{pickup.label}</strong> 픽업은 <strong>{pickup.deadlineLabel} 밤 11시 59분</strong>까지 주문할 수 있어요.
+              </span>
+            </p>
+          ) : null}
           <div className="mt-4 space-y-1.5 text-[0.9rem] text-eden-mute">
             {shownDays?.length && !parents ? (
               <p className="flex items-center gap-1.5">
@@ -443,12 +445,6 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
                 {pickupLabel(shownDays[0].iso)} ~ {pickupLabel(shownDays[shownDays.length - 1].iso)} 픽업
               </p>
             ) : null}
-            {parents || gift ? null : (
-              <p className="flex items-center gap-1.5">
-                <span aria-hidden className="mx-[4px] h-1.5 w-1.5 rounded-full bg-eden-accent" />
-                표시가 있는 금요일은 메뉴가 달라요.
-              </p>
-            )}
             <p className="flex items-center gap-1.5">
               <Info size={14} strokeWidth={1.7} aria-hidden />
               {gift ? '날짜를 고르면 아래에 답례품이 나와요.' : '날짜를 고르면 아래에 그날 메뉴가 나와요.'}
@@ -458,6 +454,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
       </section>
 
       <main className="pad pb-16 pt-14">
+        <div className="mb-10 lg:hidden">{notes}</div>
         <div className="lg:grid lg:grid-cols-[1fr_340px] lg:items-start lg:gap-10">
           <div>
             <section ref={menuRef} className="scroll-mt-[90px]">
@@ -540,29 +537,38 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
             ) : null}
           </div>
 
-          <aside className="sticky top-[84px] hidden lg:block">{receipt}</aside>
+          <aside className="sticky top-[84px] hidden space-y-3 lg:block">
+            {receipt}
+            {notes}
+          </aside>
         </div>
       </main>
       <SiteFooter />
       {/* Room for the fixed bottom bar on small screens */}
       <div className="h-20 lg:hidden" />
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-eden-line bg-eden-paper/95 px-4 py-3 shadow-[0_-8px_24px_-12px_rgba(14,27,22,0.35)] backdrop-blur lg:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-eden-line bg-eden-paper/95 px-4 py-3 shadow-[0_-8px_24px_-12px_rgba(14,27,22,0.35)] backdrop-blur lg:hidden">
+        <Link
+          to="/guide"
+          className="flex h-12 shrink-0 items-center rounded-[3px] border border-eden-line bg-white px-4 text-sm font-semibold text-eden-ink"
+        >
+          이용방법
+        </Link>
         <button
           type="button"
           onClick={() => setSheetOpen(true)}
-          className="flex h-12 w-full items-center justify-between rounded-[3px] bg-eden-accent px-5 text-white"
+          className="flex h-12 min-w-0 flex-1 items-center justify-between gap-2 rounded-[3px] bg-eden-accent px-5 text-white"
         >
-          <span className="text-sm">
+          <span className="truncate text-sm">
             {totalQty > 0 ? (
               <>
                 {totalQty}개 담음 · <strong className="font-serif text-base">{won(totalPrice)}</strong>
               </>
             ) : (
-              '아직 담은 메뉴가 없어요'
+              '담은 메뉴 없음'
             )}
           </span>
-          <span className="flex items-center gap-1 text-sm font-semibold">
+          <span className="flex shrink-0 items-center gap-1 text-sm font-semibold">
             주문 내역 <ChevronUp size={16} />
           </span>
         </button>
@@ -573,6 +579,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
           <SheetTitle className="sr-only">주문 내역</SheetTitle>
           <SheetDescription className="sr-only">담은 메뉴와 합계, 픽업 날짜를 확인하고 주문해요.</SheetDescription>
           {receipt}
+          <div className="mt-3">{notes}</div>
         </SheetContent>
       </Sheet>
 

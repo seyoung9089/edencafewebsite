@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react'
+import { InfoRows } from '@/components/info-rows'
 import { CopyLabel, usePayment } from '@/components/payment-info'
 import type { PaymentMethod } from '@/components/order-receipt'
 
@@ -37,6 +38,7 @@ function Buttons({ onClose, onOrders }: { onClose: () => void; onOrders: () => v
 const StatusNote = () => (
   <p className="text-xs text-eden-mute">
     입금 확인, 픽업 준비 같은 주문 상태는 <strong className="text-eden-ink">내 주문</strong>에서 확인할 수 있어요.
+    <br />이 화면을 캡처해 두시면 계좌와 픽업 날짜를 다시 보기 편해요.
   </p>
 )
 
@@ -50,10 +52,6 @@ export function OrderCompleteBody({ order, onClose, onOrders }: BodyProps) {
       </div>
       <div>
         <h2 className="font-serif text-xl font-light">주문 완료!</h2>
-        <p className="mt-1 text-sm text-eden-mute">
-          {/* 학부모 주문 is picked up after school, not during shop hours. */}
-          {order.studentName ? `${order.pickupLabel} 하교할 때 ${order.studentName} 학생이 찾아가요` : `${pickupText(order)} 픽업`}
-        </p>
       </div>
       {order.paymentMethod === 'onsite' ? (
         <div className="rounded-card bg-eden-paper-dim px-5 py-5">
@@ -87,9 +85,16 @@ export function OrderCompleteBody({ order, onClose, onOrders }: BodyProps) {
           <p className="mt-3 text-xs text-eden-mute">{pay.note}</p>
         </div>
       )}
-      <p className="text-xs text-eden-mute">
-        {itemsText(order)} · 주문번호 {order.id.slice(0, 8)}
-      </p>
+      <InfoRows
+        rows={[
+          // 학부모 주문 is picked up after school, not during shop hours.
+          order.studentName
+            ? { label: '픽업', value: order.pickupLabel, note: `하교할 때 ${order.studentName} 학생이 찾아가요` }
+            : { label: '픽업', value: pickupText(order) },
+          { label: '메뉴', value: itemsText(order) },
+          { label: '주문번호', value: order.id.slice(0, 8) },
+        ]}
+      />
       <StatusNote />
       <Buttons onClose={onClose} onOrders={onOrders} />
     </div>

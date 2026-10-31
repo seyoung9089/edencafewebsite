@@ -35,6 +35,8 @@ export type CalendarDay = {
   day: PickupDay
   /** Pickup day still taking orders */
   open: boolean
+  /** Why a closed day can't be picked yet, shown inside its square */
+  closedNote: string | null
 }
 
 export const DEADLINE_DAYS = 2
@@ -124,6 +126,8 @@ export function listCalendarDays(nowMs: number, only: PickupDay | null = null, c
       weekLabel: WEEK_LABELS[week] ?? `${week}주 뒤`,
       day,
       open: i <= PICKUP_WINDOW_DAYS,
+      // Past the two-week window: it opens as the days move along.
+      closedNote: i <= PICKUP_WINDOW_DAYS ? null : i === PICKUP_WINDOW_DAYS + 1 ? '내일부터' : '아직 주문 전',
     })
   }
   return days

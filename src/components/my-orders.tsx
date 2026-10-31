@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Pencil } from 'lucide-react'
+import { InfoRows } from '@/components/info-rows'
 import { PaymentInfo } from '@/components/payment-info'
 import { kstTodayIso, pickupLabel } from '@/lib/pickup'
+import { useContentValue, useSiteContent } from '@/lib/site-content'
 
 export type CustomerOrder = {
   id: string
@@ -46,6 +48,42 @@ function statusLabel(order: CustomerOrder): string {
   if (order.payment_method === 'onsite' && order.status === 'wait') return '주문 접수 · 현장결제'
   return STATUS[order.status].label
 }
+/** Three dots and a line, so where the order is reads at a glance. */
+function StatusSteps({ order }: { order: CustomerOrder }) {
+  if (order.status === 'cancelled') return null
+  const steps = [order.payment_method === 'onsite' ? '주문 접수' : '입금 대기', '준비 중', '픽업 완료']
+  const current = order.status === 'wait' ? 0 : order.status === 'done' ? 1 : 2
+  return (
+    <ol className="mb-4 grid grid-cols-3" aria-label={`주문 상태: ${steps[current]}`}>
+      {steps.map((step, i) => (
+        <li key={step} className="relative flex flex-col items-center gap-1.5 text-center">
+          {i > 0 ? (
+            <span aria-hidden className={`absolute right-1/2 top-[7px] h-0.5 w-full ${i <= current ? 'bg-eden-ink' : 'bg-eden-line'}`} />
+          ) : null}
+          <span
+            aria-hidden
+            className={`relative h-4 w-4 rounded-full border-2 ${
+              i === current ? 'border-eden-accent bg-eden-accent' : i < current ? 'border-eden-ink bg-eden-ink' : 'border-eden-line bg-white'
+            }`}
+          />
+          <span className={`text-sm ${i === current ? 'font-semibold text-eden-ink' : 'text-eden-mute'}`}>{step}</span>
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+/** What the customer does next, in one line. */
+function nextStep(order: CustomerOrder, pickupTime: string): string | null {
+  const day = pickupLabel(order.pickup_date)
+  const when = `${day}${pickupTime ? ` ${pickupTime}` : ''}`
+  if (order.status === 'wait' && order.payment_method === 'transfer') return '아래 계좌로 입금해 주세요. 입금이 확인되면 준비를 시작해요.'
+  if (order.status === 'wait') return `${day}에 ${order.student_name ?? ''} 학생이 찾아갈 때 매장에서 결제해 주세요.`
+  if (order.status === 'done' && order.student_name) return `${day} 하교할 때 ${order.student_name} 학생이 찾아가면 돼요.`
+  if (order.status === 'done') return `${when}에 이든카페에 오셔서 이름을 말씀해 주세요.`
+  return null
+}
+
 /** "10월 27일(화)", the same way pickup days read. */
 const orderedOn = (iso: string) => pickupLabel(kstTodayIso(new Date(iso).getTime()))
 const won = (n: number) => `${n.toLocaleString('ko-KR')}원`
@@ -141,26 +179,30 @@ function CancelButton({ order, onCancel }: { order: CustomerOrder; onCancel: (id
 }
 
 function OrderCard({ order, onCancel, highlight = false }: { order: CustomerOrder; onCancel: (id: string) => Promise<boolean>; highlight?: boolean }) {
+  const pickupTime = useContentValue(useSiteContent(), 'pickup.time')
+  const next = nextStep(order, pickupTime)
   return (
     <article className={`rounded-card bg-eden-paper-dim p-5 shadow-soft ${highlight && order.status !== 'cancelled' ? 'border border-eden-accent/60' : ''} ${order.status === 'cancelled' ? 'opacity-60' : ''}`}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <strong className={order.status === 'wait' ? 'text-eden-accent' : ''}>{statusLabel(order)}</strong>
-        <span className="text-sm text-eden-mute">
-          {orderedOn(order.created_at)} 주문 · {pickupLabel(order.pickup_date)} 픽업
-        </span>
+        <span className="text-sm text-eden-mute">{orderedOn(order.created_at)} 주문</span>
       </div>
+      <StatusSteps order={order} />
+      {next ? <p className="mb-4 bg-eden-paper px-4 py-3 text-[15px] font-semibold leading-relaxed">{next}</p> : null}
       {order.order_type === 'gift' ? (
         <p className="mb-2 text-sm">
           <span className="rounded-full bg-eden-mute px-2 py-0.5 text-xs font-semibold text-eden-paper">답례품</span>
           {order.request_note ? <span className="ml-2 text-eden-mute">{order.request_note}</span> : null}
         </p>
       ) : null}
-      {order.student_name ? (
-        <p className="mb-2 text-sm">
-          <span className="text-eden-mute">학생 이름</span> <strong>{order.student_name}</strong> ·{' '}
-          {order.payment_method === 'onsite' ? '현장결제' : '계좌이체'}
-        </p>
-      ) : null}
+      <InfoRows
+        className="mb-3"
+        rows={[
+          { label: '픽업', value: pickupLabel(order.pickup_date), note: order.student_name ? '학생이 하교할 때 찾아가요' : pickupTime || undefined },
+          ...(order.student_name ? [{ label: '학생', value: order.student_name }] : []),
+          { label: '결제', value: order.payment_method === 'onsite' ? '현장결제' : '계좌이체' },
+        ]}
+      />
       {order.items.map((i) => (
         <div key={i.name} className="flex justify-between text-sm">
           <span>
@@ -177,6 +219,9 @@ function OrderCard({ order, onCancel, highlight = false }: { order: CustomerOrde
         <>
           {order.payment_method === 'transfer' ? <PaymentInfo total={order.total} className="mt-3" /> : null}
           <CancelButton order={order} onCancel={onCancel} />
+          <p className="mt-1.5 text-center text-xs text-eden-mute">
+            {order.payment_method === 'transfer' ? '입금이 확인되기 전까지만 취소할 수 있어요.' : '준비가 시작되기 전까지만 취소할 수 있어요.'}
+          </p>
         </>
       ) : null}
     </article>

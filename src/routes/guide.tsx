@@ -33,7 +33,7 @@ function GuidePage() {
     },
     {
       q: '언제까지 주문해야 하나요?',
-      a: '픽업하는 날 2일 전 자정까지예요. 예를 들어 금요일에 찾아가려면 수요일 자정까지 주문해 주세요. 2주 뒤 픽업까지 미리 주문할 수 있어요.',
+      a: '픽업하는 날 2일 전 밤 11시 59분까지예요. 예를 들어 금요일에 찾아가려면 수요일 밤 11시 59분까지 주문해 주세요. 날짜를 고르면 그날의 마감 시각이 바로 아래에 나와요. 2주 뒤 픽업까지 미리 주문할 수 있어요.',
     },
     {
       q: '학부모 주문은 뭐가 다른가요?',
@@ -63,7 +63,7 @@ function GuidePage() {
 
         <div className="mb-10 flex flex-wrap gap-2 text-sm">
           <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2">월~금 픽업</span>
-          <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2">픽업 2일 전 자정까지 주문</span>
+          <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2">픽업 2일 전 밤 11시 59분까지 주문</span>
           {pickupTime ? <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2">픽업 시간 {pickupTime}</span> : null}
         </div>
 

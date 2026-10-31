@@ -133,7 +133,7 @@ function HomePage() {
             </div>
           </div>
           <div className="flex items-end justify-between gap-4">
-            <span className="text-[0.95rem] opacity-90">픽업 2일 전 자정까지 주문</span>
+            <span className="text-[0.95rem] opacity-90">픽업 2일 전 밤 11시 59분까지 주문</span>
             <span className={`${go} border-white`} aria-hidden><ArrowRight size={20} /></span>
           </div>
         </Link>
@@ -147,7 +147,7 @@ function HomePage() {
             </div>
           </div>
           <div className="flex items-end justify-between gap-4">
-            <span className="text-[0.95rem] opacity-90">그 주 수요일 자정까지 주문</span>
+            <span className="text-[0.95rem] opacity-90">그 주 수요일 밤 11시 59분까지 주문</span>
             <span className={`${go} border-eden-pane-ink`} aria-hidden><ArrowRight size={20} /></span>
           </div>
         </Link>
@@ -190,7 +190,7 @@ function HomePage() {
         <Reveal className="mb-9 grid gap-5 md:grid-cols-3">
           <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
             <CalendarDays size={28} strokeWidth={1.6} />
-            <b className="font-serif text-[1.25rem] font-normal">픽업 2일 전 자정까지</b>
+            <b className="font-serif text-[1.25rem] font-normal">픽업 2일 전 밤 11시 59분까지</b>
             <span className="text-[0.95rem] opacity-90">주문 마감</span>
           </div>
           <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">

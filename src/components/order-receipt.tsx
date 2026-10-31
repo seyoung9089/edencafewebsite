@@ -7,6 +7,11 @@ import { CopyLabel, usePayment } from '@/components/payment-info'
 import { rememberReturnTo } from '@/lib/return-to'
 
 const won = (n: number) => `${n.toLocaleString('ko-KR')}원`
+/** "11/2(월)" for the order button. */
+const shortDate = (iso: string) => {
+  const d = new Date(`${iso}T00:00:00Z`)
+  return `${d.getUTCMonth() + 1}/${d.getUTCDate()}(${'일월화수목금토'[d.getUTCDay()]})`
+}
 
 export type PaymentMethod = 'transfer' | 'onsite'
 
@@ -134,8 +139,15 @@ export function OrderReceipt({
 }: ReceiptProps) {
   return (
     <div className="border border-eden-line bg-white p-5">
-      <p className="eyebrow">YOUR ORDER</p>
-      <h2 className="mt-1.5 text-[1.35rem]">주문 내역</h2>
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <p className="eyebrow">YOUR ORDER</p>
+          <h2 className="mt-1.5 text-[1.35rem]">주문 내역</h2>
+        </div>
+        <Link to="/guide" className="rounded-[3px] border border-eden-line px-3 py-1.5 text-sm font-semibold text-eden-ink hover:bg-eden-paper">
+          이용방법
+        </Link>
+      </div>
 
       <div className="mt-3 border-y border-eden-line py-3">
         <div className="text-xs text-eden-mute">픽업 날짜</div>
@@ -145,7 +157,6 @@ export function OrderReceipt({
               {pickup.label}
               {pickupTime && !parents ? <span className="ml-1.5 font-sans text-sm font-normal text-eden-mute">{pickupTime}</span> : null}
             </div>
-            {parents ? <p className="mt-1 text-xs leading-relaxed text-eden-mute">학생이 금요일 하교할 때 찾아가요.</p> : null}
           </>
         ) : (
           <div className="font-semibold text-eden-accent">먼저 픽업 날짜를 골라 주세요</div>
@@ -235,13 +246,30 @@ export function OrderReceipt({
         ) : loggedIn ? (
           <>
             {blocker && items.length > 0 ? <p className="mb-2 text-center text-sm font-semibold text-eden-accent">{blocker}</p> : null}
+            {!blocker && items.length > 0 && pickup ? (
+              <ul className="mb-3 space-y-1 bg-eden-paper px-4 py-3 text-sm leading-relaxed">
+                <li>
+                  <span className="text-eden-mute">픽업</span> <strong>{pickup.label}</strong>
+                  {pickupTime && !parents ? ` ${pickupTime}` : ''}
+                </li>
+                <li>
+                  <span className="text-eden-mute">결제</span>{' '}
+                  <strong>{parents && paymentMethod === 'onsite' ? '현장결제' : '계좌이체'}</strong>
+                </li>
+                <li className="text-eden-mute">
+                  {parents && paymentMethod === 'onsite'
+                    ? '준비가 시작되기 전까지 내 주문에서 취소할 수 있어요.'
+                    : '입금이 확인되기 전까지 내 주문에서 취소할 수 있어요.'}
+                </li>
+              </ul>
+            ) : null}
             <button
               type="button"
               onClick={onCheckout}
               disabled={Boolean(blocker) || items.length === 0 || submitting}
               className="h-14 w-full rounded-[3px] bg-eden-accent text-base font-semibold text-white transition-colors hover:bg-eden-accent-d disabled:opacity-40"
             >
-              {submitting ? '주문하는 중…' : gift ? '예약하기' : '주문하기'}
+              {submitting ? '주문하는 중…' : `${pickup ? `${shortDate(pickup.iso)} 픽업 ` : ''}${gift ? '예약하기' : '주문하기'}`}
             </button>
           </>
         ) : (

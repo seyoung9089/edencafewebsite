@@ -41,7 +41,7 @@ export function usePayment() {
       await copyText(account.replace(/[^0-9]/g, ''), near ?? null)
       setCopied(true)
     } catch {
-      toast.error('복사하지 못했어요. 계좌번호를 직접 입력해주세요.')
+      toast.error('복사하지 못했습니다. 계좌번호를 보고 직접 입력하시면 됩니다.')
     }
   }
   return { bank: cv('payment.bank'), account, holder: cv('payment.holder'), note: cv('payment.note'), copy, copied }

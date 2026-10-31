@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { Pencil } from 'lucide-react'
+import { ChevronDown, Pencil } from 'lucide-react'
 import { InfoRows } from '@/components/info-rows'
 import { PaymentInfo } from '@/components/payment-info'
 import { kstTodayIso, pickupLabel } from '@/lib/pickup'
@@ -43,11 +43,6 @@ const STATUS = {
 
 export { pickupLabel }
 
-/** 현장결제 orders aren't waiting on a transfer, so 'wait' reads differently. */
-function statusLabel(order: CustomerOrder): string {
-  if (order.payment_method === 'onsite' && order.status === 'wait') return '주문 접수 · 현장결제'
-  return STATUS[order.status].label
-}
 /** Three dots and a line, so where the order is reads at a glance. */
 function StatusSteps({ order }: { order: CustomerOrder }) {
   if (order.status === 'cancelled') return null
@@ -74,13 +69,11 @@ function StatusSteps({ order }: { order: CustomerOrder }) {
 }
 
 /** What the customer does next, in one line. */
-function nextStep(order: CustomerOrder, pickupTime: string): string | null {
-  const day = pickupLabel(order.pickup_date)
-  const when = `${day}${pickupTime ? ` ${pickupTime}` : ''}`
-  if (order.status === 'wait' && order.payment_method === 'transfer') return '아래 계좌로 입금해 주세요. 입금이 확인되면 준비를 시작해요.'
-  if (order.status === 'wait') return `${day}에 ${order.student_name ?? ''} 학생이 찾아갈 때 매장에서 결제해 주세요.`
-  if (order.status === 'done' && order.student_name) return `${day} 하교할 때 ${order.student_name} 학생이 찾아가면 돼요.`
-  if (order.status === 'done') return `${when}에 이든카페에 오셔서 이름을 말씀해 주세요.`
+function nextStep(order: CustomerOrder): string | null {
+  if (order.status === 'wait' && order.payment_method === 'transfer') return '아래 계좌로 입금해 주시기 바랍니다. 입금이 확인되면 준비를 시작합니다.'
+  if (order.status === 'wait') return '학생이 찾아갈 때 매장에서 결제하시면 됩니다.'
+  if (order.status === 'done' && order.student_name) return '학생이 매장에서 이름을 말하고 찾아가면 됩니다.'
+  if (order.status === 'done') return '이든카페에 오셔서 이름을 말씀하시면 됩니다.'
   return null
 }
 
@@ -108,7 +101,7 @@ function NameLine({ name, onSave, className = '', suffix = '님' }: { name: stri
       >
         <input
           aria-label="이름"
-          placeholder="이름을 입력해주세요"
+          placeholder="이름"
           maxLength={30}
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -122,7 +115,7 @@ function NameLine({ name, onSave, className = '', suffix = '님' }: { name: stri
             취소
           </button>
         ) : (
-          <span className="text-xs opacity-70">픽업할 때 확인할 이름이에요.</span>
+          <span className="text-xs opacity-70">픽업할 때 확인할 이름입니다.</span>
         )}
       </form>
     )
@@ -150,7 +143,7 @@ function QuickLinks({ onSignOut, className = '' }: { onSignOut: () => void; clas
 
 const Empty = () => (
   <div className="rounded-card bg-eden-paper-dim py-12 text-center text-sm text-eden-mute">
-    아직 주문 내역이 없어요.{' '}
+    아직 주문 내역이 없습니다.{' '}
     <Link to="/order" className="font-semibold text-eden-ink underline">메뉴 보러 가기</Link>
   </div>
 )
@@ -166,65 +159,146 @@ function CancelButton({ order, onCancel }: { order: CustomerOrder; onCancel: (id
       type="button"
       disabled={busy}
       onClick={async () => {
-        if (!window.confirm('이 주문을 취소할까요? 취소한 주문은 되돌릴 수 없어요.')) return
+        if (!window.confirm('이 주문을 취소하시겠습니까? 취소한 주문은 되돌릴 수 없습니다.')) return
         setBusy(true)
         await onCancel(order.id)
         setBusy(false)
       }}
-      className="mt-3 w-full rounded-[3px] border border-eden-line py-2.5 text-sm text-eden-mute hover:bg-eden-paper disabled:opacity-50"
+      className="text-[15px] text-eden-mute underline underline-offset-4 hover:text-eden-ink disabled:opacity-50"
     >
       {busy ? '취소하는 중…' : '주문 취소'}
     </button>
   )
 }
 
-function OrderCard({ order, onCancel, highlight = false }: { order: CustomerOrder; onCancel: (id: string) => Promise<boolean>; highlight?: boolean }) {
-  const pickupTime = useContentValue(useSiteContent(), 'pickup.time')
-  const next = nextStep(order, pickupTime)
+const kindLabel = (order: CustomerOrder) =>
+  order.order_type === 'gift' ? '답례품 예약' : order.order_type === 'parents' || order.student_name ? '학부모 주문' : '마을 픽업 주문'
+
+/** "소금빵 외 2가지 · 총 5개": the whole basket in one line, details folded below. */
+function itemsSummary(order: CustomerOrder): string {
+  const first = order.items[0]
+  if (!first) return '담은 메뉴 없음'
+  const count = order.items.reduce((n, i) => n + i.qty, 0)
+  const rest = order.items.length - 1
+  return `${first.name}${rest > 0 ? ` 외 ${rest}가지` : ''} · 총 ${count}개`
+}
+
+function StatusChip({ order }: { order: CustomerOrder }) {
+  const label = order.payment_method === 'onsite' && order.status === 'wait' ? '주문 접수' : STATUS[order.status].short
+  return <span className={`shrink-0 rounded-[3px] px-2.5 py-1 text-sm font-semibold ${STATUS[order.status].tone}`}>{label}</span>
+}
+
+/** Everything that isn't needed at a glance: each item, payment, student, request, order date. */
+function OrderDetails({ order }: { order: CustomerOrder }) {
   return (
-    <article className={`rounded-card bg-eden-paper-dim p-5 shadow-soft ${highlight && order.status !== 'cancelled' ? 'border border-eden-accent/60' : ''} ${order.status === 'cancelled' ? 'opacity-60' : ''}`}>
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <strong className={order.status === 'wait' ? 'text-eden-accent' : ''}>{statusLabel(order)}</strong>
-        <span className="text-sm text-eden-mute">{orderedOn(order.created_at)} 주문</span>
+    <details className="group border-t border-eden-line">
+      <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-3.5 text-[15px] font-semibold">
+        주문 상세 보기
+        <ChevronDown size={18} className="text-eden-mute transition-transform group-open:rotate-180" aria-hidden />
+      </summary>
+      <div className="px-5 pb-5">
+        <ul className="mb-3 space-y-1.5 text-[15px]">
+          {order.items.map((i) => (
+            <li key={i.name} className="flex justify-between gap-3">
+              <span>
+                {i.name} × {i.qty}
+              </span>
+              <span>{won(i.price * i.qty)}</span>
+            </li>
+          ))}
+        </ul>
+        <InfoRows
+          className="border-t border-eden-line"
+          rows={[
+            { label: '결제', value: order.payment_method === 'onsite' ? '현장결제' : '계좌이체' },
+            ...(order.student_name ? [{ label: '학생', value: order.student_name }] : []),
+            ...(order.request_note ? [{ label: '요청사항', value: order.request_note }] : []),
+            { label: '주문일', value: orderedOn(order.created_at) },
+          ]}
+        />
       </div>
-      <StatusSteps order={order} />
-      {next ? <p className="mb-4 bg-eden-paper px-4 py-3 text-[15px] font-semibold leading-relaxed">{next}</p> : null}
-      {order.order_type === 'gift' ? (
-        <p className="mb-2 text-sm">
-          <span className="rounded-full bg-eden-mute px-2 py-0.5 text-xs font-semibold text-eden-paper">답례품</span>
-          {order.request_note ? <span className="ml-2 text-eden-mute">{order.request_note}</span> : null}
-        </p>
-      ) : null}
-      <InfoRows
-        className="mb-3"
-        rows={[
-          { label: '픽업', value: pickupLabel(order.pickup_date), note: order.student_name ? '학생이 하교할 때 찾아가요' : pickupTime || undefined },
-          ...(order.student_name ? [{ label: '학생', value: order.student_name }] : []),
-          { label: '결제', value: order.payment_method === 'onsite' ? '현장결제' : '계좌이체' },
-        ]}
-      />
-      {order.items.map((i) => (
-        <div key={i.name} className="flex justify-between text-sm">
-          <span>
-            {i.name} × {i.qty}
-          </span>
-          <span>{won(i.price * i.qty)}</span>
+    </details>
+  )
+}
+
+/**
+ * One order, read top to bottom in the order a customer asks: when do I pick
+ * it up → where is it now → what do I do next → what did I order. Item lines
+ * and the rest fold under 주문 상세 보기.
+ */
+function OrderCard({ order, onCancel }: { order: CustomerOrder; onCancel: (id: string) => Promise<boolean> }) {
+  const pickupTime = useContentValue(useSiteContent(), 'pickup.time')
+  const next = nextStep(order)
+  const when = order.student_name ? `하교할 때 ${order.student_name} 학생이 찾아갑니다` : pickupTime
+  return (
+    <article className={`border border-eden-line bg-white ${order.status === 'cancelled' ? 'opacity-60' : ''}`}>
+      <header className="flex items-start justify-between gap-3 px-5 pb-4 pt-5">
+        <div>
+          <p className="text-[15px] text-eden-mute">{kindLabel(order)}</p>
+          <h4 className="mt-0.5 text-[1.35rem] font-bold leading-snug">{pickupLabel(order.pickup_date)} 픽업</h4>
+          {when ? <p className="text-[15px] text-eden-mute">{when}</p> : null}
         </div>
-      ))}
-      <div className="mt-3 flex justify-between border-t border-eden-line pt-3 font-semibold">
-        <span>합계</span>
-        <span>{won(order.total)}</span>
+        <StatusChip order={order} />
+      </header>
+      <div className="px-5">
+        <StatusSteps order={order} />
       </div>
+      {next ? <p className="mx-5 mb-4 bg-eden-paper px-4 py-3 text-base font-semibold leading-relaxed">{next}</p> : null}
+      {order.status === 'wait' && order.payment_method === 'transfer' ? <PaymentInfo total={order.total} className="mx-5 mb-4" /> : null}
+      <div className="flex items-baseline justify-between gap-3 border-t border-eden-line px-5 py-4">
+        <span className="text-base">{itemsSummary(order)}</span>
+        <strong className="shrink-0 text-lg">{won(order.total)}</strong>
+      </div>
+      <OrderDetails order={order} />
       {order.status === 'wait' ? (
-        <>
-          {order.payment_method === 'transfer' ? <PaymentInfo total={order.total} className="mt-3" /> : null}
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-eden-line px-5 py-3.5">
+          <span className="text-sm text-eden-mute">
+            {order.payment_method === 'transfer' ? '입금 확인 전까지 취소할 수 있습니다' : '준비 시작 전까지 취소할 수 있습니다'}
+          </span>
           <CancelButton order={order} onCancel={onCancel} />
-          <p className="mt-1.5 text-center text-xs text-eden-mute">
-            {order.payment_method === 'transfer' ? '입금이 확인되기 전까지만 취소할 수 있어요.' : '준비가 시작되기 전까지만 취소할 수 있어요.'}
-          </p>
-        </>
+        </div>
       ) : null}
     </article>
+  )
+}
+
+/** A past order as one line (날짜 · 메뉴 · 금액 · 상태); tap to see the rest. */
+function PastOrderRow({ order }: { order: CustomerOrder }) {
+  return (
+    <details className={`group border-b border-eden-line ${order.status === 'cancelled' ? 'opacity-60' : ''}`}>
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 py-4">
+        <div className="min-w-0">
+          <div className="text-base font-semibold">{pickupLabel(order.pickup_date)} 픽업</div>
+          <div className="text-[15px] text-eden-mute">
+            {itemsSummary(order)} · {won(order.total)}
+          </div>
+        </div>
+        <span className="flex shrink-0 items-center gap-2">
+          <StatusChip order={order} />
+          <ChevronDown size={18} className="text-eden-mute transition-transform group-open:rotate-180" aria-hidden />
+        </span>
+      </summary>
+      <div className="pb-4">
+        <ul className="mb-2 space-y-1.5 text-[15px]">
+          {order.items.map((i) => (
+            <li key={i.name} className="flex justify-between gap-3">
+              <span>
+                {i.name} × {i.qty}
+              </span>
+              <span>{won(i.price * i.qty)}</span>
+            </li>
+          ))}
+        </ul>
+        <InfoRows
+          className="border-t border-eden-line"
+          rows={[
+            { label: '종류', value: kindLabel(order) },
+            { label: '결제', value: order.payment_method === 'onsite' ? '현장결제' : '계좌이체' },
+            { label: '주문일', value: orderedOn(order.created_at) },
+          ]}
+        />
+      </div>
+    </details>
   )
 }
 
@@ -238,7 +312,7 @@ function TodaySection({ title, subtitle, orders, empty, onCancel }: { title: str
       {orders.length ? (
         <div className="space-y-3">
           {orders.map((o) => (
-            <OrderCard key={o.id} order={o} onCancel={onCancel} highlight />
+            <OrderCard key={o.id} order={o} onCancel={onCancel} />
           ))}
         </div>
       ) : (
@@ -256,8 +330,6 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut, onCan
   const upcoming = orders.filter((o) => o.pickup_date > todayIso).sort((a, b) => a.pickup_date.localeCompare(b.pickup_date))
   const others = orders.filter((o) => o.pickup_date < todayIso)
   const shown = filter === 'all' ? others : others.filter((o) => o.status === filter)
-  const byDay = new Map<string, CustomerOrder[]>()
-  for (const o of shown) byDay.set(orderedOn(o.created_at), [...(byDay.get(orderedOn(o.created_at)) ?? []), o])
 
   return (
     <div>
@@ -275,7 +347,7 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut, onCan
           subtitle={`${pickupLabel(todayIso)} · 오늘 챙겨야 할 주문`}
           orders={pickupToday}
           onCancel={onCancel}
-          empty="오늘 픽업할 주문이 없어요."
+          empty="오늘 픽업할 주문이 없습니다."
         />
         <TodaySection
           title="다가오는 픽업"
@@ -284,7 +356,7 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut, onCan
           onCancel={onCancel}
           empty={
             <>
-              미리 주문한 메뉴가 없어요. 픽업 2일 전까지 주문할 수 있어요.{' '}
+              미리 주문한 메뉴가 없습니다. 픽업 2일 전까지 주문할 수 있습니다.{' '}
               <Link to="/order" className="font-semibold text-eden-ink underline">메뉴 보기</Link>
             </>
           }
@@ -293,11 +365,14 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut, onCan
 
       <h3 className="mb-4 font-serif text-lg font-light">지난 주문</h3>
       {others.length === 0 ? (
-        orders.length === 0 ? <Empty /> : <p className="text-sm text-eden-mute">지난 주문이 없어요.</p>
+        orders.length === 0 ? <Empty /> : <p className="text-sm text-eden-mute">지난 주문이 없습니다.</p>
       ) : (
         <>
           <div className="mb-6 flex flex-wrap gap-2">
-            {(['all', 'wait', 'done', 'picked', 'cancelled'] as const).map((f) => (
+            {(['all', 'wait', 'done', 'picked', 'cancelled'] as const)
+              // A filter with nothing in it is just noise.
+              .filter((f) => f === 'all' || others.some((o) => o.status === f))
+              .map((f) => (
               <button
                 key={f}
                 type="button"
@@ -308,16 +383,11 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut, onCan
               </button>
             ))}
           </div>
-          {[...byDay].map(([day, list]) => (
-            <section key={day} className="mb-8">
-              <h4 className="mb-3 text-sm font-semibold text-eden-mute">{day} 주문</h4>
-              <div className="space-y-3">
-                {list.map((o) => (
-                  <OrderCard key={o.id} order={o} onCancel={onCancel} />
-                ))}
-              </div>
-            </section>
-          ))}
+          <div className="border-t border-eden-line">
+            {shown.map((o) => (
+              <PastOrderRow key={o.id} order={o} />
+            ))}
+          </div>
         </>
       )}
     </div>

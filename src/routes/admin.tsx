@@ -89,7 +89,7 @@ function AdminPage() {
     <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
       <section className="px-6 pb-24 pt-[clamp(48px,7vw,96px)] md:px-8">
-        <p className="eyebrow mb-3">ADMIN</p>
+        <p className="eyebrow mb-3">관리자</p>
         <h1 className="mb-3 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">관리자 페이지</h1>
         <p className="mb-10 text-[15px] text-eden-mute">주문 · 고객 · 문의 · 메뉴 · 글귀 · 관리자를 한곳에서 관리해요.</p>
 

@@ -32,13 +32,13 @@ export function takeReturnTo(): string | null {
 /** Supabase Auth messages a customer may see, in plain Korean. */
 export function authErrorMessage(message: string): string {
   const m = message.toLowerCase()
-  if (m.includes('invalid login credentials')) return '이메일이나 비밀번호가 맞지 않아요. 다시 확인해 주세요.'
-  if (m.includes('email not confirmed')) return '아직 이메일 인증을 하지 않았어요. 가입할 때 받은 메일의 링크를 먼저 눌러 주세요.'
-  if (m.includes('already registered') || m.includes('already been registered')) return '이미 가입된 이메일이에요. 로그인해 주세요.'
-  if (m.includes('password should be at least') || m.includes('weak password')) return '비밀번호는 6자 이상으로 정해 주세요.'
-  if (m.includes('unable to validate email') || m.includes('invalid email')) return '이메일 주소를 다시 확인해 주세요.'
-  if (m.includes('rate limit') || m.includes('too many') || m.includes('security purposes')) return '잠시 뒤에 다시 시도해 주세요.'
-  if (m.includes('failed to fetch') || m.includes('network')) return '인터넷 연결을 확인하고 다시 시도해 주세요.'
+  if (m.includes('invalid login credentials')) return '이메일이나 비밀번호가 맞지 않습니다. 한 번 더 확인해 주시기 바랍니다.'
+  if (m.includes('email not confirmed')) return '아직 이메일 인증을 하지 않았습니다. 가입할 때 받은 메일의 링크를 누르시면 로그인할 수 있습니다.'
+  if (m.includes('already registered') || m.includes('already been registered')) return '이미 가입된 이메일입니다. 이 이메일로 로그인하시면 됩니다.'
+  if (m.includes('password should be at least') || m.includes('weak password')) return '비밀번호는 6자 이상이어야 합니다.'
+  if (m.includes('unable to validate email') || m.includes('invalid email')) return '이메일 주소를 다시 확인해 주시기 바랍니다.'
+  if (m.includes('rate limit') || m.includes('too many') || m.includes('security purposes')) return '요청이 많아 잠시 막혔습니다. 몇 분 뒤 다시 시도하시면 됩니다.'
+  if (m.includes('failed to fetch') || m.includes('network')) return '인터넷 연결을 확인하고 다시 시도해 주시기 바랍니다.'
   return message
 }
 

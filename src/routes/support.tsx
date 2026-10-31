@@ -29,7 +29,7 @@ function SupportPage() {
   }
   useEffect(() => { if (user) void load(user.id); else setInquiries([]) }, [user?.id])
   const submit = async () => {
-    if (!user || !title.trim() || !content.trim()) { toast.error('제목과 내용을 입력해주세요.'); return }
+    if (!user || !title.trim() || !content.trim()) { toast.error('제목과 내용을 입력해 주시기 바랍니다.'); return }
     setBusy(true)
     const { error } = await supabase.from('inquiries').insert({ user_id: user.id, category, title: title.trim(), content: content.trim() })
     setBusy(false)
@@ -37,9 +37,9 @@ function SupportPage() {
     setTitle(''); setContent(''); toast.success('문의가 접수되었습니다.'); void load(user.id)
   }
   return <div className="min-h-screen bg-eden-paper text-eden-ink"><SiteHeader /><main className="mx-auto max-w-5xl px-6 pb-24 pt-[clamp(48px,7vw,96px)]">
-    <p className="eyebrow mb-3">NEWS & QUESTIONS</p>
+    <p className="eyebrow mb-3">새소식 · 문의</p>
         <h1 className="mb-3 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">문의사항</h1>
-    <p className="mb-10 text-[15px] text-eden-mute">이든의 새소식을 먼저 확인하시고, 궁금한 점은 아래에 남겨주세요.</p>
+    <p className="mb-10 text-[15px] text-eden-mute">이든의 새소식을 먼저 확인하시고, 궁금한 점은 아래에 남겨 주시면 답해 드리겠습니다.</p>
 
     <section className="mb-16">
       <h2 className="mb-4 font-serif text-xl font-light">새소식</h2>
@@ -55,8 +55,8 @@ function SupportPage() {
     </section>
 
     <section id="inquiry" className="scroll-mt-24">
-    <h2 className="mb-2 font-serif text-xl font-light">문의하기</h2><p className="mb-6 text-[15px] text-eden-mute">궁금한 점을 남겨주시면 빠르게 답변드릴게요. 주문하는 방법은 <Link to="/guide" className="font-semibold text-eden-ink underline underline-offset-4">픽업 이용방법</Link>에도 정리해두었어요.</p>
-    {loading ? <p>로그인 상태 확인 중…</p> : !user ? <div><p className="mb-4">로그인 후 문의를 남길 수 있어요.</p><Link to="/login" onClick={() => rememberReturnTo('/support')} className="inline-block bg-eden-accent px-7 py-3 text-white rounded-[3px] transition-colors hover:bg-eden-accent-d">로그인하기</Link></div> : <div className="grid gap-7 lg:grid-cols-[1.3fr_1fr]">
+    <h2 className="mb-2 font-serif text-xl font-light">문의하기</h2><p className="mb-6 text-[15px] text-eden-mute">궁금한 점을 남겨 주시면 빠르게 답변드리겠습니다. 주문하는 방법은 <Link to="/guide" className="font-semibold text-eden-ink underline underline-offset-4">픽업 이용방법</Link>에도 정리해 두었습니다.</p>
+    {loading ? <p>로그인 상태 확인 중…</p> : !user ? <div><p className="mb-4">로그인 후 문의를 남길 수 있습니다.</p><Link to="/login" onClick={() => rememberReturnTo('/support')} className="inline-block bg-eden-accent px-7 py-3 text-white rounded-[3px] transition-colors hover:bg-eden-accent-d">로그인하기</Link></div> : <div className="grid gap-7 lg:grid-cols-[1.3fr_1fr]">
       <div className="rounded-card bg-eden-paper-dim shadow-soft p-7"><label htmlFor="category" className="mb-2 block text-sm">문의 종류</label><select id="category" value={category} onChange={e => setCategory(e.target.value)} className="mb-5 w-full rounded-[2px] border border-eden-line bg-eden-paper p-3">{categories.map(c => <option key={c}>{c}</option>)}</select>
         <label htmlFor="title" className="mb-2 block text-sm">제목</label><input id="title" maxLength={100} value={title} onChange={e => setTitle(e.target.value)} className="mb-5 w-full rounded-[2px] border border-eden-line bg-eden-paper p-3" />
         <label htmlFor="content" className="mb-2 block text-sm">내용</label><textarea id="content" maxLength={3000} value={content} onChange={e => setContent(e.target.value)} className="mb-5 min-h-36 w-full rounded-[2px] border border-eden-line bg-eden-paper p-3" />

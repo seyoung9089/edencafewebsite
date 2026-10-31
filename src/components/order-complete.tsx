@@ -37,8 +37,7 @@ function Buttons({ onClose, onOrders }: { onClose: () => void; onOrders: () => v
 
 const StatusNote = () => (
   <p className="text-xs text-eden-mute">
-    입금 확인, 픽업 준비 같은 주문 상태는 <strong className="text-eden-ink">내 주문</strong>에서 확인할 수 있어요.
-    <br />이 화면을 캡처해 두시면 계좌와 픽업 날짜를 다시 보기 편해요.
+    주문 상태는 <strong className="text-eden-ink">내 주문</strong>에서 언제든 다시 볼 수 있습니다.
   </p>
 )
 
@@ -51,13 +50,14 @@ export function OrderCompleteBody({ order, onClose, onOrders }: BodyProps) {
         <Check size={34} strokeWidth={2.5} />
       </div>
       <div>
-        <h2 className="font-serif text-xl font-light">주문 완료!</h2>
+        <h2 className="font-serif text-xl font-light">주문이 접수되었습니다</h2>
+        {order.paymentMethod === 'onsite' ? null : <p className="mt-2 text-sm text-eden-mute">입금이 확인되면 주문이 확정됩니다.</p>}
       </div>
       {order.paymentMethod === 'onsite' ? (
         <div className="rounded-card bg-eden-paper-dim px-5 py-5">
           <div className="text-xs text-eden-mute">현장에서 결제할 금액</div>
           <div className="mt-1 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">{won(order.total)}</div>
-          <p className="mt-3 text-sm text-eden-mute">{order.studentName} 학생이 찾아갈 때 매장에서 결제해 주세요.</p>
+          <p className="mt-3 text-sm text-eden-mute">{order.studentName} 학생이 찾아갈 때 매장에서 결제하시면 됩니다.</p>
         </div>
       ) : (
         <div className="rounded-card bg-eden-paper-dim px-5 py-5">
@@ -89,7 +89,7 @@ export function OrderCompleteBody({ order, onClose, onOrders }: BodyProps) {
         rows={[
           // 학부모 주문 is picked up after school, not during shop hours.
           order.studentName
-            ? { label: '픽업', value: order.pickupLabel, note: `하교할 때 ${order.studentName} 학생이 찾아가요` }
+            ? { label: '픽업', value: order.pickupLabel, note: `하교할 때 ${order.studentName} 학생이 찾아갑니다` }
             : { label: '픽업', value: pickupText(order) },
           { label: '메뉴', value: itemsText(order) },
           { label: '주문번호', value: order.id.slice(0, 8) },

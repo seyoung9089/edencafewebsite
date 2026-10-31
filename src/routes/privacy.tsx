@@ -18,7 +18,7 @@ function PrivacyPage() {
   return <div className="min-h-screen bg-eden-paper text-eden-ink">
     <SiteHeader />
     <main className="mx-auto max-w-3xl px-6 pb-20 pt-[clamp(48px,7vw,96px)]">
-      <p className="eyebrow mb-3">PRIVACY</p>
+      <p className="eyebrow mb-3">이든카페</p>
       <h1 className="mb-6 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">개인정보처리방침</h1>
       <p className="mb-10 leading-7">{operator}은 이든카페 웹사이트에서 필요한 개인정보를 아래와 같이 처리합니다.</p>
       <div className="space-y-9 text-sm leading-7">

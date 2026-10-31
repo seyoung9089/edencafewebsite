@@ -12,44 +12,44 @@ function GuidePage() {
   const pickupTime = useContentValue(content, 'pickup.time')
 
   const steps = [
-    { icon: LogIn, title: '로그인', desc: '구글 계정이나 이메일로 로그인해요. 처음이면 회원가입부터 하시면 돼요.' },
+    { icon: LogIn, title: '로그인', desc: '이메일이나 Google 계정으로 로그인합니다. 처음이시면 회원가입을 먼저 하시면 됩니다.' },
     {
       icon: ShoppingBasket,
       title: '날짜 고르고 빵 담기',
-      desc: '마을 픽업 주문 탭(학생이 금요일에 찾아갈 빵은 학부모 주문 탭)에서 픽업 날짜를 먼저 고르면 그날 메뉴가 나와요. 원하는 빵의 [담기]를 누르고 수량을 정해요. 음료는 매장에서만 주문할 수 있어요.',
+      desc: '픽업 날짜를 고르면 그날 메뉴가 나옵니다. 원하는 빵의 [담기]를 누르고 수량을 정합니다. 학생이 찾아갈 빵은 학부모 주문 탭에서 주문합니다.',
     },
-    { icon: Landmark, title: '주문하고 결제하기', desc: '주문 내역을 확인하고 [주문하기]를 눌러요. 안내되는 계좌로 입금하면 끝이에요. 학부모 주문은 현장결제도 고를 수 있어요.' },
+    { icon: Landmark, title: '주문하고 입금하기', desc: '[주문하기]를 누르면 입금할 계좌와 금액이 나옵니다. 입금이 확인되면 주문이 확정됩니다.' },
     {
       icon: Store,
       title: '매장에서 찾아가기',
-      desc: `고른 날${pickupTime ? ` ${pickupTime} 사이에` : ''} 이든카페에 오셔서 이름을 말씀해주세요. 학부모 주문은 학생이 금요일 하교할 때 찾아가요.`,
+      desc: `고른 날${pickupTime ? ` ${pickupTime} 사이에` : ''} 이든카페에서 이름을 말씀하시면 됩니다.`,
     },
   ]
 
   const faqs = [
     {
       q: '주문을 취소할 수 있나요?',
-      a: '입금하기 전(입금대기)에는 내 주문에서 직접 취소할 수 있어요. 입금한 뒤에 취소하고 싶으시면 문의사항에 남겨 주세요. 확인하고 안내해 드릴게요.',
+      a: '입금하기 전(입금 대기)에는 내 주문에서 직접 취소할 수 있습니다. 입금한 뒤에는 문의사항에 남겨 주시면 안내해 드리겠습니다.',
     },
     {
       q: '언제까지 주문해야 하나요?',
-      a: '픽업하는 날 2일 전 밤 11시 59분까지예요. 예를 들어 금요일에 찾아가려면 수요일 밤 11시 59분까지 주문해 주세요. 날짜를 고르면 그날의 마감 시각이 바로 아래에 나와요. 2주 뒤 픽업까지 미리 주문할 수 있어요.',
+      a: '픽업 2일 전까지입니다. 예를 들어 금요일 픽업은 수요일까지 주문하시면 됩니다. 오늘부터 2주 안의 날짜를 고를 수 있습니다.',
     },
     {
       q: '학부모 주문은 뭐가 다른가요?',
-      a: '학부모 주문 탭은 학부모님이 주문하고 학생이 금요일 하교할 때 찾아가는 주문이에요. 주문할 때 학생 이름을 꼭 적어 주세요. 결제는 계좌이체나 현장결제 중에 고를 수 있고, 계좌이체는 입금자명을 학생 이름으로 해 주세요.',
+      a: '학부모님이 주문하고, 학생이 금요일 하교할 때 찾아갑니다. 학생 이름으로 찾아가므로 이름을 꼭 적어 주시기 바랍니다. 결제는 계좌이체나 현장결제 중에 고를 수 있습니다.',
     },
     {
       q: '결제는 어떻게 하나요?',
-      a: '무통장입금으로 받고 있어요. 주문을 마치면 입금할 계좌와 금액이 바로 나오고, 내 주문에서도 다시 볼 수 있어요. 학부모 주문은 현장결제도 돼요.',
+      a: '계좌이체로 받고 있습니다. 주문을 마치면 입금할 계좌와 금액이 바로 나오고, 내 주문에서도 다시 볼 수 있습니다. 학부모 주문은 현장결제도 됩니다.',
     },
     {
       q: '소금빵이나 치아바타를 많이 주문하고 싶어요.',
-      a: '소금빵·치아바타·베이글은 맛을 합쳐 10개 이상이면 사이트가 아닌 별도 문의로 받고 있어요.',
+      a: '소금빵·치아바타·베이글은 맛을 합쳐 10개 이상이면 사이트에서 주문할 수 없습니다. 문의사항에 남겨 주시면 따로 안내해 드리겠습니다.',
     },
     {
       q: '픽업 날 못 가면 어떻게 하나요?',
-      a: '픽업 날 전에 문의사항에 남겨 주세요. 확인하고 안내해 드릴게요.',
+      a: '픽업 날 전에 문의사항에 남겨 주시면 안내해 드리겠습니다.',
     },
   ]
 
@@ -57,13 +57,13 @@ function GuidePage() {
     <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
       <main className="mx-auto max-w-3xl px-6 pb-24 pt-[clamp(48px,7vw,96px)] md:px-8">
-        <p className="eyebrow mb-3">HOW TO ORDER</p>
+        <p className="eyebrow mb-3">처음이신 분께</p>
         <h1 className="mb-3 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">픽업 주문 이용방법</h1>
-        <p className="mb-8 text-[15px] text-eden-mute">픽업 날짜를 골라 미리 주문하고, 그날 매장에서 찾아가요. 네 단계면 충분해요.</p>
+        <p className="mb-8 text-[15px] text-eden-mute">미리 주문하고, 고른 날 매장에서 찾아가는 방식(픽업)입니다.</p>
 
         <div className="mb-10 flex flex-wrap gap-2 text-sm">
           <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2">월~금 픽업</span>
-          <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2">픽업 2일 전 밤 11시 59분까지 주문</span>
+          <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2">픽업 2일 전까지 주문</span>
           {pickupTime ? <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2">픽업 시간 {pickupTime}</span> : null}
         </div>
 
@@ -100,7 +100,7 @@ function GuidePage() {
             <Link to="/support" hash="inquiry" className="font-semibold text-eden-ink underline underline-offset-4">
               문의사항
             </Link>
-            에 남겨주세요.
+            에 남겨 주시면 됩니다.
           </p>
         </section>
 

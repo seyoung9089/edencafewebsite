@@ -19,7 +19,7 @@ export function SiteFooter() {
       <div className="grid grid-cols-2 gap-x-6 gap-y-8 border-b border-eden-line pb-10 md:grid-cols-4">
         <div className={cell}>
           <b className={label}><Phone size={15} strokeWidth={1.7} /> 전화</b>
-          <span className={value}>{isPlaceholder(phone) ? '준비 중이에요' : phone}</span>
+          <span className={value}>{isPlaceholder(phone) ? '준비 중입니다' : phone}</span>
         </div>
         <div className={cell}>
           <b className={label}><MapPin size={15} strokeWidth={1.7} /> 주소</b>
@@ -44,7 +44,6 @@ export function SiteFooter() {
           <Link to="/guide" className="hover:text-eden-ink">이용방법</Link>
           <Link to="/orders" className="hover:text-eden-ink">내 주문</Link>
           <Link to="/privacy" className="hover:text-eden-ink">개인정보처리방침</Link>
-          <Link to="/admin" className="hover:text-eden-ink">관리자 페이지</Link>
         </span>
       </div>
     </footer>

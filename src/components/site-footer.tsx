@@ -19,7 +19,7 @@ export function SiteFooter() {
       <div className="grid grid-cols-2 gap-x-6 gap-y-8 border-b border-eden-line pb-10 md:grid-cols-4">
         <div className={cell}>
           <b className={label}><Phone size={15} strokeWidth={1.7} /> 전화</b>
-          <span className={value}>{isPlaceholder(phone) ? '준비 중이에요' : phone}</span>
+          <span className={value}>{isPlaceholder(phone) ? '준비 중입니다' : phone}</span>
         </div>
         <div className={cell}>
           <b className={label}><MapPin size={15} strokeWidth={1.7} /> 주소</b>

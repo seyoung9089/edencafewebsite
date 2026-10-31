@@ -73,18 +73,18 @@ function Body({ item, popular, qty, onAdd, onQty }: Omit<Props, 'item' | 'onClos
 
         <DialogDescription asChild>
           <div className="whitespace-pre-line text-[17px] leading-relaxed text-eden-ink">
-            {item.description || <span className="text-eden-mute">아직 메뉴 설명이 없어요.</span>}
+            {item.description || <span className="text-eden-mute">아직 메뉴 설명이 없습니다.</span>}
           </div>
         </DialogDescription>
 
         {item.category === 'drink' ? (
           <p className="rounded-[2px] bg-eden-paper-dim px-4 py-3 text-base text-eden-mute">
-            음료는 온라인 주문이 안 돼요. 매장에서 바로 주문해주세요.
+            음료는 온라인 주문이 되지 않습니다. 매장에서 바로 주문해 주시기 바랍니다.
           </p>
         ) : soldOut ? (
-          <p className="rounded-[2px] bg-eden-paper-dim px-4 py-3 text-base text-eden-mute">오늘은 다 팔렸어요.</p>
+          <p className="rounded-[2px] bg-eden-paper-dim px-4 py-3 text-base text-eden-mute">오늘은 다 팔렸습니다.</p>
         ) : unpriced ? (
-          <p className="rounded-[2px] bg-eden-paper-dim px-4 py-3 text-base text-eden-mute">가격이 정해지면 주문할 수 있어요.</p>
+          <p className="rounded-[2px] bg-eden-paper-dim px-4 py-3 text-base text-eden-mute">가격이 정해지면 주문할 수 있습니다.</p>
         ) : qty > 0 ? (
           <div className="flex h-14 items-center justify-between rounded-[3px] bg-eden-accent px-2 text-white">
             <button

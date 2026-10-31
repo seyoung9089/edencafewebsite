@@ -12,7 +12,7 @@ function ResetPasswordPage() {
   const submit = async (event: FormEvent) => {
     event.preventDefault(); setBusy(true)
     const { error } = await supabase.auth.updateUser({ password })
-    setMessage(error ? error.message : '비밀번호가 변경되었습니다. 다시 로그인해주세요.')
+    setMessage(error ? error.message : '비밀번호가 변경되었습니다. 다시 로그인해 주시기 바랍니다.')
     if (!error) { setPassword(''); await supabase.auth.signOut() }
     setBusy(false)
   }

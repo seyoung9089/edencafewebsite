@@ -121,7 +121,7 @@ function HomePage() {
             <h2 className="mt-3 text-[clamp(1.7rem,2.6vw,2.4rem)] leading-[1.25]">마을 픽업 주문</h2>
             <div className="mt-4 flex flex-col gap-1.5 text-[1rem]">
               <span className="flex items-center gap-2"><CalendarDays size={17} strokeWidth={1.7} /> 월요일부터 금요일까지 픽업</span>
-              <span className="flex items-center gap-2"><Store size={17} strokeWidth={1.7} /> 고른 날 매장에서 찾아가요</span>
+              <span className="flex items-center gap-2"><Store size={17} strokeWidth={1.7} /> 고른 날 매장에서 찾아갑니다</span>
             </div>
           </div>
           <div className="flex items-end justify-between gap-4">
@@ -134,8 +134,8 @@ function HomePage() {
             <p className="eyebrow !text-eden-pane-ink">금요일 픽업</p>
             <h2 className="mt-3 text-[clamp(1.7rem,2.6vw,2.4rem)] leading-[1.25]">학부모 주문</h2>
             <div className="mt-4 flex flex-col gap-1.5 text-[1rem]">
-              <span className="flex items-center gap-2"><School size={17} strokeWidth={1.7} /> 금요일 하교할 때 학생이 찾아가요</span>
-              <span className="flex items-center gap-2"><Info size={17} strokeWidth={1.7} /> 주문할 때 학생 이름을 적어 주세요</span>
+              <span className="flex items-center gap-2"><School size={17} strokeWidth={1.7} /> 금요일 하교할 때 학생이 찾아갑니다</span>
+              <span className="flex items-center gap-2"><Info size={17} strokeWidth={1.7} /> 주문할 때 학생 이름을 적어 주십시오</span>
             </div>
           </div>
           <div className="flex items-end justify-between gap-4">
@@ -150,7 +150,7 @@ function HomePage() {
       >
         <span className="flex flex-wrap items-baseline gap-x-5 gap-y-1">
           <span className="eyebrow">답례품</span>
-          <span className="font-serif text-[clamp(1.2rem,1.8vw,1.5rem)]">모임과 행사에 나눌 답례품도 미리 예약받아요</span>
+          <span className="font-serif text-[clamp(1.2rem,1.8vw,1.5rem)]">모임과 행사에 나눌 답례품도 미리 예약받습니다</span>
         </span>
         <span className="inline-flex items-center gap-1.5 text-[1rem] font-bold text-eden-accent group-hover:underline group-hover:underline-offset-4">
           답례품 예약 <ArrowRight size={17} />
@@ -164,7 +164,7 @@ function HomePage() {
           <h2 className="mb-7 mt-3 text-[clamp(1.4rem,2.1vw,1.9rem)]">{cv('menuHome.title')}</h2>
           <Slider slides={slides} label="이든카페 빵" />
           <p className="mt-5 flex items-center gap-1.5 text-[0.9rem] text-eden-mute">
-            <Info size={15} strokeWidth={1.7} /> 날짜마다 메뉴가 달라요. 주문 화면에서 날짜를 고르면 그날 메뉴가 나와요.
+            <Info size={15} strokeWidth={1.7} /> 날짜마다 메뉴가 다릅니다. 주문 화면에서 날짜를 고르면 그날 메뉴가 나옵니다.
           </p>
         </section>
       ) : null}
@@ -176,7 +176,7 @@ function HomePage() {
           <h2 className="mb-9 mt-4 text-[clamp(1.5rem,2.6vw,2.3rem)] leading-[1.35]">
             주문 마감과
             <br />
-            픽업 시간이에요.
+            픽업 시간입니다.
           </h2>
         </Reveal>
         <Reveal className="mb-9 grid gap-5 md:grid-cols-3">
@@ -188,7 +188,7 @@ function HomePage() {
           <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
             <Store size={28} strokeWidth={1.6} />
             <b className="font-serif text-[1.25rem] font-normal">월요일 ~ 금요일</b>
-            <span className="text-[0.95rem] opacity-90">2주 뒤 픽업까지 미리 주문할 수 있어요</span>
+            <span className="text-[0.95rem] opacity-90">2주 뒤 픽업까지 미리 주문할 수 있습니다</span>
           </div>
           <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
             <Clock size={28} strokeWidth={1.6} />
@@ -218,7 +218,7 @@ function HomePage() {
           </div>
         ) : null}
         <p className="mb-6 flex items-center gap-2 text-[1rem]">
-          <Bell size={17} strokeWidth={1.7} /> 주문을 마치면 입금할 계좌와 금액이 바로 나와요.
+          <Bell size={17} strokeWidth={1.7} /> 주문을 마치면 입금할 계좌와 금액이 바로 나옵니다.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link to="/order" className="btn ivory">
@@ -261,7 +261,7 @@ function HomePage() {
           <h2 className="mb-9 mt-4 text-[clamp(1.5rem,2.6vw,2.3rem)] leading-[1.35]">
             학생들의 작은 시작이
             <br />
-            협동조합 카페가 되었어요.
+            협동조합 카페가 되었습니다.
           </h2>
           <Link to="/about" className="btn ivory">
             카페소개 보기 <ArrowRight size={18} />

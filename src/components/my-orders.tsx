@@ -77,10 +77,10 @@ function StatusSteps({ order }: { order: CustomerOrder }) {
 function nextStep(order: CustomerOrder, pickupTime: string): string | null {
   const day = pickupLabel(order.pickup_date)
   const when = `${day}${pickupTime ? ` ${pickupTime}` : ''}`
-  if (order.status === 'wait' && order.payment_method === 'transfer') return '아래 계좌로 입금해 주세요. 입금이 확인되면 준비를 시작해요.'
-  if (order.status === 'wait') return `${day}에 ${order.student_name ?? ''} 학생이 찾아갈 때 매장에서 결제해 주세요.`
-  if (order.status === 'done' && order.student_name) return `${day} 하교할 때 ${order.student_name} 학생이 찾아가면 돼요.`
-  if (order.status === 'done') return `${when}에 이든카페에 오셔서 이름을 말씀해 주세요.`
+  if (order.status === 'wait' && order.payment_method === 'transfer') return '아래 계좌로 입금해 주시기 바랍니다. 입금이 확인되면 준비를 시작합니다.'
+  if (order.status === 'wait') return `${day}에 ${order.student_name ?? ''} 학생이 찾아갈 때 매장에서 결제해 주시기 바랍니다.`
+  if (order.status === 'done' && order.student_name) return `${day} 하교할 때 ${order.student_name} 학생이 찾아가면 됩니다.`
+  if (order.status === 'done') return `${when}에 이든카페에 오셔서 이름을 말씀해 주시기 바랍니다.`
   return null
 }
 
@@ -108,7 +108,7 @@ function NameLine({ name, onSave, className = '', suffix = '님' }: { name: stri
       >
         <input
           aria-label="이름"
-          placeholder="이름을 입력해주세요"
+          placeholder="이름을 입력해 주시기 바랍니다"
           maxLength={30}
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -122,7 +122,7 @@ function NameLine({ name, onSave, className = '', suffix = '님' }: { name: stri
             취소
           </button>
         ) : (
-          <span className="text-xs opacity-70">픽업할 때 확인할 이름이에요.</span>
+          <span className="text-xs opacity-70">픽업할 때 확인할 이름입니다.</span>
         )}
       </form>
     )
@@ -150,7 +150,7 @@ function QuickLinks({ onSignOut, className = '' }: { onSignOut: () => void; clas
 
 const Empty = () => (
   <div className="rounded-card bg-eden-paper-dim py-12 text-center text-sm text-eden-mute">
-    아직 주문 내역이 없어요.{' '}
+    아직 주문 내역이 없습니다.{' '}
     <Link to="/order" className="font-semibold text-eden-ink underline">메뉴 보러 가기</Link>
   </div>
 )
@@ -166,7 +166,7 @@ function CancelButton({ order, onCancel }: { order: CustomerOrder; onCancel: (id
       type="button"
       disabled={busy}
       onClick={async () => {
-        if (!window.confirm('이 주문을 취소할까요? 취소한 주문은 되돌릴 수 없어요.')) return
+        if (!window.confirm('이 주문을 취소하시겠습니까? 취소한 주문은 되돌릴 수 없습니다.')) return
         setBusy(true)
         await onCancel(order.id)
         setBusy(false)
@@ -198,7 +198,7 @@ function OrderCard({ order, onCancel, highlight = false }: { order: CustomerOrde
       <InfoRows
         className="mb-3"
         rows={[
-          { label: '픽업', value: pickupLabel(order.pickup_date), note: order.student_name ? '학생이 하교할 때 찾아가요' : pickupTime || undefined },
+          { label: '픽업', value: pickupLabel(order.pickup_date), note: order.student_name ? '학생이 하교할 때 찾아갑니다' : pickupTime || undefined },
           ...(order.student_name ? [{ label: '학생', value: order.student_name }] : []),
           { label: '결제', value: order.payment_method === 'onsite' ? '현장결제' : '계좌이체' },
         ]}
@@ -220,7 +220,7 @@ function OrderCard({ order, onCancel, highlight = false }: { order: CustomerOrde
           {order.payment_method === 'transfer' ? <PaymentInfo total={order.total} className="mt-3" /> : null}
           <CancelButton order={order} onCancel={onCancel} />
           <p className="mt-1.5 text-center text-xs text-eden-mute">
-            {order.payment_method === 'transfer' ? '입금이 확인되기 전까지만 취소할 수 있어요.' : '준비가 시작되기 전까지만 취소할 수 있어요.'}
+            {order.payment_method === 'transfer' ? '입금이 확인되기 전까지만 취소할 수 있습니다.' : '준비가 시작되기 전까지만 취소할 수 있습니다.'}
           </p>
         </>
       ) : null}
@@ -275,7 +275,7 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut, onCan
           subtitle={`${pickupLabel(todayIso)} · 오늘 챙겨야 할 주문`}
           orders={pickupToday}
           onCancel={onCancel}
-          empty="오늘 픽업할 주문이 없어요."
+          empty="오늘 픽업할 주문이 없습니다."
         />
         <TodaySection
           title="다가오는 픽업"
@@ -284,7 +284,7 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut, onCan
           onCancel={onCancel}
           empty={
             <>
-              미리 주문한 메뉴가 없어요. 픽업 2일 전까지 주문할 수 있어요.{' '}
+              미리 주문한 메뉴가 없습니다. 픽업 2일 전까지 주문할 수 있습니다.{' '}
               <Link to="/order" className="font-semibold text-eden-ink underline">메뉴 보기</Link>
             </>
           }
@@ -293,7 +293,7 @@ export function MyOrdersBody({ name, email, orders, onSaveName, onSignOut, onCan
 
       <h3 className="mb-4 font-serif text-lg font-light">지난 주문</h3>
       {others.length === 0 ? (
-        orders.length === 0 ? <Empty /> : <p className="text-sm text-eden-mute">지난 주문이 없어요.</p>
+        orders.length === 0 ? <Empty /> : <p className="text-sm text-eden-mute">지난 주문이 없습니다.</p>
       ) : (
         <>
           <div className="mb-6 flex flex-wrap gap-2">

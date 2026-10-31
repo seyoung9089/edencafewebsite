@@ -30,7 +30,7 @@ export function HeroSection() {
         <h1 className="mb-9 mt-4 text-[clamp(2.1rem,4.4vw,3.6rem)] leading-[1.3]">
           미리 주문하고,
           <br />
-          <em className="font-normal not-italic">고른 날</em> 찾아가세요.
+          <em className="font-normal not-italic">고른 날</em> 찾아가십시오.
         </h1>
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link to="/order" className="btn">
@@ -42,7 +42,7 @@ export function HeroSection() {
         </div>
 
         <Link to="/gifts" className="mt-3 inline-flex items-center gap-1.5 text-[1rem] text-white/90 underline underline-offset-[5px] hover:text-white">
-          모임·행사 답례품도 예약받아요 <ArrowRight size={16} />
+          모임·행사 답례품도 예약받습니다 <ArrowRight size={16} />
         </Link>
       </div>
     </section>

@@ -16,9 +16,9 @@ export function NotFound() {
       </div>
       <div>
         <div className="mb-2 eyebrow">404</div>
-        <h1 className="mb-3 font-serif text-2xl font-light md:text-3xl">페이지를 찾을 수 없어요</h1>
+        <h1 className="mb-3 font-serif text-2xl font-light md:text-3xl">페이지를 찾을 수 없습니다</h1>
         <p className="max-w-[38ch] text-[15px] text-eden-mute">
-          주소가 바뀌었거나 존재하지 않는 페이지예요. 이든카페 메인으로 돌아가 다시 둘러보세요.
+          주소가 바뀌었거나 존재하지 않는 페이지입니다. 이든카페 메인으로 돌아가 다시 둘러보시기 바랍니다.
         </p>
       </div>
       <Link

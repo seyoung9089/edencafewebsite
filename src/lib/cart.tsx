@@ -134,7 +134,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (readyFor !== 'guest') {
       const timer = window.setTimeout(() => {
         void supabase.rpc('set_cart', { p_items: items.map(({ name, qty }) => ({ name, qty })) }).then(({ error }) => {
-          if (error) toast.error('담은 메뉴를 저장하지 못했어요. 인터넷 연결을 확인해주세요.')
+          if (error) toast.error('담은 메뉴를 저장하지 못했습니다. 인터넷 연결을 확인해 주시기 바랍니다.')
         })
       }, 250)
       return () => window.clearTimeout(timer)

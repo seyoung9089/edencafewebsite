@@ -36,7 +36,7 @@ function NewsDetailPage() {
           {body ? (
             <p className="whitespace-pre-wrap text-[15px] leading-relaxed">{body}</p>
           ) : (
-            <p className="text-[15px] text-eden-mute">자세한 내용은 준비 중이에요.</p>
+            <p className="text-[15px] text-eden-mute">자세한 내용은 준비 중입니다.</p>
           )}
         </div>
       </article>

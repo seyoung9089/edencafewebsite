@@ -100,7 +100,7 @@ export function useMenu(): { items: MenuItem[] | undefined; groups: MenuGroup[];
       .catch((e: unknown) => {
         if (!active) return
         setItems([])
-        setError(e instanceof Error ? e.message : '메뉴를 불러오지 못했어요.')
+        setError(e instanceof Error ? e.message : '메뉴를 불러오지 못했습니다.')
       })
     return () => {
       active = false

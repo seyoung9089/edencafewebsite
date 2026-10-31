@@ -86,6 +86,10 @@ export function HeroSection() {
           ) : null}
           {pickupTime ? <li className="rounded-full bg-eden-sand/15 px-3 py-1.5">픽업 시간 {pickupTime}</li> : null}
         </ul>
+
+        <Link to="/gifts" className="mt-4 inline-flex items-center gap-1 text-sm text-eden-sage-dim underline underline-offset-4 hover:text-eden-sand">
+          모임·행사 답례품도 예약받아요 <ArrowRight size={14} />
+        </Link>
       </div>
     </section>
   )

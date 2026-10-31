@@ -56,7 +56,7 @@ function StructuredData({ menuItems }: { menuItems: HomeMenuItem[] }) {
     name: '이든카페',
     alternateName: 'Eden Cafe',
     description:
-      '별무리고등학교에서 시작된 학생 협동조합 카페. 픽업 날짜를 골라 미리 주문하면 그날 매장에서 찾아갈 수 있습니다.',
+      '별무리고등학교에서 시작된 학생 협동조합 카페. 찾아가실 날짜를 골라 미리 주문하면 그날 매장에서 받아 가실 수 있습니다.',
     areaServed: '충청남도 금산군',
     foundingDate: '2021',
     hasMenu: {
@@ -135,7 +135,7 @@ function HomePage() {
             <h2 className="mt-3 text-[clamp(1.7rem,2.6vw,2.4rem)] leading-[1.25]">학부모 주문</h2>
             <div className="mt-4 flex flex-col gap-1.5 text-[1rem]">
               <span className="flex items-center gap-2"><School size={17} strokeWidth={1.7} /> 금요일 하교할 때 학생이 찾아갑니다</span>
-              <span className="flex items-center gap-2"><Info size={17} strokeWidth={1.7} /> 주문할 때 학생 이름을 적어 주시기 바랍니다</span>
+              <span className="flex items-center gap-2"><Info size={17} strokeWidth={1.7} /> 학생 이름으로 찾아가므로 주문할 때 이름을 꼭 적어 주시기 바랍니다</span>
             </div>
           </div>
           <div className="flex items-end justify-between gap-4">

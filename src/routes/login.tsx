@@ -46,12 +46,12 @@ function LoginPage() {
       if (mode === 'reset') {
         const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` })
         if (error) throw error
-        setMessage('비밀번호 재설정 메일을 보냈습니다. 메일함을 확인해 주시기 바랍니다.')
+        setMessage('비밀번호 재설정 메일을 보냈습니다. 메일함에서 확인하실 수 있습니다.')
       } else if (mode === 'signup') {
         const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/orders`, data: { name: name.trim() } } })
         if (error) throw error
         if (data.session) goBack()
-        else setMessage('확인 메일을 보냈습니다. 메일의 링크를 누른 뒤 로그인해 주시기 바랍니다.')
+        else setMessage('확인 메일을 보냈습니다. 메일의 링크를 누르신 뒤 로그인하시면 됩니다.')
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
@@ -66,11 +66,11 @@ function LoginPage() {
     <p className="eyebrow mb-3">이든카페 계정</p>
         <h1 className="mb-3 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">{mode === 'signup' ? '회원가입' : mode === 'reset' ? '비밀번호 찾기' : '로그인'}</h1>
     <p className="mb-8 text-[15px] text-eden-mute">
-      {mode === 'signup' ? '이메일과 비밀번호만 있으면 가입할 수 있습니다.' : mode === 'reset' ? '가입한 이메일로 비밀번호를 다시 정하는 메일을 보내 드립니다.' : '주문하려면 로그인이 필요합니다. 처음이시면 아래에서 회원가입을 먼저 해 주시기 바랍니다.'}
+      {mode === 'signup' ? '이메일과 비밀번호만 있으면 가입할 수 있습니다.' : mode === 'reset' ? '가입한 이메일로 비밀번호를 다시 정하는 메일을 보내 드립니다.' : '주문하려면 로그인이 필요합니다. 처음이시면 아래에서 회원가입부터 하시면 됩니다.'}
     </p>
     {loading ? <p>로그인 상태를 확인하는 중…</p> : user ? <div className="rounded-card bg-eden-paper-dim shadow-soft p-6"><p className="mb-4">{user.email} 계정으로 로그인되어 있습니다.</p><Link to="/orders" className="underline">내 주문 보기 →</Link><button type="button" onClick={() => void supabase.auth.signOut()} className="ml-5 underline">로그아웃</button></div> : <>
       <form onSubmit={(event) => void submit(event)} className="rounded-card bg-eden-paper-dim shadow-soft p-6">
-        {mode === 'signup' && <><label className="mb-2 block text-[15px] font-semibold" htmlFor="name">이름</label><input id="name" autoComplete="name" required maxLength={30} value={name} onChange={(e) => setName(e.target.value)} placeholder="픽업할 때 말씀하실 이름" className={input} /></>}
+        {mode === 'signup' && <><label className="mb-2 block text-[15px] font-semibold" htmlFor="name">이름</label><input id="name" autoComplete="name" required maxLength={30} value={name} onChange={(e) => setName(e.target.value)} placeholder="빵을 찾아가실 때 말씀하실 이름" className={input} /></>}
         <label className="mb-2 block text-[15px] font-semibold" htmlFor="email">이메일</label><input id="email" type="email" inputMode="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="예: eden@naver.com" className={input} />
         {mode !== 'reset' && <><label className="mb-2 block text-[15px] font-semibold" htmlFor="password">비밀번호{mode === 'signup' ? <span className="ml-1.5 text-sm font-normal text-eden-mute">6자 이상</span> : null}</label><input id="password" type="password" autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} className={`${input} mb-6`} /></>}
         {message && <p role="status" className="mb-4 rounded-[2px] bg-eden-paper-dim px-4 py-3 text-[15px] font-semibold">{message}</p>}

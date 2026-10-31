@@ -84,7 +84,7 @@ export const CONTENT_SCHEMA: ContentField[] = [
   { group: '히스토리', key: 'history.h5', label: '2026년 설명', type: 'textarea', default: '베이커리실을 새롭게 이전' },
 
   { group: '오시는 길', key: 'location.addr', label: '주소', type: 'input', default: '충청남도 금산군 ○○○ 이든카페 (별드림관 1층)' },
-  { group: '오시는 길', key: 'location.quote', label: '안내 문구', type: 'textarea', default: '"궁금하신 점이 있으면 편하게 문의해 주시기 바랍니다!"' },
+  { group: '오시는 길', key: 'location.quote', label: '안내 문구', type: 'textarea', default: '"궁금하신 점이 있으면 언제든 편하게 문의하시면 됩니다."' },
   { group: '오시는 길', key: 'location.phone', label: '연락처', type: 'input', default: '담당 연락처 · 010-XXXX-XXXX' },
 
   { group: '새소식', key: 'news.n1.tag', label: '공지1 태그', type: 'input', default: '공지' },
@@ -118,8 +118,8 @@ export const CONTENT_SCHEMA: ContentField[] = [
   { group: '입금 계좌', key: 'payment.holder', label: '예금주', type: 'input', default: '이든협동조합' },
   { group: '입금 계좌', key: 'payment.note', label: '입금 안내', type: 'input', default: '주문 후 30분 이내에 입금해 주시기 바랍니다.' },
 
-  { group: '주문 안내', key: 'order.fridayNotice', label: '학부모 주문 안내 (학부모 주문 맨 위)', type: 'textarea', default: '주문 시 꼭 학생 이름을 적어 주시기 바랍니다.' },
-  { group: '주문 안내', key: 'order.studentDepositNote', label: '학부모 주문 계좌이체 입금자명 안내', type: 'input', default: '입금자명은 학생 이름으로 해 주시기 바랍니다.' },
+  { group: '주문 안내', key: 'order.fridayNotice', label: '학부모 주문 안내 (학부모 주문 맨 위)', type: 'textarea', default: '학생이 이름으로 빵을 찾아가므로, 꼭 학생 이름을 적어 주시기 바랍니다.' },
+  { group: '주문 안내', key: 'order.studentDepositNote', label: '학부모 주문 계좌이체 입금자명 안내', type: 'input', default: '입금자명을 학생 이름으로 하시면 확인이 빠릅니다.' },
   { group: '주문 안내', key: 'order.bulkNotice', label: '대량 주문 안내', type: 'textarea', default: '소금빵·치아바타·베이글은 10개 이상 대량 주문 시 사이트가 아닌 별도 문의로 받고 있습니다.' },
   { group: '주문 안내', key: 'order.bulkContact', label: '대량 주문 문의처', type: 'input', default: '[문의처]' },
 

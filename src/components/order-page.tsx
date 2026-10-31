@@ -37,9 +37,9 @@ const FEATURED_COUNT = 2
 function orderErrorMessage(e: unknown, maxQty: number): string {
   const message = getErrorMessage(e, '주문에 실패했습니다.')
   if (message.includes('Unavailable menu item') || message.includes('Only available bakery items'))
-    return `방금 품절되었거나 지금 주문할 수 없는 메뉴가 있습니다: ${message.split(':').pop()?.trim()}. 주문 내역에서 빼고 다시 주문해 주시기 바랍니다.`
-  if (message.includes('Invalid quantity')) return `한 메뉴는 ${maxQty}개까지 주문할 수 있습니다. 수량을 줄여 주시기 바랍니다.`
-  if (message.includes('Invalid order')) return '담은 메뉴가 없거나 너무 많습니다. 확인 후 다시 주문해 주시기 바랍니다.'
+    return `방금 품절되었거나 지금 주문할 수 없는 메뉴가 있습니다: ${message.split(':').pop()?.trim()}. 그 메뉴를 주문 내역에서 빼신 뒤 다시 주문하시면 됩니다.`
+  if (message.includes('Invalid quantity')) return `한 메뉴는 ${maxQty}개까지 주문할 수 있습니다. 수량을 줄이시면 주문할 수 있습니다.`
+  if (message.includes('Invalid order')) return '담은 메뉴가 없거나 너무 많습니다. 주문 내역을 확인하신 뒤 다시 주문하시면 됩니다.'
   if (message.includes('Login required')) return '로그인이 필요합니다.'
   return message
 }
@@ -179,7 +179,7 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
   const fridayNotice = useContentValue(content, 'order.fridayNotice')
   const studentDepositNote = useContentValue(content, 'order.studentDepositNote')
   const bulkContact = useContentValue(content, 'order.bulkContact')
-  const bulkMessage = `${useContentValue(content, 'order.bulkNotice')} ${isPlaceholder(bulkContact) ? '문의사항에 남겨 주시기 바랍니다.' : bulkContact}`
+  const bulkMessage = `${useContentValue(content, 'order.bulkNotice')} ${isPlaceholder(bulkContact) ? '문의사항에 남겨 주시면 안내해 드리겠습니다.' : bulkContact}`
   const [popularity, setPopularity] = useState<Map<string, number>>(new Map())
   const [submitting, setSubmitting] = useState(false)
   const [placed, setPlaced] = useState<Omit<PlacedOrder, 'pickupTime'> | null>(null)
@@ -268,15 +268,15 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
 
   // What still stops the order, in the order a customer would fix it.
   const blocker = !pickup
-    ? '먼저 픽업 날짜를 골라 주시기 바랍니다.'
+    ? '먼저 찾아가실 날짜를 고르시면 됩니다.'
     : !menuItems || menuError
       ? '메뉴를 불러오는 중입니다.'
       : overGroupLimit(items, menuByName, groups)
         ? bulkMessage
         : parents && !studentName.trim()
-          ? '학생 이름을 적어 주시기 바랍니다.'
+          ? '학생 이름을 적으시면 주문할 수 있습니다.'
           : parents && !paymentMethod
-            ? '결제 방법을 골라 주시기 바랍니다.'
+            ? '결제 방법을 고르시면 주문할 수 있습니다.'
             : ''
 
   const checkout = async () => {
@@ -389,8 +389,8 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
           {parents
             ? '학부모님이 주문하고, 학생이 금요일 하교할 때 찾아갑니다.'
             : gift
-              ? '픽업 날짜를 먼저 고르고 답례품을 담아 주시기 바랍니다.'
-              : '픽업 날짜를 먼저 고르고 빵을 담아 주시기 바랍니다.'}{' '}
+              ? '찾아가실 날짜를 먼저 고르고 답례품을 담으시면 됩니다.'
+              : '찾아가실 날짜를 먼저 고르고 빵을 담으시면 됩니다.'}{' '}
           <Link to="/guide" className="whitespace-nowrap font-semibold text-eden-ink underline underline-offset-4">
             처음이신가요?
           </Link>
@@ -401,12 +401,12 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
         <div>
           <p className="eyebrow !text-eden-paper">1단계 · 날짜</p>
           <h2 className="mb-5 mt-4 text-[clamp(1.6rem,2.8vw,2.4rem)] leading-[1.3]">
-            {parents ? '금요일을' : '픽업 날짜를'}
+            {parents ? '찾아갈 금요일을' : '찾아가실 날짜를'}
             <br />
             골라 주시기 바랍니다.
           </h2>
           <p className="text-[1.05rem] text-eden-mute-2">
-            {parents ? '금요일 픽업은 그 주 수요일까지입니다.' : '픽업 2일 전 밤 11시 59분까지 주문해 주시기 바랍니다.'}
+            {parents ? '금요일 픽업은 그 주 수요일까지입니다.' : '찾아가시는 날 2일 전 밤 11시 59분까지 주문할 수 있습니다.'}
           </p>
           {parents ? (
             <div className="mt-6 flex max-w-md gap-3 border-t border-eden-paper/30 pt-5">
@@ -422,7 +422,7 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
               <CalendarDays size={18} strokeWidth={1.7} aria-hidden /> 날짜
             </span>
             <span className={`text-right text-[1.05rem] ${pickup ? 'font-bold' : 'text-eden-mute'}`}>
-              {pickup ? pickup.label : '아래에서 골라 주시기 바랍니다'}
+              {pickup ? pickup.label : '아직 고르지 않았습니다'}
             </span>
           </div>
           <div className="pt-5">
@@ -452,10 +452,10 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
                 {gift ? '답례품 고르기' : '빵 고르기'}
                 {pickup && !gift ? <span className="ml-2 font-sans text-base font-normal text-eden-mute">{pickup.label} 메뉴</span> : null}
               </h2>
-              {menuError ? <p className="text-sm text-destructive">메뉴를 불러오지 못했습니다. 새로고침해 주시기 바랍니다.</p> : null}
+              {menuError ? <p className="text-sm text-destructive">메뉴를 불러오지 못했습니다. 화면을 새로고침하시면 다시 불러옵니다.</p> : null}
               {!pickup ? (
                 <p className="rounded-card border border-dashed border-eden-line px-5 py-10 text-center text-base text-eden-mute">
-                  {gift ? '위에서 픽업 날짜를 고르면 답례품이 나옵니다.' : '위에서 픽업 날짜를 고르면 그날의 메뉴가 나옵니다.'}
+                  {gift ? '위에서 날짜를 고르면 답례품이 나옵니다.' : '위에서 날짜를 고르면 그날의 메뉴가 나옵니다.'}
                 </p>
               ) : !menuItems && !menuError ? (
                 <div className={grid}>
@@ -507,7 +507,7 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
               <section className="mt-12">
                 <p className="eyebrow">매장 전용</p>
                 <h2 className="mb-1 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">음료</h2>
-                <p className="mb-3 mt-3 text-sm text-eden-mute">음료는 온라인 주문이 되지 않습니다. 매장에서 바로 주문해 주시기 바랍니다.</p>
+                <p className="mb-3 mt-3 text-sm text-eden-mute">음료는 온라인 주문이 되지 않습니다. 매장에서 바로 주문하실 수 있습니다.</p>
                 <ul className="grid gap-x-8 sm:grid-cols-2">
                   {drinks.map((item) => (
                     <li key={item.name}>

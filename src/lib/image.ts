@@ -7,7 +7,7 @@ export async function resizeImage(file: File, maxSize = 1400, quality = 0.82): P
   try {
     bitmap = await createImageBitmap(file)
   } catch {
-    throw new Error('이미지를 읽을 수 없습니다. JPG 또는 PNG 파일로 올려 주시기 바랍니다.')
+    throw new Error('이미지를 읽을 수 없습니다. JPG 또는 PNG 파일로 올리시면 됩니다.')
   }
   const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height))
   const canvas = document.createElement('canvas')

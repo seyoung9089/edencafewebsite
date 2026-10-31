@@ -78,9 +78,9 @@ function nextStep(order: CustomerOrder, pickupTime: string): string | null {
   const day = pickupLabel(order.pickup_date)
   const when = `${day}${pickupTime ? ` ${pickupTime}` : ''}`
   if (order.status === 'wait' && order.payment_method === 'transfer') return '아래 계좌로 입금해 주시기 바랍니다. 입금이 확인되면 준비를 시작합니다.'
-  if (order.status === 'wait') return `${day}에 ${order.student_name ?? ''} 학생이 찾아갈 때 매장에서 결제해 주시기 바랍니다.`
+  if (order.status === 'wait') return `${day}에 ${order.student_name ?? ''} 학생이 찾아갈 때 매장에서 결제하시면 됩니다.`
   if (order.status === 'done' && order.student_name) return `${day} 하교할 때 ${order.student_name} 학생이 찾아가면 됩니다.`
-  if (order.status === 'done') return `${when}에 이든카페에 오셔서 이름을 말씀해 주시기 바랍니다.`
+  if (order.status === 'done') return `${when}에 이든카페에 오셔서 이름을 말씀하시면 됩니다.`
   return null
 }
 
@@ -108,7 +108,7 @@ function NameLine({ name, onSave, className = '', suffix = '님' }: { name: stri
       >
         <input
           aria-label="이름"
-          placeholder="이름을 입력해 주시기 바랍니다"
+          placeholder="이름"
           maxLength={30}
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -122,7 +122,7 @@ function NameLine({ name, onSave, className = '', suffix = '님' }: { name: stri
             취소
           </button>
         ) : (
-          <span className="text-xs opacity-70">픽업할 때 확인할 이름입니다.</span>
+          <span className="text-xs opacity-70">빵을 찾아가실 때 확인할 이름입니다.</span>
         )}
       </form>
     )

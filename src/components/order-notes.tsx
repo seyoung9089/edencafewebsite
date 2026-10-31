@@ -25,7 +25,7 @@ export function OrderNotes({
     audience === 'parents'
       ? [
           '금요일 픽업은 그 주 수요일 밤 11시 59분까지 주문할 수 있습니다.',
-          '주문할 때 학생 이름을 꼭 적어 주시기 바랍니다. 학생이 하교할 때 이 이름으로 찾아갑니다.',
+          '학생이 하교할 때 이름으로 빵을 찾아가므로, 주문할 때 학생 이름을 꼭 적어 주시기 바랍니다.',
           `결제는 계좌이체나 현장결제 중에 고를 수 있습니다. 계좌이체는 ${studentDepositNote}`,
           '입금이 확인되기 전(현장결제는 준비가 시작되기 전)까지 내 주문에서 직접 취소할 수 있습니다.',
         ]
@@ -37,9 +37,9 @@ export function OrderNotes({
               <Link to="/order" className="font-semibold underline underline-offset-4">
                 마을 픽업 주문
               </Link>
-              에서 주문해 주시기 바랍니다.
+              에서 주문하시면 됩니다.
             </>,
-            `한 번에 답례품마다 ${giftMaxQty}개까지 예약할 수 있습니다. 포장 문구 같은 요청은 요청사항 칸에 적어 주시기 바랍니다.`,
+            `한 번에 답례품마다 ${giftMaxQty}개까지 예약할 수 있습니다. 포장 문구 같은 요청은 요청사항 칸에 적으시면 됩니다.`,
             '결제는 계좌이체입니다. 입금이 확인되기 전까지 내 주문에서 직접 취소할 수 있습니다.',
           ]
         : [
@@ -53,7 +53,7 @@ export function OrderNotes({
               <Link to="/parents" className="font-semibold underline underline-offset-4">
                 학부모 주문
               </Link>
-              에서 주문해 주시기 바랍니다.
+              에서 주문하시면 됩니다.
             </>,
           ]
   return (

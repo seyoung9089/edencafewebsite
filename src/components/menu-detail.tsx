@@ -79,7 +79,7 @@ function Body({ item, popular, qty, onAdd, onQty }: Omit<Props, 'item' | 'onClos
 
         {item.category === 'drink' ? (
           <p className="rounded-[2px] bg-eden-paper-dim px-4 py-3 text-base text-eden-mute">
-            음료는 온라인 주문이 되지 않습니다. 매장에서 바로 주문해 주시기 바랍니다.
+            음료는 온라인 주문이 되지 않습니다. 매장에서 바로 주문하실 수 있습니다.
           </p>
         ) : soldOut ? (
           <p className="rounded-[2px] bg-eden-paper-dim px-4 py-3 text-base text-eden-mute">오늘은 다 팔렸습니다.</p>

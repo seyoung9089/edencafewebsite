@@ -159,7 +159,7 @@ export function OrderReceipt({
             </div>
           </>
         ) : (
-          <div className="font-semibold text-eden-accent">먼저 픽업 날짜를 골라 주시기 바랍니다</div>
+          <div className="font-semibold text-eden-accent">먼저 찾아가실 날짜를 고르시면 됩니다</div>
         )}
       </div>
 
@@ -281,7 +281,7 @@ export function OrderReceipt({
             >
               {gift ? '로그인하고 예약하기' : '로그인하고 주문하기'}
             </Link>
-            <p className="mt-2 text-center text-sm text-eden-mute">처음이시면 회원가입부터 해 주시기 바랍니다. 담은 {gift ? '답례품' : '빵'}은 그대로 남아 있습니다.</p>
+            <p className="mt-2 text-center text-sm text-eden-mute">처음이시면 회원가입부터 하시면 됩니다. 담은 {gift ? '답례품' : '빵'}은 그대로 남아 있습니다.</p>
           </>
         )}
         {loggedIn && (!parents || paymentMethod === 'transfer') ? (

@@ -105,7 +105,7 @@ function HomePage() {
   ))
 
   const pane = 'flex min-h-[260px] flex-col justify-between gap-8 px-[clamp(20px,5.5vw,96px)] py-[clamp(28px,4vw,56px)] transition-[filter] duration-300 hover:brightness-[.93]'
-  const go = 'grid h-12 w-12 flex-none place-items-center rounded-full border'
+  const go = 'inline-flex h-12 flex-none items-center gap-2 rounded-[3px] border px-5 text-base font-semibold'
 
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
@@ -126,7 +126,7 @@ function HomePage() {
           </div>
           <div className="flex items-end justify-between gap-4">
             <span className="text-[0.95rem] opacity-90">픽업 2일 전까지 주문</span>
-            <span className={`${go} border-white`} aria-hidden><ArrowRight size={20} /></span>
+            <span className={`${go} border-white`}>주문하기 <ArrowRight size={18} aria-hidden /></span>
           </div>
         </Link>
         <Link to="/parents" className={`${pane} bg-eden-pane text-eden-pane-ink`}>
@@ -140,7 +140,7 @@ function HomePage() {
           </div>
           <div className="flex items-end justify-between gap-4">
             <span className="text-[0.95rem] opacity-90">그 주 수요일까지 주문</span>
-            <span className={`${go} border-eden-pane-ink`} aria-hidden><ArrowRight size={20} /></span>
+            <span className={`${go} border-eden-pane-ink`}>주문하기 <ArrowRight size={18} aria-hidden /></span>
           </div>
         </Link>
       </section>
@@ -182,17 +182,17 @@ function HomePage() {
         <Reveal className="mb-9 grid gap-5 md:grid-cols-3">
           <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
             <CalendarDays size={28} strokeWidth={1.6} />
-            <b className="font-serif text-[1.25rem] font-normal">픽업 2일 전까지</b>
+            <b className="text-[1.25rem] font-semibold">픽업 2일 전까지</b>
             <span className="text-[0.95rem] opacity-90">주문 마감</span>
           </div>
           <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
             <Store size={28} strokeWidth={1.6} />
-            <b className="font-serif text-[1.25rem] font-normal">월요일 ~ 금요일</b>
-            <span className="text-[0.95rem] opacity-90">오늘부터 2주 안의 날짜를 고를 수 있습니다</span>
+            <b className="text-[1.25rem] font-semibold">월요일 ~ 금요일</b>
+            <span className="text-[0.95rem] opacity-90">픽업 요일</span>
           </div>
           <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
             <Clock size={28} strokeWidth={1.6} />
-            <b className="font-serif text-[1.25rem] font-normal">{pickupTime || '매장 운영 시간'}</b>
+            <b className="text-[1.25rem] font-semibold">{pickupTime || '매장 운영 시간'}</b>
             <span className="text-[0.95rem] opacity-90">픽업 시간</span>
           </div>
         </Reveal>

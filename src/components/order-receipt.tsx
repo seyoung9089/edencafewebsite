@@ -67,7 +67,7 @@ function FridayFields({
           autoComplete="off"
           className="mt-1.5 h-12 w-full rounded-[2px] border border-eden-line bg-eden-paper-dim px-3 text-base text-eden-ink placeholder:text-eden-mute/70"
         />
-        <span className="mt-1 block text-sm text-eden-mute">금요일 하교할 때 이 이름으로 찾아갑니다.</span>
+        <span className="mt-1 block text-[15px] text-eden-mute">금요일 하교할 때 이 이름으로 찾아갑니다.</span>
       </label>
 
       <fieldset>
@@ -108,7 +108,7 @@ function FridayFields({
           <div className="mt-1 font-semibold">{studentDepositNote}</div>
         </div>
       ) : paymentMethod === 'onsite' ? (
-        <p className="rounded-[2px] bg-eden-paper-dim px-4 py-3 text-sm text-eden-mute">학생이 찾아갈 때 매장에서 결제합니다.</p>
+        <p className="rounded-[2px] bg-eden-paper-dim px-4 py-3 text-[15px] text-eden-mute">학생이 찾아갈 때 매장에서 결제합니다.</p>
       ) : null}
     </div>
   )
@@ -144,18 +144,15 @@ export function OrderReceipt({
           <p className="eyebrow">3단계 · 주문</p>
           <h2 className="mt-1.5 text-[1.35rem]">주문 내역</h2>
         </div>
-        <Link to="/guide" className="rounded-[3px] border border-eden-line px-3 py-1.5 text-sm font-semibold text-eden-ink hover:bg-eden-paper">
-          이용방법
-        </Link>
       </div>
 
       <div className="mt-3 border-y border-eden-line py-3">
-        <div className="text-sm text-eden-mute">픽업 날짜</div>
+        <div className="text-[15px] text-eden-mute">픽업 날짜</div>
         {pickup ? (
           <>
-            <div className="font-serif text-base font-light text-eden-ink">
+            <div className="text-base font-semibold text-eden-ink">
               {pickup.label}
-              {pickupTime && !parents ? <span className="ml-1.5 font-sans text-sm font-normal text-eden-mute">{pickupTime}</span> : null}
+              {pickupTime && !parents ? <span className="ml-1.5 text-[15px] font-normal text-eden-mute">{pickupTime}</span> : null}
             </div>
           </>
         ) : (
@@ -165,7 +162,7 @@ export function OrderReceipt({
 
       <div className="mt-4 border-t border-dashed border-eden-mute/40">
         {items.length === 0 ? (
-          <p className="py-8 text-center text-sm text-eden-mute">아직 담은 메뉴가 없습니다.</p>
+          <p className="py-8 text-center text-[15px] text-eden-mute">아직 담은 메뉴가 없습니다.</p>
         ) : (
           items.map((it) => (
             <div key={it.name} className="border-b border-dashed border-eden-line py-3">
@@ -202,7 +199,7 @@ export function OrderReceipt({
                     <Plus size={13} />
                   </button>
                 </div>
-                <span className="font-serif font-light">{won(it.price * it.qty)}</span>
+                <span className="font-medium">{won(it.price * it.qty)}</span>
               </div>
             </div>
           ))
@@ -211,7 +208,7 @@ export function OrderReceipt({
 
       <div className="mt-4 flex items-baseline justify-between">
         <span className="font-semibold">합계</span>
-        <span className="font-serif text-2xl font-light text-eden-accent">{won(totalPrice)}</span>
+        <span className="text-2xl font-bold text-eden-accent">{won(totalPrice)}</span>
       </div>
 
       {parents ? (
@@ -281,11 +278,11 @@ export function OrderReceipt({
             >
               {gift ? '로그인하고 예약하기' : '로그인하고 주문하기'}
             </Link>
-            <p className="mt-2 text-center text-sm text-eden-mute">처음이시면 회원가입부터 하시면 됩니다. 담은 {gift ? '답례품' : '빵'}은 그대로 남아 있습니다.</p>
+            <p className="mt-2 text-center text-[15px] text-eden-mute">처음이시면 회원가입부터 하시면 됩니다. 담은 {gift ? '답례품' : '빵'}은 그대로 남아 있습니다.</p>
           </>
         )}
         {loggedIn && (!parents || paymentMethod === 'transfer') ? (
-          <p className="mt-2 text-center text-sm text-eden-mute">주문하면 입금할 계좌를 바로 알려 드립니다.</p>
+          <p className="mt-2 text-center text-[15px] text-eden-mute">주문하면 입금할 계좌를 바로 알려 드립니다.</p>
         ) : null}
       </div>
     </div>

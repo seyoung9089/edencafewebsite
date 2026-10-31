@@ -37,7 +37,7 @@ export function BackToTop() {
         type="button"
         onClick={scrollToTop}
         aria-label="맨 위로 이동"
-        className={`flex h-11 w-11 items-center justify-center rounded-[3px] bg-eden-ink text-eden-paper shadow-lift transition-all duration-300 hover:bg-eden-ink-2 ${onOrder ? 'max-lg:hidden' : ''} ${
+        className={`flex h-11 w-11 items-center justify-center rounded-[3px] bg-eden-accent text-white shadow-lift transition-all duration-300 hover:bg-eden-accent-d ${onOrder ? 'max-lg:hidden' : ''} ${
           visible ? 'pointer-events-auto translate-y-0 opacity-100' : 'translate-y-3 opacity-0'
         }`}
       >

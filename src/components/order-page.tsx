@@ -97,18 +97,19 @@ function MenuCard({
         </span>
       </button>
       <div className="mb-3 mt-1 flex flex-wrap items-baseline justify-between gap-x-2">
-        <span className={unpriced ? 'text-sm text-eden-mute' : 'font-semibold text-eden-ink'}>{unpriced ? '가격 준비 중' : won(item.price)}</span>
+        <span className={unpriced ? 'text-[15px] text-eden-mute' : 'font-semibold text-eden-ink'}>{unpriced ? '가격 준비 중' : won(item.price)}</span>
         {item.category !== 'drink' && item.stock !== null && item.stock > 0 ? (
-          <span className="text-sm text-eden-mute">{item.stock}개 남음</span>
+          <span className="text-[15px] text-eden-mute">{item.stock}개 남음</span>
         ) : null}
       </div>
       <div className="mt-auto">
         {item.category === 'drink' ? (
-          <span className="flex h-10 items-center justify-center text-sm text-eden-mute">매장에서만 주문</span>
+          <span className="flex h-10 items-center justify-center text-[15px] text-eden-mute">매장에서만 주문</span>
         ) : soldOut || unpriced ? (
-          // Plain text, no box: it must not look like a button.
-          <span className="flex h-10 items-center justify-center text-sm text-eden-mute">
-            {soldOut ? '품절' : '준비 중'}
+          // Plain text, no box: it must not look like a button. An unpriced item
+          // already says '가격 준비 중' above, so it only keeps the row's height.
+          <span className="flex h-10 items-center justify-center text-[15px] text-eden-mute">
+            {soldOut ? '품절' : null}
           </span>
         ) : qty > 0 ? (
           <div className="flex h-10 items-center justify-between rounded-[3px] bg-eden-accent px-1 text-white">
@@ -475,7 +476,7 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
                         <div className="mb-3 flex flex-wrap items-baseline gap-x-3">
                           <h3 className="font-serif text-lg font-light">{sec.title}</h3>
                           {cap !== null ? (
-                            <span className="text-sm text-eden-mute">
+                            <span className="text-[15px] text-eden-ink">
                               맛 합계 {cap}개까지{total > 0 ? ` · 지금 ${total}개` : ''}
                             </span>
                           ) : null}
@@ -551,7 +552,7 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
           <span className="truncate text-sm">
             {totalQty > 0 ? (
               <>
-                {totalQty}개 담음 · <strong className="font-serif text-base">{won(totalPrice)}</strong>
+                {totalQty}개 담음 · <strong className="text-base font-bold">{won(totalPrice)}</strong>
               </>
             ) : (
               '담은 메뉴 없음'

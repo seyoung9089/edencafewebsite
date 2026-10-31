@@ -406,7 +406,7 @@ export function OrderPage({ audience, initialDate }: { audience: OrderAudience; 
             골라 주시기 바랍니다.
           </h2>
           <p className="text-[1.05rem] text-eden-mute-2">
-            {parents ? '금요일 픽업은 그 주 수요일까지입니다.' : '마감은 픽업 2일 전 밤 11시 59분입니다. 금요일 픽업이면 수요일까지입니다.'}
+            {parents ? '금요일 픽업은 그 주 수요일까지입니다.' : '픽업 2일 전까지 주문할 수 있습니다. 금요일 픽업이면 수요일까지입니다.'}
           </p>
           {parents ? (
             <div className="mt-6 flex max-w-md gap-3 border-t border-eden-paper/30 pt-5">

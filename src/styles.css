@@ -216,7 +216,7 @@ h1, h2, h3, .font-display {
   color: hsl(var(--eden-accent));
 }
 
-/* Buttons: square green block that lifts on hover. Sizes stay large for
+/* Buttons: square red block that lifts on hover. Sizes stay large for
    older customers. */
 .btn {
   display: inline-flex;
@@ -237,10 +237,8 @@ h1, h2, h3, .font-display {
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .btn.ivory { background: hsl(var(--eden-paper)); color: hsl(var(--eden-ink)); }
 .btn.ivory:hover { background: hsl(var(--eden-paper-dim)); }
-/* Second button on a dark or green field: a lighter tone of the field,
-   no outline. */
-.btn.ghost { background: rgba(255, 255, 255, 0.14); color: inherit; }
-.btn.ghost:hover { background: rgba(255, 255, 255, 0.24); }
+.btn.ghost { background: transparent; color: inherit; border: 1px solid currentColor; }
+.btn.ghost:hover { background: transparent; opacity: 0.7; }
 
 /* Interactive elements share one calm transition (0.3s ease). */
 a, button {

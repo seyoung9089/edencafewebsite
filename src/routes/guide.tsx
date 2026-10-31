@@ -3,7 +3,7 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { useContentValue, useSiteContent } from '@/lib/site-content'
 import { pageMeta } from '@/lib/seo'
-import { ChevronDown } from 'lucide-react'
+import { LogIn, ShoppingBasket, Landmark, Store, ChevronDown } from 'lucide-react'
 
 export const Route = createFileRoute('/guide')({ component: GuidePage, head: () => pageMeta('/guide') })
 
@@ -12,13 +12,15 @@ function GuidePage() {
   const pickupTime = useContentValue(content, 'pickup.time')
 
   const steps = [
-    { title: '로그인', desc: '이메일이나 Google 계정으로 로그인합니다. 처음이시면 회원가입을 먼저 하시면 됩니다.' },
+    { icon: LogIn, title: '로그인', desc: '이메일이나 Google 계정으로 로그인합니다. 처음이시면 회원가입을 먼저 하시면 됩니다.' },
     {
+      icon: ShoppingBasket,
       title: '날짜 고르고 빵 담기',
       desc: '픽업 날짜를 고르면 그날 메뉴가 나옵니다. 원하는 빵의 [담기]를 누르고 수량을 정합니다. 학생이 찾아갈 빵은 학부모 주문 탭에서 주문합니다.',
     },
-    { title: '주문하고 입금하기', desc: '[주문하기]를 누르면 입금할 계좌와 금액이 나옵니다. 입금이 확인되면 주문이 확정됩니다.' },
+    { icon: Landmark, title: '주문하고 입금하기', desc: '[주문하기]를 누르면 입금할 계좌와 금액이 나옵니다. 입금이 확인되면 주문이 확정됩니다.' },
     {
+      icon: Store,
       title: '매장에서 찾아가기',
       desc: `고른 날${pickupTime ? ` ${pickupTime} 사이에` : ''} 이든카페에서 이름을 말씀하시면 됩니다.`,
     },
@@ -52,59 +54,64 @@ function GuidePage() {
   ]
 
   return (
-    <div className="min-h-svh bg-eden-paper text-eden-ink">
+    <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
-      <main className="pad pb-[clamp(72px,9vw,140px)] pt-[clamp(48px,7vw,96px)]">
-        <h1 className="mb-4 font-serif text-[clamp(2.2rem,4.4vw,3.8rem)] font-light leading-[1.2]">픽업 주문 이용방법</h1>
-        <p className="mb-8 max-w-[52ch] text-[1.15rem] leading-relaxed">미리 주문하고, 고른 날 매장에서 찾아가는 방식(픽업)입니다.</p>
+      <main className="mx-auto max-w-3xl px-6 pb-24 pt-[clamp(48px,7vw,96px)] md:px-8">
+        <p className="eyebrow mb-3">처음이신 분께</p>
+        <h1 className="mb-3 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">픽업 주문 이용방법</h1>
+        <p className="mb-8 text-[15px] text-eden-mute">미리 주문하고, 고른 날 매장에서 찾아가는 방식(픽업)입니다.</p>
 
-        <div className="mb-14 flex flex-wrap gap-2 text-[1rem]">
-          <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2.5">월~금 픽업</span>
-          <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2.5">픽업 2일 전까지 주문</span>
-          {pickupTime ? <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2.5">픽업 시간 {pickupTime}</span> : null}
+        <div className="mb-10 flex flex-wrap gap-2 text-sm">
+          <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2">월~금 픽업</span>
+          <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2">픽업 2일 전까지 주문</span>
+          {pickupTime ? <span className="rounded-[3px] bg-eden-paper-dim px-4 py-2">픽업 시간 {pickupTime}</span> : null}
         </div>
 
-        {/* The four steps, in order, as one band of green. */}
-        <ol className="grid gap-px bg-eden-accent text-white sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="grid gap-4 sm:grid-cols-2">
           {steps.map((s, i) => (
-            <li key={s.title} className="flex flex-col gap-3 bg-eden-accent px-6 py-8 lg:px-7">
-              <h2 className="font-serif text-[clamp(1.4rem,1.9vw,1.7rem)] font-light leading-snug">
-                {i + 1}. {s.title}
-              </h2>
-              <p className="text-[1.05rem] leading-relaxed text-white/95">{s.desc}</p>
+            <li key={s.title} className="flex gap-4 rounded-card bg-eden-paper-dim p-5 shadow-soft">
+              <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[3px] bg-eden-accent text-white">
+                <s.icon size={22} strokeWidth={1.7} />
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-eden-accent">{i + 1}단계</div>
+                <h2 className="mb-1 font-serif text-lg font-light">{s.title}</h2>
+                <p className="text-sm leading-relaxed text-eden-mute">{s.desc}</p>
+              </div>
             </li>
           ))}
         </ol>
 
-        <section className="mt-[clamp(72px,8vw,120px)] grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16">
-          <div>
-            <h2 className="mb-4 font-serif text-[clamp(1.9rem,3vw,2.8rem)] font-light leading-tight">자주 묻는 질문</h2>
-            <p className="max-w-[30ch] text-[1.05rem] leading-relaxed">
-              다른 궁금한 점은{' '}
-              <Link to="/support" hash="inquiry" className="font-semibold text-eden-ink underline underline-offset-4">
-                문의사항
-              </Link>
-              에 남겨 주시면 됩니다.
-            </p>
-            <Link
-              to="/order"
-              className="mt-8 inline-flex h-14 items-center justify-center rounded-[3px] bg-eden-accent px-10 text-[1.05rem] font-semibold text-white transition-colors hover:bg-eden-accent-d"
-            >
-              지금 주문하기
-            </Link>
-          </div>
-          <div className="flex flex-col gap-2">
+        <section className="mt-16">
+          <h2 className="mb-4 font-serif text-xl font-light">자주 묻는 질문</h2>
+          <div className="border-t border-eden-line">
             {faqs.map((f) => (
-              <details key={f.q} className="group bg-eden-paper-dim px-6">
-                <summary className="flex min-h-[64px] cursor-pointer list-none items-center justify-between gap-4 py-4 text-[1.1rem] font-semibold">
+              <details key={f.q} className="group border-b border-eden-line">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-[15px] font-semibold">
                   {f.q}
-                  <ChevronDown size={20} className="flex-shrink-0 text-eden-mute transition-transform group-open:rotate-180" />
+                  <ChevronDown size={18} className="flex-shrink-0 text-eden-mute transition-transform group-open:rotate-180" />
                 </summary>
-                <p className="max-w-[60ch] pb-6 text-[1.05rem] leading-relaxed">{f.a}</p>
+                <p className="pb-5 text-sm leading-relaxed text-eden-mute">{f.a}</p>
               </details>
             ))}
           </div>
+          <p className="mt-4 text-sm text-eden-mute">
+            다른 궁금한 점은{' '}
+            <Link to="/support" hash="inquiry" className="font-semibold text-eden-ink underline underline-offset-4">
+              문의사항
+            </Link>
+            에 남겨 주시면 됩니다.
+          </p>
         </section>
+
+        <div className="mt-14 text-center">
+          <Link
+            to="/order"
+            className="inline-flex h-14 items-center justify-center rounded-[3px] bg-eden-accent px-12 text-base font-semibold text-white transition-colors hover:bg-eden-accent-d"
+          >
+            지금 주문하기
+          </Link>
+        </div>
       </main>
       <SiteFooter />
     </div>

@@ -8,7 +8,7 @@ import { fetchMenu, isSoldOut } from '@/lib/menu'
 import { pageMeta } from '@/lib/seo'
 import { usePickupDates } from '@/lib/pickup'
 import { Slider } from '@/components/slider'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, CalendarDays, Clock, Info, School, Store, Bell } from 'lucide-react'
 
 // Fetched server-side (during SSR / static prerender) so the structured
 // data below is present in the raw HTML — not only after client JS runs.
@@ -105,10 +105,10 @@ function HomePage() {
   ))
 
   const pane = 'flex min-h-[260px] flex-col justify-between gap-8 px-[clamp(20px,5.5vw,96px)] py-[clamp(28px,4vw,56px)] transition-[filter] duration-300 hover:brightness-[.93]'
-  const go = 'inline-flex h-12 flex-none items-center gap-2 rounded-[3px] px-5 text-base font-semibold'
+  const go = 'inline-flex h-12 flex-none items-center gap-2 rounded-[3px] border px-5 text-base font-semibold'
 
   return (
-    <div className="min-h-svh bg-eden-paper text-eden-ink">
+    <div className="min-h-screen bg-eden-paper text-eden-ink">
       <StructuredData menuItems={menuItems} />
       <SiteHeader overlay />
       <HeroSection />
@@ -117,38 +117,41 @@ function HomePage() {
       <section className="grid md:grid-cols-2">
         <Link to="/order" className={`${pane} bg-eden-accent text-white`}>
           <div>
-            <h2 className="text-[clamp(1.9rem,3vw,2.8rem)] leading-[1.2]">마을 픽업 주문</h2>
-            <p className="mt-4 text-[1.1rem] leading-relaxed">
-              월요일부터 금요일까지 픽업
-              <br />
-              고른 날 매장에서 찾아갑니다
-            </p>
+            <p className="eyebrow !text-white">월~금 픽업</p>
+            <h2 className="mt-3 text-[clamp(1.7rem,2.6vw,2.4rem)] leading-[1.25]">마을 픽업 주문</h2>
+            <div className="mt-4 flex flex-col gap-1.5 text-[1rem]">
+              <span className="flex items-center gap-2"><CalendarDays size={17} strokeWidth={1.7} /> 월요일부터 금요일까지 픽업</span>
+              <span className="flex items-center gap-2"><Store size={17} strokeWidth={1.7} /> 고른 날 매장에서 찾아갑니다</span>
+            </div>
           </div>
           <div className="flex items-end justify-between gap-4">
             <span className="text-[0.95rem] opacity-90">픽업 2일 전까지 주문</span>
-            <span className={`${go} bg-eden-paper text-eden-ink`}>주문하기 <ArrowRight size={18} aria-hidden /></span>
+            <span className={`${go} border-white`}>주문하기 <ArrowRight size={18} aria-hidden /></span>
           </div>
         </Link>
         <Link to="/parents" className={`${pane} bg-eden-pane text-eden-pane-ink`}>
           <div>
-            <h2 className="text-[clamp(1.9rem,3vw,2.8rem)] leading-[1.2]">학부모 주문</h2>
-            <p className="mt-4 text-[1.1rem] leading-relaxed">
-              금요일 하교할 때 학생이 찾아갑니다
-              <br />
-              학생 이름으로 찾아갑니다
-            </p>
+            <p className="eyebrow !text-eden-pane-ink">금요일 픽업</p>
+            <h2 className="mt-3 text-[clamp(1.7rem,2.6vw,2.4rem)] leading-[1.25]">학부모 주문</h2>
+            <div className="mt-4 flex flex-col gap-1.5 text-[1rem]">
+              <span className="flex items-center gap-2"><School size={17} strokeWidth={1.7} /> 금요일 하교할 때 학생이 찾아갑니다</span>
+              <span className="flex items-center gap-2"><Info size={17} strokeWidth={1.7} /> 학생 이름으로 찾아갑니다</span>
+            </div>
           </div>
           <div className="flex items-end justify-between gap-4">
             <span className="text-[0.95rem] opacity-90">그 주 수요일까지 주문</span>
-            <span className={`${go} bg-eden-pane-ink text-eden-paper`}>주문하기 <ArrowRight size={18} aria-hidden /></span>
+            <span className={`${go} border-eden-pane-ink`}>주문하기 <ArrowRight size={18} aria-hidden /></span>
           </div>
         </Link>
       </section>
       <Link
         to="/gifts"
-        className="pad group flex flex-wrap items-center justify-between gap-4 bg-eden-paper-dim py-8 transition-colors hover:bg-[#E9E2D4]"
+        className="pad group flex flex-wrap items-center justify-between gap-4 border-b border-eden-line bg-eden-paper-dim py-7 transition-colors hover:bg-[#E9E2D4]"
       >
-        <span className="font-serif text-[clamp(1.25rem,1.9vw,1.6rem)]">모임과 행사에 나눌 답례품도 미리 예약받습니다</span>
+        <span className="flex flex-wrap items-baseline gap-x-5 gap-y-1">
+          <span className="eyebrow">답례품</span>
+          <span className="font-serif text-[clamp(1.2rem,1.8vw,1.5rem)]">모임과 행사에 나눌 답례품도 미리 예약받습니다</span>
+        </span>
         <span className="inline-flex items-center gap-1.5 text-[1rem] font-bold text-eden-accent group-hover:underline group-hover:underline-offset-4">
           답례품 예약 <ArrowRight size={17} />
         </span>
@@ -157,47 +160,52 @@ function HomePage() {
       {/* The breads */}
       {slides.length ? (
         <section className="pad bg-eden-paper-dim pb-20 pt-[70px]">
-          <h2 className="mb-8 text-[clamp(1.9rem,3vw,2.8rem)]">{cv('menuHome.title')}</h2>
+          <p className="eyebrow">메뉴</p>
+          <h2 className="mb-7 mt-3 text-[clamp(1.4rem,2.1vw,1.9rem)]">{cv('menuHome.title')}</h2>
           <Slider slides={slides} label="이든카페 빵" />
-          <p className="mt-5 text-[1rem] text-eden-ink">
-            날짜마다 메뉴가 다릅니다. 주문 화면에서 날짜를 고르면 그날 메뉴가 나옵니다.
+          <p className="mt-5 flex items-center gap-1.5 text-[0.9rem] text-eden-mute">
+            <Info size={15} strokeWidth={1.7} /> 날짜마다 메뉴가 다릅니다. 주문 화면에서 날짜를 고르면 그날 메뉴가 나옵니다.
           </p>
         </section>
       ) : null}
 
-      {/* Pickup basics on green, with the days open for orders */}
-      <section className="pad bg-eden-accent py-[clamp(72px,9vw,140px)] text-white">
+      {/* Pickup basics on red, with the days open for orders */}
+      <section className="pad bg-eden-accent py-[90px] text-white">
+        <p className="eyebrow !text-white">픽업 안내</p>
         <Reveal>
-          <h2 className="mb-12 text-[clamp(1.9rem,3.4vw,3.2rem)] leading-[1.25]">
+          <h2 className="mb-9 mt-4 text-[clamp(1.5rem,2.6vw,2.3rem)] leading-[1.35]">
             주문 마감과
             <br />
             픽업 시간입니다.
           </h2>
         </Reveal>
-        <Reveal className="mb-12 grid gap-x-10 gap-y-7 md:grid-cols-3">
-          <div className="flex flex-col gap-1">
-            <span className="text-[1.05rem] opacity-90">주문 마감</span>
-            <b className="text-[clamp(1.5rem,2.2vw,2rem)] font-semibold leading-tight">픽업 2일 전까지</b>
+        <Reveal className="mb-9 grid gap-5 md:grid-cols-3">
+          <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
+            <CalendarDays size={28} strokeWidth={1.6} />
+            <b className="text-[1.25rem] font-semibold">픽업 2일 전까지</b>
+            <span className="text-[0.95rem] opacity-90">주문 마감</span>
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-[1.05rem] opacity-90">픽업 요일</span>
-            <b className="text-[clamp(1.5rem,2.2vw,2rem)] font-semibold leading-tight">월요일 ~ 금요일</b>
+          <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
+            <Store size={28} strokeWidth={1.6} />
+            <b className="text-[1.25rem] font-semibold">월요일 ~ 금요일</b>
+            <span className="text-[0.95rem] opacity-90">픽업 요일</span>
           </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-[1.05rem] opacity-90">픽업 시간</span>
-            <b className="text-[clamp(1.5rem,2.2vw,2rem)] font-semibold leading-tight">{pickupTime || '매장 운영 시간'}</b>
+          <div className="flex flex-col gap-1.5 border-t border-white/50 pt-4">
+            <Clock size={28} strokeWidth={1.6} />
+            <b className="text-[1.25rem] font-semibold">{pickupTime || '매장 운영 시간'}</b>
+            <span className="text-[0.95rem] opacity-90">픽업 시간</span>
           </div>
         </Reveal>
         {calendar?.days.length ? (
           <div className="mb-9">
-            <p className="mb-3 text-[1.05rem] opacity-90">지금 주문할 수 있는 픽업 날짜</p>
+            <p className="mb-3 text-[0.95rem] opacity-90">지금 주문할 수 있는 픽업 날짜</p>
             <div className="grid grid-cols-5 gap-2">
               {calendar.days.map((d) => (
                 <Link
                   key={d.iso}
                   to="/order"
                   search={{ date: d.iso }}
-                  className={`flex h-[88px] flex-col items-center justify-center gap-0.5 rounded-[2px] bg-white/[.12] px-1 hover:bg-white/[.22] ${d.open ? '' : 'pointer-events-none opacity-50'}`}
+                  className={`flex h-[88px] flex-col items-center justify-center gap-0.5 rounded-[2px] border border-white/45 px-1 hover:bg-white/10 ${d.open ? '' : 'pointer-events-none opacity-50'}`}
                 >
                   {/* Same type as the date picker on the order page. */}
                   <span className="text-2xl font-medium leading-tight">{d.weekday}</span>
@@ -209,8 +217,8 @@ function HomePage() {
             </div>
           </div>
         ) : null}
-        <p className="mb-6 text-[1.05rem]">
-          주문을 마치면 입금할 계좌와 금액이 바로 나옵니다.
+        <p className="mb-6 flex items-center gap-2 text-[1rem]">
+          <Bell size={17} strokeWidth={1.7} /> 주문을 마치면 입금할 계좌와 금액이 바로 나옵니다.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link to="/order" className="btn ivory">
@@ -223,24 +231,23 @@ function HomePage() {
       </section>
 
       {/* News */}
-      <section id="news" className="pad py-[clamp(72px,9vw,140px)]">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="text-[clamp(1.9rem,3vw,2.8rem)]">새소식</h2>
-          <Link to="/support" className="inline-flex items-center gap-1 text-[1.05rem] font-bold text-eden-accent hover:underline hover:underline-offset-4">
+      <section id="news" className="pad pb-[90px] pt-[70px]">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="eyebrow">소식</p>
+            <h2 className="mt-3 text-[clamp(1.4rem,2.1vw,1.9rem)]">새소식</h2>
+          </div>
+          <Link to="/support" className="inline-flex items-center gap-1 text-[0.95rem] font-bold text-eden-accent hover:underline hover:underline-offset-4">
             전체 보기 <ArrowRight size={15} />
           </Link>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="border-t-2 border-eden-ink">
           {HOME_NEWS_KEYS.map((key, i) => (
-            <Reveal key={key} delay={i * 80}>
-              <NewsLink
-                tag={cv(`news.${key}.tag`)}
-                newsKey={key}
-                className="group flex flex-wrap items-center gap-x-5 gap-y-1 bg-eden-paper-dim px-6 py-5 transition-colors hover:bg-[#E9E2D4]"
-              >
-                <span className="w-10 text-[1rem] font-bold text-eden-accent">{cv(`news.${key}.tag`)}</span>
-                <span className="min-w-0 flex-1 text-[1.15rem] font-medium group-hover:text-eden-accent">{cv(`news.${key}.title`)}</span>
-                <span className="basis-full pl-[3.75rem] text-[1rem] text-eden-mute sm:basis-auto sm:pl-0">{cv(`news.${key}.date`)}</span>
+            <Reveal key={key} delay={i * 80} className="border-b border-eden-line">
+              <NewsLink tag={cv(`news.${key}.tag`)} newsKey={key} className="group flex flex-wrap items-center gap-x-4 gap-y-1 py-5">
+                <span className="rounded-full border border-eden-accent px-3 py-0.5 text-[0.8rem] font-bold text-eden-accent">{cv(`news.${key}.tag`)}</span>
+                <span className="min-w-0 flex-1 text-[1.1rem] font-medium group-hover:text-eden-accent">{cv(`news.${key}.title`)}</span>
+                <span className="text-[0.9rem] text-eden-mute">{cv(`news.${key}.date`)}</span>
               </NewsLink>
             </Reveal>
           ))}
@@ -248,9 +255,10 @@ function HomePage() {
       </section>
 
       {/* About teaser */}
-      <section className="pad bg-eden-ink py-[clamp(72px,9vw,140px)] text-eden-paper">
+      <section className="pad bg-eden-ink py-[80px] text-eden-paper">
         <Reveal>
-          <h2 className="mb-10 text-[clamp(1.9rem,3.4vw,3.2rem)] leading-[1.25]">
+          <p className="eyebrow !text-eden-paper">카페 이야기</p>
+          <h2 className="mb-9 mt-4 text-[clamp(1.5rem,2.6vw,2.3rem)] leading-[1.35]">
             학생들의 작은 시작이
             <br />
             협동조합 카페가 되었습니다.

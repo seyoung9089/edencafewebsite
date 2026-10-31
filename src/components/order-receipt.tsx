@@ -4,6 +4,7 @@ import { maxQtyFor, type CartItem } from '@/lib/cart'
 import type { MenuItem } from '@/lib/menu'
 import type { PickupDate } from '@/lib/pickup'
 import { CopyLabel, usePayment } from '@/components/payment-info'
+import { rememberReturnTo } from '@/lib/return-to'
 
 const won = (n: number) => `${n.toLocaleString('ko-KR')}원`
 
@@ -48,10 +49,10 @@ function FridayFields({
 }: Pick<ReceiptProps, 'studentName' | 'onStudentName' | 'paymentMethod' | 'onPaymentMethod' | 'studentDepositNote'>) {
   const pay = usePayment()
   return (
-    <div className="mt-4 space-y-4 rounded-[10px] border border-eden-sand/60 bg-eden-paper px-4 py-4">
+    <div className="mt-4 space-y-4 rounded-[2px] border border-eden-accent/60 bg-eden-paper px-4 py-4">
       <label className="block">
         <span className="text-sm font-semibold">
-          학생 이름 <span className="text-eden-sand">(필수)</span>
+          학생 이름 <span className="text-eden-accent">(필수)</span>
         </span>
         <input
           value={studentName}
@@ -59,9 +60,9 @@ function FridayFields({
           maxLength={30}
           placeholder="예: 김이든"
           autoComplete="off"
-          className="mt-1.5 h-12 w-full rounded-[10px] border border-eden-line bg-eden-paper-dim px-3 text-base text-eden-ink placeholder:text-eden-sage-dim/70"
+          className="mt-1.5 h-12 w-full rounded-[2px] border border-eden-line bg-eden-paper-dim px-3 text-base text-eden-ink placeholder:text-eden-mute/70"
         />
-        <span className="mt-1 block text-xs text-eden-sage-dim">금요일 하교할 때 이 이름으로 찾아가요.</span>
+        <span className="mt-1 block text-xs text-eden-mute">금요일 하교할 때 이 이름으로 찾아가요.</span>
       </label>
 
       <fieldset>
@@ -78,8 +79,8 @@ function FridayFields({
               type="button"
               aria-pressed={paymentMethod === value}
               onClick={() => onPaymentMethod(value)}
-              className={`h-12 rounded-full border text-base font-semibold transition-colors ${
-                paymentMethod === value ? 'border-eden-ink bg-eden-ink text-eden-paper' : 'border-eden-line bg-eden-paper-dim text-eden-ink'
+              className={`h-12 rounded-[3px] border text-base font-semibold transition-colors ${
+                paymentMethod === value ? 'border-eden-accent bg-eden-accent text-white' : 'border-eden-line bg-white text-eden-ink'
               }`}
             >
               {label}
@@ -89,7 +90,7 @@ function FridayFields({
       </fieldset>
 
       {paymentMethod === 'transfer' ? (
-        <div className="rounded-[10px] bg-eden-sage-dim px-4 py-3 text-sm leading-relaxed text-eden-paper">
+        <div className="rounded-[2px] bg-eden-mute px-4 py-3 text-sm leading-relaxed text-eden-paper">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span>
               {pay.bank} <strong>{pay.account}</strong>
@@ -102,7 +103,7 @@ function FridayFields({
           <div className="mt-1 font-semibold">{studentDepositNote}</div>
         </div>
       ) : paymentMethod === 'onsite' ? (
-        <p className="rounded-[10px] bg-eden-paper-dim px-4 py-3 text-sm text-eden-sage-dim">학생이 찾아갈 때 매장에서 결제해요.</p>
+        <p className="rounded-[2px] bg-eden-paper-dim px-4 py-3 text-sm text-eden-mute">학생이 찾아갈 때 매장에서 결제해요.</p>
       ) : null}
     </div>
   )
@@ -132,27 +133,28 @@ export function OrderReceipt({
   onCheckout,
 }: ReceiptProps) {
   return (
-    <div className="rounded-card bg-eden-paper-dim p-5 shadow-soft">
-      <h2 className="font-serif text-lg font-semibold">주문 내역</h2>
+    <div className="border border-eden-line bg-white p-5">
+      <p className="eyebrow">YOUR ORDER</p>
+      <h2 className="mt-1.5 text-[1.35rem]">주문 내역</h2>
 
-      <div className="mt-3 rounded-[10px] bg-eden-sand/15 px-4 py-3">
-        <div className="text-xs text-eden-sage-dim">픽업 날짜</div>
+      <div className="mt-3 border-y border-eden-line py-3">
+        <div className="text-xs text-eden-mute">픽업 날짜</div>
         {pickup ? (
           <>
-            <div className="font-serif text-base font-semibold text-eden-ink">
+            <div className="font-serif text-base font-light text-eden-ink">
               {pickup.label}
-              {pickupTime && !parents ? <span className="ml-1.5 font-sans text-sm font-normal text-eden-sage-dim">{pickupTime}</span> : null}
+              {pickupTime && !parents ? <span className="ml-1.5 font-sans text-sm font-normal text-eden-mute">{pickupTime}</span> : null}
             </div>
-            {parents ? <p className="mt-1 text-xs leading-relaxed text-eden-sage-dim">학생이 금요일 하교할 때 찾아가요.</p> : null}
+            {parents ? <p className="mt-1 text-xs leading-relaxed text-eden-mute">학생이 금요일 하교할 때 찾아가요.</p> : null}
           </>
         ) : (
-          <div className="font-semibold text-eden-sand">먼저 픽업 날짜를 골라 주세요</div>
+          <div className="font-semibold text-eden-accent">먼저 픽업 날짜를 골라 주세요</div>
         )}
       </div>
 
-      <div className="mt-4 border-t border-dashed border-eden-sage-dim/40">
+      <div className="mt-4 border-t border-dashed border-eden-mute/40">
         {items.length === 0 ? (
-          <p className="py-8 text-center text-sm text-eden-sage-dim">아직 담은 메뉴가 없어요.</p>
+          <p className="py-8 text-center text-sm text-eden-mute">아직 담은 메뉴가 없어요.</p>
         ) : (
           items.map((it) => (
             <div key={it.name} className="border-b border-dashed border-eden-line py-3">
@@ -162,7 +164,7 @@ export function OrderReceipt({
                   type="button"
                   onClick={() => onRemove(it.name)}
                   aria-label={`${it.name} 빼기`}
-                  className="-mr-1 p-1 text-eden-sage-dim hover:text-destructive"
+                  className="-mr-1 p-1 text-eden-mute hover:text-destructive"
                 >
                   <X size={16} />
                 </button>
@@ -189,7 +191,7 @@ export function OrderReceipt({
                     <Plus size={13} />
                   </button>
                 </div>
-                <span className="font-serif font-semibold">{won(it.price * it.qty)}</span>
+                <span className="font-serif font-light">{won(it.price * it.qty)}</span>
               </div>
             </div>
           ))
@@ -198,7 +200,7 @@ export function OrderReceipt({
 
       <div className="mt-4 flex items-baseline justify-between">
         <span className="font-semibold">합계</span>
-        <span className="font-serif text-2xl font-bold text-eden-sand">{won(totalPrice)}</span>
+        <span className="font-serif text-2xl font-light text-eden-accent">{won(totalPrice)}</span>
       </div>
 
       {parents ? (
@@ -214,7 +216,7 @@ export function OrderReceipt({
       {gift ? (
         <label className="mt-4 block">
           <span className="text-sm font-semibold">
-            요청사항 <span className="font-normal text-eden-sage-dim">(선택)</span>
+            요청사항 <span className="font-normal text-eden-mute">(선택)</span>
           </span>
           <textarea
             value={requestNote}
@@ -222,22 +224,22 @@ export function OrderReceipt({
             maxLength={300}
             rows={3}
             placeholder="예: 포장 문구, 행사 이름, 연락받을 번호"
-            className="mt-1.5 w-full rounded-[10px] border border-eden-line bg-eden-paper px-3 py-2 text-base text-eden-ink placeholder:text-eden-sage-dim/70"
+            className="mt-1.5 w-full rounded-[2px] border border-eden-line bg-eden-paper px-3 py-2 text-base text-eden-ink placeholder:text-eden-mute/70"
           />
         </label>
       ) : null}
 
       <div className="mt-5">
         {loggedIn === null ? (
-          <div className="h-14 w-full animate-pulse rounded-full bg-eden-line" />
+          <div className="h-14 w-full animate-pulse rounded-[3px] bg-eden-line" />
         ) : loggedIn ? (
           <>
-            {blocker && items.length > 0 ? <p className="mb-2 text-center text-sm font-semibold text-eden-sand">{blocker}</p> : null}
+            {blocker && items.length > 0 ? <p className="mb-2 text-center text-sm font-semibold text-eden-accent">{blocker}</p> : null}
             <button
               type="button"
               onClick={onCheckout}
               disabled={Boolean(blocker) || items.length === 0 || submitting}
-              className="h-14 w-full rounded-full bg-eden-ink text-base font-semibold text-eden-paper transition-colors hover:bg-eden-ink-2 disabled:opacity-40"
+              className="h-14 w-full rounded-[3px] bg-eden-accent text-base font-semibold text-white transition-colors hover:bg-eden-accent-d disabled:opacity-40"
             >
               {submitting ? '주문하는 중…' : gift ? '예약하기' : '주문하기'}
             </button>
@@ -246,15 +248,16 @@ export function OrderReceipt({
           <>
             <Link
               to="/login"
-              className="flex h-14 w-full items-center justify-center rounded-full bg-eden-ink text-base font-semibold text-eden-paper transition-colors hover:bg-eden-ink-2"
+              onClick={() => rememberReturnTo(parents ? '/parents' : '/order')}
+              className="flex h-14 w-full items-center justify-center rounded-[3px] bg-eden-accent text-base font-semibold text-white transition-colors hover:bg-eden-accent-d"
             >
               {gift ? '로그인하고 예약하기' : '로그인하고 주문하기'}
             </Link>
-            <p className="mt-2 text-center text-xs text-eden-sage-dim">담은 메뉴는 로그인해도 그대로 남아 있어요.</p>
+            <p className="mt-2 text-center text-xs text-eden-mute">처음이시면 회원가입부터 해요. 담은 {gift ? '답례품' : '빵'}은 그대로 남아 있어요.</p>
           </>
         )}
         {loggedIn && (!parents || paymentMethod === 'transfer') ? (
-          <p className="mt-2 text-center text-xs text-eden-sage-dim">주문하면 입금할 계좌를 바로 알려드려요.</p>
+          <p className="mt-2 text-center text-xs text-eden-mute">주문하면 입금할 계좌를 바로 알려드려요.</p>
         ) : null}
       </div>
     </div>

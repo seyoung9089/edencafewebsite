@@ -138,3 +138,8 @@ const DEFAULTS: Record<string, string> = Object.fromEntries(CONTENT_SCHEMA.map((
 export function useContentValue(content: Record<string, string> | undefined, key: string): string {
   return content?.[key] ?? DEFAULTS[key] ?? ''
 }
+
+/** Admin text that still holds a sample value (010-XXXX-XXXX, ○○○, [문의처]) — not shown to customers. */
+export function isPlaceholder(value: string): boolean {
+  return !value.trim() || /XXXX|○○○|^\[.*\]$/.test(value.trim())
+}

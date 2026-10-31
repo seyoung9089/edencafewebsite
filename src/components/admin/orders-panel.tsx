@@ -21,13 +21,6 @@ type Order = {
 }
 
 const PAYMENT_METHOD_LABEL = { transfer: '계좌이체', onsite: '현장결제' } as const
-const PAYMENT_STATUS_LABEL = { pending: '입금 대기', confirmed: '입금 확인', onsite: '현장결제' } as const
-const PAYMENT_BADGE_CLASS = {
-  pending: 'bg-amber-100 text-amber-800 ring-1 ring-inset ring-amber-300',
-  confirmed: 'bg-emerald-100 text-emerald-800 ring-1 ring-inset ring-emerald-300',
-  onsite: 'bg-sky-100 text-sky-800 ring-1 ring-inset ring-sky-300',
-} as const
-
 /** 현장결제 orders aren't waiting on a transfer, so 'wait' reads as 접수. */
 function statusLabel(o: Pick<Order, 'payment_method'>, status: Order['status']): string {
   return o.payment_method === 'onsite' && status === 'wait' ? '접수' : STATUS_LABEL[status]
@@ -79,8 +72,16 @@ export function OrdersPanel() {
     setOrders((data ?? []) as Order[])
     setCustomers(map)
   }
+  // New orders show up without reloading: every minute and when the tab comes back.
   useEffect(() => {
     void refresh()
+    const timer = window.setInterval(() => void refresh(), 60_000)
+    const onFocus = () => void refresh()
+    window.addEventListener('focus', onFocus)
+    return () => {
+      window.clearInterval(timer)
+      window.removeEventListener('focus', onFocus)
+    }
   }, [])
 
   const updateStatus = async (id: string, status: Order['status']) => {
@@ -94,17 +95,19 @@ export function OrdersPanel() {
     }
   }
 
-  const confirmPayment = async (o: Order) => {
-    // The order status follows (입금대기 → 입금확인) in the database.
-    const { error } = await supabase.from('orders').update({ payment_status: 'confirmed' }).eq('id', o.id)
+  // Staff may only write orders.status (column grant), so 입금 확인 sets the
+  // status and the sync_order_payment trigger marks the payment confirmed.
+  const quickStatus = async (o: Order, status: 'done' | 'picked') => {
+    const { error } = await supabase.from('orders').update({ status }).eq('id', o.id)
     if (error) toast.error(error.message)
     else {
-      toast.success(`${o.student_name ?? customers.get(o.user_id) ?? '주문'} 입금 확인했어요.`)
+      const who = o.student_name ? `${o.student_name} 학생` : (customers.get(o.user_id) ?? '주문')
+      toast.success(status === 'done' ? `${who} 입금 확인했어요.` : `${who} 픽업 완료로 바꿨어요.`)
       void refresh()
     }
   }
 
-  if (!orders) return <p className="text-sm text-eden-sage-dim">불러오는 중…</p>
+  if (!orders) return <p className="text-sm text-eden-mute">불러오는 중…</p>
 
   // Today's pickups and later are "upcoming"; older ones are hidden unless asked.
   const todayIso = kstTodayIso(Date.now())
@@ -123,22 +126,27 @@ export function OrdersPanel() {
       return next
     })
   const chip = (active: boolean) =>
-    `rounded-full border px-3 py-1.5 text-sm ${active ? 'border-eden-ink bg-eden-ink text-eden-paper' : 'border-eden-line bg-eden-paper'}`
+    `rounded-[3px] border px-3 py-1.5 text-sm ${active ? 'border-eden-accent bg-eden-accent text-white' : 'border-eden-line bg-eden-paper'}`
 
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         {earliest ? (
-          <p className="rounded-full bg-eden-sand/15 px-4 py-2 text-sm">
-            지금 받는 가장 빠른 픽업 <strong className="text-eden-sand">{earliest.label}</strong> · 마감 {earliest.deadlineLabel} 23:59
+          <p className="rounded-[3px] bg-eden-paper-dim px-4 py-2 text-sm">
+            지금 받는 가장 빠른 픽업 <strong className="text-eden-accent">{earliest.label}</strong> · 마감 {earliest.deadlineLabel} 23:59
           </p>
         ) : (
           <span />
         )}
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={showPast} onChange={(e) => setShowPast(e.target.checked)} />
-          지난 픽업도 보기
-        </label>
+        <span className="flex items-center gap-4">
+          <button type="button" onClick={() => void refresh()} className="rounded-[3px] border border-eden-line bg-eden-paper px-3 py-1.5 text-sm hover:border-eden-ink">
+            새로고침
+          </button>
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={showPast} onChange={(e) => setShowPast(e.target.checked)} />
+            지난 픽업도 보기
+          </label>
+        </span>
       </div>
 
       {allDates.length > 1 ? (
@@ -154,7 +162,7 @@ export function OrdersPanel() {
         </div>
       ) : null}
 
-      {dates.length === 0 ? <p className="py-6 text-center text-sm text-eden-sage-dim">해당하는 주문이 없어요.</p> : null}
+      {dates.length === 0 ? <p className="py-6 text-center text-sm text-eden-mute">해당하는 주문이 없어요.</p> : null}
       {dates.map((iso) => {
         const friday = pickupDayOf(iso) === 'friday'
         const nameOrder = friday && !byOrderTime.has(iso)
@@ -165,18 +173,18 @@ export function OrdersPanel() {
         return (
           <section key={iso} className="mb-10 last:mb-0">
             <div className="mb-3 flex flex-wrap items-baseline gap-3 border-b-2 border-eden-ink pb-3">
-              <h3 className="font-serif text-lg font-semibold">{dateLabel(iso)} 픽업</h3>
+              <h3 className="font-serif text-lg font-light">{dateLabel(iso)} 픽업</h3>
               {active.some((o) => o.order_type === 'gift') ? (
-                <span className="rounded-full bg-eden-sage-dim px-2.5 py-0.5 text-xs font-semibold text-eden-paper">
+                <span className="rounded-full bg-eden-mute px-2.5 py-0.5 text-xs font-semibold text-eden-paper">
                   답례품 {active.filter((o) => o.order_type === 'gift').length}건
                 </span>
               ) : null}
               {friday ? (
-                <span className="rounded-full bg-eden-sand px-2.5 py-0.5 text-xs font-semibold text-eden-ink-2">
+                <span className="rounded-full bg-eden-accent px-2.5 py-0.5 text-xs font-semibold text-white">
                   학부모 주문 {active.filter((o) => o.student_name).length}건
                 </span>
               ) : null}
-              <span className="text-sm text-eden-sage-dim">
+              <span className="text-sm text-eden-mute">
                 주문 {active.length}건 · 입금대기 {active.filter((o) => o.payment_status === 'pending').length}건 ·{' '}
                 {active.reduce((sum, o) => sum + o.total, 0).toLocaleString('ko-KR')}원
                 {active.length < list.length ? ` · 취소 ${list.length - active.length}건` : ''}
@@ -192,48 +200,49 @@ export function OrdersPanel() {
                 </span>
               ) : null}
             </div>
-            <p className="mb-4 rounded-[10px] bg-eden-paper px-4 py-3 text-sm">
+            <p className="mb-4 rounded-[2px] bg-eden-paper px-4 py-3 text-sm">
               <strong className="mr-2">준비할 메뉴</strong>
               {[...prep].map(([name, qty]) => `${name} ${qty}개`).join(' · ')}
             </p>
             <div className="space-y-2">
               {list.map((o) => (
-                <article key={o.id} className={`flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[10px] border border-eden-line bg-eden-paper p-4 ${o.status === 'cancelled' ? 'opacity-60' : ''}`}>
+                <article key={o.id} className={`flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[2px] border border-eden-line bg-eden-paper p-4 ${o.status === 'cancelled' ? 'opacity-60' : ''}`}>
                   <div className="min-w-48 flex-1">
                     {o.student_name ? (
-                      <p className="font-serif text-lg font-semibold">
-                        {o.student_name} <span className="font-sans text-xs font-normal text-eden-sage-dim">학생 · 주문 {customers.get(o.user_id) ?? o.user_id.slice(0, 8)}</span>
+                      <p className="font-serif text-lg font-light">
+                        {o.student_name} <span className="font-sans text-xs font-normal text-eden-mute">학생 · 주문 {customers.get(o.user_id) ?? o.user_id.slice(0, 8)}</span>
                       </p>
                     ) : (
                       <p className="text-sm font-semibold">
                         {o.order_type === 'gift' ? (
-                          <span className="mr-2 rounded-full bg-eden-sage-dim px-2 py-0.5 text-xs text-eden-paper">답례품</span>
+                          <span className="mr-2 rounded-full bg-eden-mute px-2 py-0.5 text-xs text-eden-paper">답례품</span>
                         ) : null}
                         {customers.get(o.user_id) ?? o.user_id.slice(0, 8)}
                       </p>
                     )}
                     <p className="text-sm">{o.items.map((i) => `${i.name} × ${i.qty}`).join(', ')}</p>
-                    {o.request_note ? <p className="mt-1 whitespace-pre-wrap text-sm text-eden-sage-dim">요청사항: {o.request_note}</p> : null}
+                    {o.request_note ? <p className="mt-1 whitespace-pre-wrap text-sm text-eden-mute">요청사항: {o.request_note}</p> : null}
                   </div>
-                  <span className="font-semibold">{o.total.toLocaleString('ko-KR')}원</span>
-                  <span className="text-xs text-eden-sage-dim">{PAYMENT_METHOD_LABEL[o.payment_method]}</span>
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${PAYMENT_BADGE_CLASS[o.payment_status]}`}>{PAYMENT_STATUS_LABEL[o.payment_status]}</span>
-                  {o.payment_status === 'pending' && o.status !== 'cancelled' ? (
-                    <button
-                      type="button"
-                      onClick={() => void confirmPayment(o)}
-                      className="rounded-full bg-eden-ink px-4 py-2 text-sm font-semibold text-eden-paper hover:bg-eden-ink-2"
-                    >
+                  <span className="font-semibold">
+                    {o.total.toLocaleString('ko-KR')}원 <span className="text-xs font-normal text-eden-mute">{PAYMENT_METHOD_LABEL[o.payment_method]}</span>
+                  </span>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_BADGE_CLASS[o.status]}`}>{statusLabel(o, o.status)}</span>
+                  {/* The one next step for this order, as a big button. */}
+                  {o.status === 'wait' && o.payment_method === 'transfer' ? (
+                    <button type="button" onClick={() => void quickStatus(o, 'done')} className="rounded-[3px] bg-eden-accent px-4 py-2 text-sm font-semibold text-white hover:bg-eden-accent-d">
                       입금 확인
                     </button>
+                  ) : o.status === 'done' || (o.status === 'wait' && o.payment_method === 'onsite') ? (
+                    <button type="button" onClick={() => void quickStatus(o, 'picked')} className="rounded-[3px] bg-eden-accent px-4 py-2 text-sm font-semibold text-white hover:opacity-90">
+                      픽업 완료
+                    </button>
                   ) : null}
-                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_BADGE_CLASS[o.status]}`}>{statusLabel(o, o.status)}</span>
                   <select
-                    aria-label="입금·픽업 상태"
+                    aria-label="상태 직접 바꾸기"
                     value={o.status}
                     disabled={o.status === 'cancelled'}
                     onChange={(e) => void updateStatus(o.id, e.target.value as Order['status'])}
-                    className={`rounded-[10px] border p-2 text-sm font-medium focus:outline-none focus:ring-2 ${STATUS_SELECT_CLASS[o.status]}`}
+                    className={`rounded-[2px] border p-2 text-sm font-medium focus:outline-none focus:ring-2 ${STATUS_SELECT_CLASS[o.status]}`}
                   >
                     {(Object.keys(STATUS_LABEL) as Order['status'][]).map((value) => (
                       <option key={value} value={value}>

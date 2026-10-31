@@ -50,7 +50,7 @@ export function usePayment() {
 /** Small "복사" pill that turns into "복사됨" for a moment after copying. */
 export function CopyLabel({ copied, className = '' }: { copied: boolean; className?: string }) {
   return (
-    <span className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${copied ? 'bg-eden-sand text-eden-ink-2' : 'bg-eden-sand/15 text-eden-sand'} ${className}`}>
+    <span className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${copied ? 'bg-eden-accent text-white' : 'bg-eden-paper-dim text-eden-accent'} ${className}`}>
       {copied ? <Check size={13} strokeWidth={3} /> : <Copy size={13} />}
       {copied ? '복사됨' : '복사'}
     </span>
@@ -61,7 +61,7 @@ export function PaymentInfo({ total, className = '' }: { total: number; classNam
   const { bank, account, holder, note, copy, copied } = usePayment()
 
   return (
-    <div className={`rounded-[10px] bg-eden-sage-dim px-4 py-3 text-sm leading-relaxed text-eden-paper ${className}`}>
+    <div className={`rounded-[2px] bg-eden-mute px-4 py-3 text-sm leading-relaxed text-eden-paper ${className}`}>
       <div className="flex flex-wrap items-center gap-x-2">
         <span>
           {bank} <strong>{account}</strong>

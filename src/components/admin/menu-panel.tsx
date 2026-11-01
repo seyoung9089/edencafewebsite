@@ -127,7 +127,13 @@ function MenuRow({
       })
       .eq('name', item.name)
     setBusy(false)
-    if (error) return void toast.error(error.message)
+    if (error) {
+      // 메뉴 이름이 menu_catalog의 기본키라서, 다른 메뉴가 이미 쓰는 이름으로 바꾸면 23505가 나요.
+      if (error.code === '23505') {
+        return void toast.error(`"${name.trim()}" 이름의 메뉴가 이미 있어요. 다른 이름으로 바꾸거나, 겹치는 메뉴를 먼저 삭제한 뒤 저장해주세요.`)
+      }
+      return void toast.error(error.message)
+    }
     toast.success(`${name.trim()} 저장했어요.`)
     await onChanged()
   }

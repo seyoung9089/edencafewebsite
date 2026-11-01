@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Pencil } from 'lucide-react'
-import { InfoRows } from '@/components/info-rows'
-import { PaymentInfo } from '@/components/payment-info'
+import { CopyLabel, usePayment } from '@/components/payment-info'
 import { kstTodayIso, pickupLabel } from '@/lib/pickup'
 import { useContentValue, useSiteContent } from '@/lib/site-content'
 
@@ -54,7 +53,7 @@ function StatusSteps({ order }: { order: CustomerOrder }) {
   const steps = [order.payment_method === 'onsite' ? '주문 접수' : '입금 대기', '준비 중', '픽업 완료']
   const current = order.status === 'wait' ? 0 : order.status === 'done' ? 1 : 2
   return (
-    <ol className="mb-4 grid grid-cols-3" aria-label={`주문 상태: ${steps[current]}`}>
+    <ol className="grid grid-cols-3" aria-label={`주문 상태: ${steps[current]}`}>
       {steps.map((step, i) => (
         <li key={step} className="relative flex flex-col items-center gap-1.5 text-center">
           {i > 0 ? (
@@ -71,17 +70,6 @@ function StatusSteps({ order }: { order: CustomerOrder }) {
       ))}
     </ol>
   )
-}
-
-/** What the customer does next, in one line. */
-function nextStep(order: CustomerOrder, pickupTime: string): string | null {
-  const day = pickupLabel(order.pickup_date)
-  const when = `${day}${pickupTime ? ` ${pickupTime}` : ''}`
-  if (order.status === 'wait' && order.payment_method === 'transfer') return '아래 계좌로 입금해 주세요. 입금이 확인되면 준비를 시작해요.'
-  if (order.status === 'wait') return `${day}에 ${order.student_name ?? ''} 학생이 찾아갈 때 매장에서 결제해 주세요.`
-  if (order.status === 'done' && order.student_name) return `${day} 하교할 때 ${order.student_name} 학생이 찾아가면 돼요.`
-  if (order.status === 'done') return `${when}에 이든카페에 오셔서 이름을 말씀해 주세요.`
-  return null
 }
 
 /** "10월 27일(화)", the same way pickup days read. */
@@ -178,46 +166,86 @@ function CancelButton({ order, onCancel }: { order: CustomerOrder; onCancel: (id
   )
 }
 
+/** The sketch's bottom box: where to send the money, with a copy button. */
+function AccountBox({ total }: { total: number }) {
+  const { bank, account, holder, note, copy, copied } = usePayment()
+  return (
+    <div className="mt-6 rounded-[3px] border-2 border-eden-ink/70 bg-eden-paper px-5 py-4">
+      <h4 className="mb-2 text-base font-semibold">계좌정보</h4>
+      <div className="flex flex-wrap items-center gap-x-2 text-[17px]">
+        <span>
+          {bank} <strong>{account}</strong>
+        </span>
+        <button type="button" onClick={(e) => void copy(e.currentTarget)} aria-label="계좌번호 복사">
+          <CopyLabel copied={copied} />
+        </button>
+      </div>
+      <div className="text-[15px]">예금주 {holder}</div>
+      <div className="text-[15px]">
+        입금금액 <strong>{won(total)}</strong>
+      </div>
+      {note ? <div className="mt-1 text-sm text-eden-mute">{note}</div> : null}
+    </div>
+  )
+}
+
+/**
+ * One order as a single sheet, top to bottom: pickup date (big) → status and
+ * progress dots → every item → total → bank account box. Nothing is folded away.
+ */
 function OrderCard({ order, onCancel, highlight = false }: { order: CustomerOrder; onCancel: (id: string) => Promise<boolean>; highlight?: boolean }) {
   const pickupTime = useContentValue(useSiteContent(), 'pickup.time')
-  const next = nextStep(order, pickupTime)
+  const cancelled = order.status === 'cancelled'
+  const when = order.student_name ? `${order.student_name} 학생이 하교할 때` : pickupTime
   return (
-    <article className={`rounded-card bg-eden-paper-dim p-5 shadow-soft ${highlight && order.status !== 'cancelled' ? 'border border-eden-accent/60' : ''} ${order.status === 'cancelled' ? 'opacity-60' : ''}`}>
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <strong className={order.status === 'wait' ? 'text-eden-accent' : ''}>{statusLabel(order)}</strong>
+    <article className={`rounded-card bg-eden-paper-dim p-5 shadow-soft sm:p-6 ${highlight && !cancelled ? 'border border-eden-accent/60' : ''} ${cancelled ? 'opacity-60' : ''}`}>
+      {/* ① 픽업 날짜 */}
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h4 className="font-serif text-2xl font-normal sm:text-[28px]">{pickupLabel(order.pickup_date)} 픽업</h4>
         <span className="text-sm text-eden-mute">{orderedOn(order.created_at)} 주문</span>
       </div>
-      <StatusSteps order={order} />
-      {next ? <p className="mb-4 bg-eden-paper px-4 py-3 text-[15px] font-semibold leading-relaxed">{next}</p> : null}
-      {order.order_type === 'gift' ? (
-        <p className="mb-2 text-sm">
-          <span className="rounded-full bg-eden-mute px-2 py-0.5 text-xs font-semibold text-eden-paper">답례품</span>
-          {order.request_note ? <span className="ml-2 text-eden-mute">{order.request_note}</span> : null}
+      {when || order.order_type === 'gift' ? (
+        <p className="mt-1 text-[15px] text-eden-mute">
+          {order.order_type === 'gift' ? <span className="mr-2 rounded-full bg-eden-mute px-2 py-0.5 text-xs font-semibold text-eden-paper">답례품</span> : null}
+          {when}
         </p>
       ) : null}
-      <InfoRows
-        className="mb-3"
-        rows={[
-          { label: '픽업', value: pickupLabel(order.pickup_date), note: order.student_name ? '학생이 하교할 때 찾아가요' : pickupTime || undefined },
-          ...(order.student_name ? [{ label: '학생', value: order.student_name }] : []),
-          { label: '결제', value: order.payment_method === 'onsite' ? '현장결제' : '계좌이체' },
-        ]}
-      />
-      {order.items.map((i) => (
-        <div key={i.name} className="flex justify-between text-sm">
-          <span>
-            {i.name} × {i.qty}
-          </span>
-          <span>{won(i.price * i.qty)}</span>
-        </div>
-      ))}
-      <div className="mt-3 flex justify-between border-t border-eden-line pt-3 font-semibold">
+
+      {/* ② 상태 + 진행 점 */}
+      <p className={`mb-3 mt-5 text-lg font-semibold ${order.status === 'wait' ? 'text-eden-accent' : ''}`}>{statusLabel(order)}</p>
+      <StatusSteps order={order} />
+
+      {/* ③ 품목 */}
+      <h5 className="mb-2 mt-6 text-sm font-semibold text-eden-mute">품목</h5>
+      <ul className="space-y-1.5">
+        {order.items.map((i) => (
+          <li key={i.name} className="flex justify-between gap-4 text-base">
+            <span>
+              {i.name} × {i.qty}
+            </span>
+            <span className="shrink-0 tabular-nums">{won(i.price * i.qty)}</span>
+          </li>
+        ))}
+      </ul>
+      {order.request_note ? <p className="mt-2 text-sm text-eden-mute">요청사항: {order.request_note}</p> : null}
+
+      {/* ④ 합계 */}
+      <div className="mt-4 flex justify-between border-t border-eden-ink/40 pt-3 text-lg font-semibold">
         <span>합계</span>
-        <span>{won(order.total)}</span>
+        <span className="tabular-nums">{won(order.total)}</span>
       </div>
+
+      {/* ⑤ 계좌정보 (입금 대기일 때) */}
+      {order.status === 'wait' && order.payment_method === 'transfer' ? <AccountBox total={order.total} /> : null}
+      {order.status === 'wait' && order.payment_method === 'onsite' ? (
+        <div className="mt-6 rounded-[3px] border-2 border-eden-ink/70 bg-eden-paper px-5 py-4 text-[15px]">
+          <h4 className="mb-1 text-base font-semibold">현장결제</h4>
+          찾아가실 때 매장에서 결제해 주세요.
+        </div>
+      ) : null}
+
       {order.status === 'wait' ? (
         <>
-          {order.payment_method === 'transfer' ? <PaymentInfo total={order.total} className="mt-3" /> : null}
           <CancelButton order={order} onCancel={onCancel} />
           <p className="mt-1.5 text-center text-xs text-eden-mute">
             {order.payment_method === 'transfer' ? '입금이 확인되기 전까지만 취소할 수 있어요.' : '준비가 시작되기 전까지만 취소할 수 있어요.'}

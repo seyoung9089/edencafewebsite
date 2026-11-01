@@ -76,7 +76,7 @@ export function MenuPanel() {
   )
 }
 
-/** Bakery is split by kind (가나다 order), then "종류 없음"; other categories stay one list. */
+/** Bakery is split by kind (휘낭시에, 쿠키, …), then "종류 없음"; other categories stay one list. */
 function kindSections(items: MenuItem[], groups: MenuGroup[]): { title: string; items: MenuItem[] }[] {
   if (groups.length === 0) return items.length ? [{ title: '', items }] : []
   const known = new Set(groups.map((g) => g.name))
@@ -323,7 +323,7 @@ function GroupsEditor({ groups, onChanged }: { groups: MenuGroup[]; onChanged: (
     setBusy(true)
     const { error } = await supabase
       .from('menu_groups')
-      .insert({ name: name.trim() })
+      .insert({ name: name.trim(), sort_order: Math.max(0, ...groups.map((g) => g.sort_order)) + 1 })
     setBusy(false)
     if (error) return void toast.error(error.code === '23505' ? '같은 이름의 종류가 이미 있어요.' : error.message)
     setName('')

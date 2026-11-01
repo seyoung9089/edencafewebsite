@@ -49,24 +49,41 @@ export function MenuPanel() {
       {(['bakery', 'gift', 'drink'] as const).map((category) => (
         <section key={category} className="mb-10">
           <h3 className="mb-3 border-b border-eden-line pb-2 font-serif text-lg font-light">{CATEGORY_LABEL[category]}</h3>
-          <div className="space-y-3">
-            {items
-              .filter((i) => i.category === category)
-              .map((item) => (
-                <MenuRow
-                  key={item.name}
-                  item={item}
-                  groups={groups}
-                  otherFeaturedCount={featuredCount - (item.is_featured ? 1 : 0)}
-                  onChanged={refresh}
-                />
-              ))}
-          </div>
+          {kindSections(items.filter((i) => i.category === category), category === 'bakery' ? groups : []).map((sec) => (
+            <div key={sec.title} className="mb-6">
+              {sec.title ? (
+                <h4 className="mb-2 text-sm font-semibold text-eden-mute">
+                  {sec.title} <span className="font-normal">· {sec.items.length}개</span>
+                </h4>
+              ) : null}
+              <div className="space-y-3">
+                {sec.items.map((item) => (
+                  <MenuRow
+                    key={item.name}
+                    item={item}
+                    groups={groups}
+                    otherFeaturedCount={featuredCount - (item.is_featured ? 1 : 0)}
+                    onChanged={refresh}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
         </section>
       ))}
-      <NewMenuForm nextSortOrder={Math.max(0, ...items.map((i) => i.sort_order)) + 1} onAdded={refresh} />
+      <NewMenuForm onAdded={refresh} />
     </div>
   )
+}
+
+/** Bakery is split by kind (가나다 order), then "종류 없음"; other categories stay one list. */
+function kindSections(items: MenuItem[], groups: MenuGroup[]): { title: string; items: MenuItem[] }[] {
+  if (groups.length === 0) return items.length ? [{ title: '', items }] : []
+  const known = new Set(groups.map((g) => g.name))
+  return [
+    ...groups.map((g) => ({ title: g.name, items: items.filter((i) => i.group_name === g.name) })),
+    { title: '종류 없음', items: items.filter((i) => !i.group_name || !known.has(i.group_name)) },
+  ].filter((sec) => sec.items.length > 0)
 }
 
 function MenuRow({
@@ -86,7 +103,6 @@ function MenuRow({
   const [price, setPrice] = useState(String(item.price))
   const [stock, setStock] = useState(item.stock === null ? '' : String(item.stock))
   const [soldOut, setSoldOut] = useState(item.sold_out)
-  const [sortOrder, setSortOrder] = useState(String(item.sort_order))
   const [featured, setFeatured] = useState(item.is_featured)
   const [saleDays, setSaleDays] = useState<PickupDay[]>(item.sale_days)
   const [groupName, setGroupName] = useState(item.group_name ?? '')
@@ -104,11 +120,9 @@ function MenuRow({
   const save = async () => {
     const nextPrice = Number(price)
     const nextStock = stock.trim() === '' ? null : Number(stock)
-    const nextSort = Number(sortOrder)
     if (!name.trim()) return void toast.error('메뉴 이름을 입력해주세요.')
     if (!Number.isInteger(nextPrice) || nextPrice < 0) return void toast.error('가격은 0 이상의 숫자로 입력해주세요. 0원은 "가격 준비 중"이에요.')
     if (nextStock !== null && (!Number.isInteger(nextStock) || nextStock < 0)) return void toast.error('수량은 0 이상의 숫자로 입력하거나 비워두세요.')
-    if (!Number.isInteger(nextSort)) return void toast.error('순서는 숫자로 입력해주세요.')
     if (featured && otherFeaturedCount >= 2) return void toast.error('인기 메뉴는 최대 2개까지 고를 수 있어요. 다른 메뉴의 선택을 먼저 해제해주세요.')
     setBusy(true)
     const { error } = await supabase
@@ -120,7 +134,6 @@ function MenuRow({
         price: nextPrice,
         stock: nextStock,
         sold_out: soldOut,
-        sort_order: nextSort,
         is_featured: featured,
         sale_days: saleDays,
         group_name: groupName || null,
@@ -231,10 +244,6 @@ function MenuRow({
             <input inputMode="numeric" placeholder="제한 없음" value={stock} onChange={(e) => setStock(e.target.value)} className={`w-24 ${inputClass}`} />
           </label>
           <label className="flex items-center gap-1">
-            순서
-            <input inputMode="numeric" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} className={`w-16 ${inputClass}`} />
-          </label>
-          <label className="flex items-center gap-1">
             <input type="checkbox" checked={soldOut} onChange={(e) => setSoldOut(e.target.checked)} />
             품절
           </label>
@@ -259,7 +268,7 @@ function MenuRow({
   )
 }
 
-function NewMenuForm({ nextSortOrder, onAdded }: { nextSortOrder: number; onAdded: () => Promise<void> }) {
+function NewMenuForm({ onAdded }: { onAdded: () => Promise<void> }) {
   const [name, setName] = useState('')
   const [category, setCategory] = useState<MenuItem['category']>('bakery')
   const [price, setPrice] = useState('')
@@ -272,7 +281,7 @@ function NewMenuForm({ nextSortOrder, onAdded }: { nextSortOrder: number; onAdde
     setBusy(true)
     const { error } = await supabase
       .from('menu_catalog')
-      .insert({ name: name.trim(), category, price: nextPrice, sold_out: false, sort_order: nextSortOrder })
+      .insert({ name: name.trim(), category, price: nextPrice, sold_out: false })
     setBusy(false)
     if (error) return void toast.error(error.code === '23505' ? '같은 이름의 메뉴가 이미 있어요.' : error.message)
     toast.success('메뉴를 추가했어요. 설명과 사진은 목록에서 채워주세요.')
@@ -314,7 +323,7 @@ function GroupsEditor({ groups, onChanged }: { groups: MenuGroup[]; onChanged: (
     setBusy(true)
     const { error } = await supabase
       .from('menu_groups')
-      .insert({ name: name.trim(), sort_order: Math.max(0, ...groups.map((g) => g.sort_order)) + 1 })
+      .insert({ name: name.trim() })
     setBusy(false)
     if (error) return void toast.error(error.code === '23505' ? '같은 이름의 종류가 이미 있어요.' : error.message)
     setName('')
@@ -349,17 +358,14 @@ function GroupsEditor({ groups, onChanged }: { groups: MenuGroup[]; onChanged: (
 }
 
 function GroupRow({ group, onChanged }: { group: MenuGroup; onChanged: () => Promise<void> }) {
-  const [sortOrder, setSortOrder] = useState(String(group.sort_order))
   const [maxQty, setMaxQty] = useState(group.max_qty === null ? '' : String(group.max_qty))
   const [busy, setBusy] = useState(false)
 
   const save = async () => {
-    const nextSort = Number(sortOrder)
     const nextMax = maxQty.trim() === '' ? null : Number(maxQty)
-    if (!Number.isInteger(nextSort)) return void toast.error('순서는 숫자로 입력해주세요.')
     if (nextMax !== null && (!Number.isInteger(nextMax) || nextMax < 1)) return void toast.error('최대 수량은 1 이상의 숫자로 입력하거나 비워두세요.')
     setBusy(true)
-    const { error } = await supabase.from('menu_groups').update({ sort_order: nextSort, max_qty: nextMax }).eq('name', group.name)
+    const { error } = await supabase.from('menu_groups').update({ max_qty: nextMax }).eq('name', group.name)
     setBusy(false)
     if (error) return void toast.error(error.message)
     toast.success(`${group.name} 저장했어요.`)
@@ -378,10 +384,6 @@ function GroupRow({ group, onChanged }: { group: MenuGroup; onChanged: () => Pro
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-[2px] border border-eden-line bg-eden-paper px-4 py-2 text-sm">
       <strong className="min-w-24">{group.name}</strong>
-      <label className="flex items-center gap-1">
-        순서
-        <input inputMode="numeric" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} className={`w-16 ${inputClass}`} />
-      </label>
       <label className="flex items-center gap-1">
         한 주문 최대
         <input inputMode="numeric" placeholder="제한 없음" value={maxQty} onChange={(e) => setMaxQty(e.target.value)} className={`w-24 ${inputClass}`} />

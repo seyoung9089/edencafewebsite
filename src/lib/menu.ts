@@ -53,17 +53,21 @@ export function isUnpriced(item: Pick<MenuItem, 'price'>): boolean {
 }
 
 export async function fetchMenuGroups(): Promise<MenuGroup[]> {
-  const { data, error } = await supabase.from('menu_groups').select('name,sort_order,max_qty').order('sort_order')
+  const { data, error } = await supabase.from('menu_groups').select('name,sort_order,max_qty')
   if (error) throw error
-  return (data ?? []).map((g) => ({
-    name: String(g.name),
-    sort_order: Number(g.sort_order) || 0,
-    max_qty: typeof g.max_qty === 'number' ? g.max_qty : null,
-  }))
+  // No manual order any more: kinds are listed in 가나다 order.
+  return (data ?? [])
+    .map((g) => ({
+      name: String(g.name),
+      sort_order: Number(g.sort_order) || 0,
+      max_qty: typeof g.max_qty === 'number' ? g.max_qty : null,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, 'ko'))
 }
 
 export function sortMenu(items: MenuItem[]): MenuItem[] {
-  return [...items].sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name, 'ko'))
+  // No manual order any more: menus are listed in 가나다 order (grouped by kind where the page groups them).
+  return [...items].sort((a, b) => a.name.localeCompare(b.name, 'ko'))
 }
 
 export async function fetchMenu(): Promise<MenuItem[]> {

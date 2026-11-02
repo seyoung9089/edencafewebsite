@@ -84,9 +84,13 @@ export function SiteHeader({ overlay = false }: { overlay?: boolean }) {
             >
               이든카페
             </Link>
-            <span aria-hidden className="hidden h-4 w-px bg-current opacity-30 lg:block" />
-            <Link to="/" aria-label="처음 화면" className="hidden w-6 lg:flex">
-              <EdenMark className="h-auto w-full" />
+            <span aria-hidden className="hidden h-4 w-px bg-current opacity-30 sm:block" />
+            <Link
+              to="/"
+              onClick={() => setMobileOpen(false)}
+              className={`hidden whitespace-nowrap font-serif text-[1rem] font-light sm:block ${clear ? 'text-white' : 'text-eden-green'}`}
+            >
+              Eden cafe
             </Link>
           </div>
 

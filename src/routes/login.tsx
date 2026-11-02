@@ -6,7 +6,12 @@ import { useCustomerAuth } from '@/lib/customer-auth'
 import { supabase } from '@/lib/supabase'
 import { authErrorMessage, takeReturnTo } from '@/lib/return-to'
 
-export const Route = createFileRoute('/login')({ component: LoginPage, head: () => ({ meta: [{ title: '로그인 | 이든카페' }] }) })
+// /login?mode=signup opens straight on 회원가입 (the order card's "주문이 처음이신가요? 회원가입").
+export const Route = createFileRoute('/login')({
+  component: LoginPage,
+  validateSearch: (search: Record<string, unknown>): { mode?: 'signup' } => (search.mode === 'signup' ? { mode: 'signup' } : {}),
+  head: () => ({ meta: [{ title: '로그인 | 이든카페' }] }),
+})
 
 const socialEnabled = {
   google: import.meta.env.VITE_GOOGLE_LOGIN_ENABLED !== 'false',
@@ -16,7 +21,8 @@ const socialEnabled = {
 function LoginPage() {
   const { user, loading } = useCustomerAuth()
   const navigate = useNavigate()
-  const [mode, setMode] = useState<'login' | 'signup' | 'reset'>('login')
+  const search = Route.useSearch()
+  const [mode, setMode] = useState<'login' | 'signup' | 'reset'>(search.mode === 'signup' ? 'signup' : 'login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')

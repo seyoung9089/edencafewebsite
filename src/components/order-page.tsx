@@ -6,7 +6,7 @@ import { OrderReceipt, type PaymentMethod } from '@/components/order-receipt'
 import { PickupDatePicker } from '@/components/pickup-date-picker'
 import { OrderCompleteBody, type PlacedOrder } from '@/components/order-complete'
 import { GIFT_MAX_QTY, MAX_QTY, groupTotals, maxQtyFor, overGroupLimit, reconcileCart, useCart, useGiftCart } from '@/lib/cart'
-import { pickupLabel, usePickupDates } from '@/lib/pickup'
+import { usePickupDates } from '@/lib/pickup'
 import { useCustomerAuth } from '@/lib/customer-auth'
 import { isPlaceholder, useContentValue, useSiteContent } from '@/lib/site-content'
 import { useMenu, isSoldOut, isUnpriced, fetchPopularity, type MenuGroup, type MenuItem } from '@/lib/menu'
@@ -17,7 +17,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import { MenuDetailDialog } from '@/components/menu-detail'
-import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School, CalendarDays, Info, Gift, Clock } from 'lucide-react'
+import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School, Gift } from 'lucide-react'
 import { toast } from 'sonner'
 
 /**
@@ -368,7 +368,7 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
       <SiteHeader />
-      {/* Page top, then the pickup day on a dark band (the reference's 예약 layout). */}
+      {/* Page top */}
       <section className="pad pb-12 pt-[clamp(48px,7vw,100px)]">
         <p className="eyebrow">{parents ? 'PARENTS · FRIDAY' : gift ? 'GIFTS · 답례품' : 'VILLAGE PICKUP'}</p>
         <h1 className="mb-4 mt-3 text-[clamp(1.75rem,3vw,2.6rem)] leading-[1.3]">
@@ -394,70 +394,31 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
         </p>
       </section>
 
-      <section className="pad grid gap-10 bg-eden-ink pb-[clamp(56px,7vw,100px)] pt-[clamp(56px,7vw,90px)] text-eden-paper lg:grid-cols-2 lg:gap-[8%]">
-        <div>
-          <p className="eyebrow !text-eden-paper">STEP 1 · PICKUP DAY</p>
-          <h2 className="mb-5 mt-4 text-[clamp(1.6rem,2.8vw,2.4rem)] leading-[1.3]">
-            {parents ? '금요일을' : '픽업 날짜를'}
-            <br />
-            골라주세요.
-          </h2>
-          <p className="text-[1.05rem] text-eden-mute-2">
-            {parents ? '금요일 픽업은 그 주 수요일 밤 11시 59분까지 주문해 주세요.' : '픽업 2일 전 밤 11시 59분까지 주문해 주세요.'}
-          </p>
-          {parents ? (
-            <div className="mt-6 flex max-w-md gap-3 border-t border-eden-paper/30 pt-5">
-              <School size={22} strokeWidth={1.7} className="mt-0.5 shrink-0" aria-hidden />
-              <p className="text-[1rem] leading-relaxed">{fridayNotice}</p>
-            </div>
-          ) : null}
-        </div>
-
-        <div className="min-w-0 bg-eden-paper p-[clamp(20px,3.2vw,44px)] text-eden-ink">
-          <div className="flex items-center justify-between gap-4 border-b border-eden-line pb-4">
-            <span className="flex items-center gap-2 text-[1rem] font-bold">
-              <CalendarDays size={18} strokeWidth={1.7} aria-hidden /> 날짜
-            </span>
-            <span className={`text-right text-[1.05rem] ${pickup ? 'font-bold' : 'text-eden-mute'}`}>
-              {pickup ? pickup.label : '아래에서 골라 주세요'}
-            </span>
-          </div>
-          <div className="pt-5">
-            <PickupDatePicker
-              days={shownDays}
-              markFriday={!parents && !gift}
-              selected={pickup?.iso ?? null}
-              onSelect={choosePickup}
-            />
-          </div>
-          {pickup ? (
-            <p className="mt-4 flex items-start gap-2 bg-eden-paper-dim px-4 py-3 text-[1rem] leading-relaxed">
-              <Clock size={18} strokeWidth={1.7} className="mt-0.5 shrink-0 text-eden-accent" aria-hidden />
-              <span>
-                <strong>{pickup.label}</strong> 픽업은 <strong>{pickup.deadlineLabel} 밤 11시 59분</strong>까지 주문할 수 있어요.
-              </span>
-            </p>
-          ) : null}
-          <div className="mt-4 space-y-1.5 text-[0.9rem] text-eden-mute">
-            {shownDays?.length && !parents ? (
-              <p className="flex items-center gap-1.5">
-                <Info size={14} strokeWidth={1.7} aria-hidden />
-                {pickupLabel(shownDays[0].iso)} ~ {pickupLabel(shownDays[shownDays.length - 1].iso)} 픽업
-              </p>
-            ) : null}
-            <p className="flex items-center gap-1.5">
-              <Info size={14} strokeWidth={1.7} aria-hidden />
-              {gift ? '날짜를 고르면 아래에 답례품이 나와요.' : '날짜를 고르면 아래에 그날 메뉴가 나와요.'}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <main className="pad pb-16 pt-14">
-        <div className="mb-10 lg:hidden">{notes}</div>
+      {/* Step 1 sits in the page flow, right above step 2, like the earlier /order. */}
+      <main className="pad border-t border-eden-line pb-16 pt-12">
         <div className="lg:grid lg:grid-cols-[1fr_340px] lg:items-start lg:gap-10">
           <div>
-            <section ref={menuRef} className="scroll-mt-[90px]">
+            <section>
+              <p className="eyebrow">STEP 1 · PICKUP DAY</p>
+              <h2 className="mb-4 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">{parents ? '금요일 고르기' : '픽업 날짜 고르기'}</h2>
+              <p className="mb-4 text-[1.05rem] font-semibold">{parents ? '주문은 수요일까지 받습니다.' : '주문은 2일 전까지만 받습니다.'}</p>
+              {parents ? (
+                <p className="-mt-2 mb-4 flex items-start gap-2 text-[1rem] leading-relaxed">
+                  <School size={20} strokeWidth={1.7} className="mt-0.5 shrink-0" aria-hidden />
+                  {fridayNotice}
+                </p>
+              ) : null}
+              <PickupDatePicker
+                days={shownDays}
+                markFriday={!parents && !gift}
+                selected={pickup?.iso ?? null}
+                onSelect={choosePickup}
+              />
+            </section>
+
+            <div className="mt-10 lg:hidden">{notes}</div>
+
+            <section ref={menuRef} className="mt-12 scroll-mt-[90px]">
               <p className="eyebrow">{gift ? 'STEP 2 · GIFTS' : 'STEP 2 · BREAD'}</p>
               <h2 className="mb-4 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">
                 {gift ? '답례품 고르기' : '빵 고르기'}

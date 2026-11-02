@@ -6,7 +6,7 @@ import { useCustomerAuth } from '@/lib/customer-auth'
 import { supabase } from '@/lib/supabase'
 import { pageMeta } from '@/lib/seo'
 import { rememberReturnTo } from '@/lib/return-to'
-import { useSiteContent, useContentValue, ALL_NEWS_KEYS } from '@/lib/site-content'
+import { useSiteContent, useContentValue, ALL_NEWS_KEYS, filledNewsKeys } from '@/lib/site-content'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/support')({ component: SupportPage, head: () => pageMeta('/support') })
@@ -44,7 +44,8 @@ function SupportPage() {
     <section className="mb-16">
       <h2 className="mb-4 font-serif text-xl font-light">새소식</h2>
       <div className="max-w-3xl">
-        {ALL_NEWS_KEYS.map((k) => (
+        {filledNewsKeys(siteContent, ALL_NEWS_KEYS).length === 0 && <p className="border-y border-eden-line py-6 text-[15px] text-eden-mute">아직 올라온 새소식이 없습니다.</p>}
+        {filledNewsKeys(siteContent, ALL_NEWS_KEYS).map((k) => (
           <Link key={k} to="/news/$id" params={{ id: k }} className="group flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-eden-line py-4 last:border-b">
             <span className="rounded-full bg-eden-paper-dim px-3 py-1 text-xs font-semibold text-eden-ink">{cv(`news.${k}.tag`)}</span>
             <span className="min-w-0 flex-1 text-[15px] group-hover:text-eden-accent">{cv(`news.${k}.title`)}</span>

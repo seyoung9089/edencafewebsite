@@ -87,29 +87,29 @@ export const CONTENT_SCHEMA: ContentField[] = [
   { group: '오시는 길', key: 'location.quote', label: '안내 문구', type: 'textarea', default: '"궁금하신 점이 있으면 편하게 문의해주세요!"' },
   { group: '오시는 길', key: 'location.phone', label: '연락처', type: 'input', default: '담당 연락처 · 010-XXXX-XXXX' },
 
-  { group: '새소식', key: 'news.n1.tag', label: '공지1 태그', type: 'input', default: '공지' },
-  { group: '새소식', key: 'news.n1.title', label: '공지1 제목', type: 'input', default: '추석 연휴 픽업 운영 안내' },
-  { group: '새소식', key: 'news.n1.date', label: '공지1 날짜', type: 'input', default: '2026.09.10' },
+  { group: '새소식', key: 'news.n1.tag', label: '공지1 태그', type: 'input', default: '' },
+  { group: '새소식', key: 'news.n1.title', label: '공지1 제목', type: 'input', default: '' },
+  { group: '새소식', key: 'news.n1.date', label: '공지1 날짜', type: 'input', default: '' },
   { group: '새소식', key: 'news.n1.body', label: '공지1 내용', type: 'textarea', default: '' },
-  { group: '새소식', key: 'news.n2.tag', label: '공지2 태그', type: 'input', default: '소식' },
-  { group: '새소식', key: 'news.n2.title', label: '공지2 제목', type: 'input', default: '가을 신메뉴 출시 안내' },
-  { group: '새소식', key: 'news.n2.date', label: '공지2 날짜', type: 'input', default: '2026.09.02' },
+  { group: '새소식', key: 'news.n2.tag', label: '공지2 태그', type: 'input', default: '' },
+  { group: '새소식', key: 'news.n2.title', label: '공지2 제목', type: 'input', default: '' },
+  { group: '새소식', key: 'news.n2.date', label: '공지2 날짜', type: 'input', default: '' },
   { group: '새소식', key: 'news.n2.body', label: '공지2 내용', type: 'textarea', default: '' },
-  { group: '새소식', key: 'news.n3.tag', label: '공지3 태그', type: 'input', default: '소식' },
-  { group: '새소식', key: 'news.n3.title', label: '공지3 제목', type: 'input', default: '베이커리실 이전 완료 안내' },
-  { group: '새소식', key: 'news.n3.date', label: '공지3 날짜', type: 'input', default: '2026.08.20' },
+  { group: '새소식', key: 'news.n3.tag', label: '공지3 태그', type: 'input', default: '' },
+  { group: '새소식', key: 'news.n3.title', label: '공지3 제목', type: 'input', default: '' },
+  { group: '새소식', key: 'news.n3.date', label: '공지3 날짜', type: 'input', default: '' },
   { group: '새소식', key: 'news.n3.body', label: '공지3 내용', type: 'textarea', default: '' },
-  { group: '새소식', key: 'news.n4.tag', label: '공지4 태그 (전체페이지 전용)', type: 'input', default: '소식' },
-  { group: '새소식', key: 'news.n4.title', label: '공지4 제목 (전체페이지 전용)', type: 'input', default: '여름 시즌 메뉴 안내' },
-  { group: '새소식', key: 'news.n4.date', label: '공지4 날짜', type: 'input', default: '2026.06.15' },
+  { group: '새소식', key: 'news.n4.tag', label: '공지4 태그 (전체페이지 전용)', type: 'input', default: '' },
+  { group: '새소식', key: 'news.n4.title', label: '공지4 제목 (전체페이지 전용)', type: 'input', default: '' },
+  { group: '새소식', key: 'news.n4.date', label: '공지4 날짜', type: 'input', default: '' },
   { group: '새소식', key: 'news.n4.body', label: '공지4 내용', type: 'textarea', default: '' },
-  { group: '새소식', key: 'news.n5.tag', label: '공지5 태그 (전체페이지 전용)', type: 'input', default: '공지' },
-  { group: '새소식', key: 'news.n5.title', label: '공지5 제목 (전체페이지 전용)', type: 'input', default: '정기 휴무일 변경 안내' },
-  { group: '새소식', key: 'news.n5.date', label: '공지5 날짜', type: 'input', default: '2026.05.02' },
+  { group: '새소식', key: 'news.n5.tag', label: '공지5 태그 (전체페이지 전용)', type: 'input', default: '' },
+  { group: '새소식', key: 'news.n5.title', label: '공지5 제목 (전체페이지 전용)', type: 'input', default: '' },
+  { group: '새소식', key: 'news.n5.date', label: '공지5 날짜', type: 'input', default: '' },
   { group: '새소식', key: 'news.n5.body', label: '공지5 내용', type: 'textarea', default: '' },
-  { group: '새소식', key: 'news.n6.tag', label: '공지6 태그 (전체페이지 전용)', type: 'input', default: '소식' },
-  { group: '새소식', key: 'news.n6.title', label: '공지6 제목 (전체페이지 전용)', type: 'input', default: '이든 협동조합 정기총회 안내' },
-  { group: '새소식', key: 'news.n6.date', label: '공지6 날짜', type: 'input', default: '2026.03.20' },
+  { group: '새소식', key: 'news.n6.tag', label: '공지6 태그 (전체페이지 전용)', type: 'input', default: '' },
+  { group: '새소식', key: 'news.n6.title', label: '공지6 제목 (전체페이지 전용)', type: 'input', default: '' },
+  { group: '새소식', key: 'news.n6.date', label: '공지6 날짜', type: 'input', default: '' },
   { group: '새소식', key: 'news.n6.body', label: '공지6 내용', type: 'textarea', default: '' },
 
   { group: '입금 계좌', key: 'pickup.time', label: '픽업 시간 (주문 완료 창에 표시)', type: 'input', default: '09:00 – 18:00' },
@@ -128,6 +128,11 @@ export const CONTENT_SCHEMA: ContentField[] = [
 
 export const ALL_NEWS_KEYS = ['n1', 'n2', 'n3', 'n4', 'n5', 'n6'] as const
 export const HOME_NEWS_KEYS = ['n1', 'n2', 'n3'] as const
+
+/** News slots whose title is filled in. Empty slots are hidden from customers. */
+export function filledNewsKeys<K extends string>(content: Record<string, string> | undefined, keys: readonly K[]): K[] {
+  return keys.filter((k) => (content?.[`news.${k}.title`] ?? DEFAULTS[`news.${k}.title`] ?? '').trim() !== '')
+}
 
 // Single source of truth for fallback text: every call site just passes the
 // key, so a field can never silently render blank because someone forgot to

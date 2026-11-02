@@ -137,6 +137,8 @@ export function OrderReceipt({
   onRemove,
   onCheckout,
 }: ReceiptProps) {
+  // After logging in or signing up, come back to this same order tab (the cart stays).
+  const returnPath = gift ? '/gifts' : parents ? '/parents' : '/order'
   return (
     <div className="border border-eden-line bg-white p-5">
       <div className="flex items-start justify-between gap-2">
@@ -276,12 +278,22 @@ export function OrderReceipt({
           <>
             <Link
               to="/login"
-              onClick={() => rememberReturnTo(parents ? '/parents' : '/order')}
+              onClick={() => rememberReturnTo(returnPath)}
               className="flex h-14 w-full items-center justify-center rounded-[3px] bg-eden-accent text-base font-semibold text-white transition-colors hover:bg-eden-accent-d"
             >
               {gift ? '로그인하고 예약하기' : '로그인하고 주문하기'}
             </Link>
-            <p className="mt-2 text-center text-xs text-eden-mute">처음이시면 회원가입부터 해요. 담은 {gift ? '답례품' : '빵'}은 그대로 남아 있어요.</p>
+            <p className="mt-3 text-center text-[0.95rem] text-eden-mute">
+              주문이 처음이신가요?{' '}
+              <Link
+                to="/login"
+                search={{ mode: 'signup' }}
+                onClick={() => rememberReturnTo(returnPath)}
+                className="font-semibold text-eden-ink underline underline-offset-4"
+              >
+                회원가입
+              </Link>
+            </p>
           </>
         )}
         {loggedIn && (!parents || paymentMethod === 'transfer') ? (

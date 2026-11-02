@@ -6,7 +6,7 @@ import { OrderReceipt, type PaymentMethod } from '@/components/order-receipt'
 import { PickupDatePicker } from '@/components/pickup-date-picker'
 import { OrderCompleteBody, type PlacedOrder } from '@/components/order-complete'
 import { GIFT_MAX_QTY, MAX_QTY, groupTotals, maxQtyFor, overGroupLimit, reconcileCart, useCart, useGiftCart } from '@/lib/cart'
-import { pickupLabel, usePickupDates } from '@/lib/pickup'
+import { usePickupDates } from '@/lib/pickup'
 import { useCustomerAuth } from '@/lib/customer-auth'
 import { isPlaceholder, useContentValue, useSiteContent } from '@/lib/site-content'
 import { useMenu, isSoldOut, isUnpriced, fetchPopularity, type MenuGroup, type MenuItem } from '@/lib/menu'
@@ -17,7 +17,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import { MenuDetailDialog } from '@/components/menu-detail'
-import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School, Info, Gift, Clock } from 'lucide-react'
+import { Minus, Plus, Croissant, Coffee, Flame, ChevronUp, ChevronRight, School, Gift } from 'lucide-react'
 import { toast } from 'sonner'
 
 /**
@@ -400,20 +400,10 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
           <div>
             <section>
               <p className="eyebrow">STEP 1 · PICKUP DAY</p>
-              <h2 className="mb-4 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">
-                {parents ? '금요일 고르기' : '픽업 날짜 고르기'}
-                {pickup ? <span className="ml-2 font-sans text-base font-normal text-eden-mute">{pickup.label}</span> : null}
-              </h2>
-              {shownDays?.length && !parents ? (
-                <p className="mb-1 text-[0.95rem] text-eden-mute">
-                  {pickupLabel(shownDays[0].iso)} ~ {pickupLabel(shownDays[shownDays.length - 1].iso)} 픽업
-                </p>
-              ) : null}
-              <p className="mb-3 text-[1.05rem] font-semibold">
-                {parents ? '금요일 픽업은 그 주 수요일 밤 11시 59분까지 주문해 주세요.' : '픽업 2일 전 밤 11시 59분까지 주문해 주세요.'}
-              </p>
+              <h2 className="mb-4 mt-2 border-b border-eden-line pb-3 text-[1.5rem]">{parents ? '금요일 고르기' : '픽업 날짜 고르기'}</h2>
+              <p className="mb-4 text-[1.05rem] font-semibold">{parents ? '주문은 수요일까지 받습니다.' : '주문은 2일 전까지만 받습니다.'}</p>
               {parents ? (
-                <p className="mb-4 flex items-start gap-2 text-[1rem] leading-relaxed">
+                <p className="-mt-2 mb-4 flex items-start gap-2 text-[1rem] leading-relaxed">
                   <School size={20} strokeWidth={1.7} className="mt-0.5 shrink-0" aria-hidden />
                   {fridayNotice}
                 </p>
@@ -424,19 +414,6 @@ export function OrderPage({ audience }: { audience: OrderAudience }) {
                 selected={pickup?.iso ?? null}
                 onSelect={choosePickup}
               />
-              {pickup ? (
-                <p className="mt-4 flex items-start gap-2 bg-eden-paper-dim px-4 py-3 text-[1rem] leading-relaxed">
-                  <Clock size={18} strokeWidth={1.7} className="mt-0.5 shrink-0 text-eden-accent" aria-hidden />
-                  <span>
-                    <strong>{pickup.label}</strong> 픽업은 <strong>{pickup.deadlineLabel} 밤 11시 59분</strong>까지 주문할 수 있어요.
-                  </span>
-                </p>
-              ) : (
-                <p className="mt-3 flex items-center gap-1.5 text-[0.95rem] text-eden-mute">
-                  <Info size={14} strokeWidth={1.7} aria-hidden />
-                  {gift ? '날짜를 고르면 아래에 답례품이 나와요.' : '날짜를 고르면 아래에 그날 메뉴가 나와요.'}
-                </p>
-              )}
             </section>
 
             <div className="mt-10 lg:hidden">{notes}</div>

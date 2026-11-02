@@ -1,5 +1,4 @@
 import { Check } from 'lucide-react'
-import { InfoRows } from '@/components/info-rows'
 import { CopyLabel, usePayment } from '@/components/payment-info'
 import type { PaymentMethod } from '@/components/order-receipt'
 
@@ -25,10 +24,10 @@ const pickupText = (order: PlacedOrder) => `${order.pickupLabel}${order.pickupTi
 function Buttons({ onClose, onOrders }: { onClose: () => void; onOrders: () => void }) {
   return (
     <div className="space-y-2">
-      <button type="button" onClick={onOrders} className="w-full rounded-[3px] bg-eden-accent py-3 text-sm font-semibold text-white hover:bg-eden-accent-d">
+      <button type="button" onClick={onOrders} className="w-full rounded-full bg-eden-ink py-3 text-sm font-semibold text-eden-paper hover:bg-eden-ink-2">
         내 주문 보기
       </button>
-      <button type="button" onClick={onClose} className="w-full py-2 text-sm text-eden-mute">
+      <button type="button" onClick={onClose} className="w-full py-2 text-sm text-eden-sage-dim">
         닫기
       </button>
     </div>
@@ -36,9 +35,8 @@ function Buttons({ onClose, onOrders }: { onClose: () => void; onOrders: () => v
 }
 
 const StatusNote = () => (
-  <p className="text-xs text-eden-mute">
+  <p className="text-xs text-eden-sage-dim">
     입금 확인, 픽업 준비 같은 주문 상태는 <strong className="text-eden-ink">내 주문</strong>에서 확인할 수 있어요.
-    <br />이 화면을 캡처해 두시면 계좌와 픽업 날짜를 다시 보기 편해요.
   </p>
 )
 
@@ -47,30 +45,33 @@ export function OrderCompleteBody({ order, onClose, onOrders }: BodyProps) {
   const pay = usePayment()
   return (
     <div className="space-y-5 text-center">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[3px] bg-eden-accent text-white">
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-eden-sand text-eden-ink-2">
         <Check size={34} strokeWidth={2.5} />
       </div>
       <div>
-        <h2 className="font-serif text-xl font-light">주문 완료!</h2>
+        <h2 className="font-serif text-xl font-semibold">주문 완료!</h2>
+        <p className="mt-1 text-sm text-eden-sage-dim">
+          {pickupText(order)} 픽업{order.studentName ? ` · ${order.studentName} 학생` : ''}
+        </p>
       </div>
       {order.paymentMethod === 'onsite' ? (
         <div className="rounded-card bg-eden-paper-dim px-5 py-5">
-          <div className="text-xs text-eden-mute">현장에서 결제할 금액</div>
-          <div className="mt-1 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">{won(order.total)}</div>
-          <p className="mt-3 text-sm text-eden-mute">{order.studentName} 학생이 찾아갈 때 매장에서 결제해 주세요.</p>
+          <div className="text-xs text-eden-sage-dim">현장에서 결제할 금액</div>
+          <div className="mt-1 font-serif text-3xl font-bold">{won(order.total)}</div>
+          <p className="mt-3 text-sm text-eden-sage-dim">{order.studentName} 학생이 찾아갈 때 매장에서 결제해 주세요.</p>
         </div>
       ) : (
         <div className="rounded-card bg-eden-paper-dim px-5 py-5">
-          <div className="text-xs text-eden-mute">입금할 금액</div>
-          <div className="mt-1 font-serif text-[clamp(1.75rem,3vw,2.6rem)] font-light leading-snug">{won(order.total)}</div>
+          <div className="text-xs text-eden-sage-dim">입금할 금액</div>
+          <div className="mt-1 font-serif text-3xl font-bold">{won(order.total)}</div>
           <button
             type="button"
             onClick={(e) => void pay.copy(e.currentTarget)}
             aria-label="계좌번호 복사"
-            className="mt-4 flex w-full items-center justify-between gap-3 rounded-[2px] bg-eden-paper px-4 py-3 text-left text-sm shadow-soft transition-transform active:scale-[0.98]"
+            className="mt-4 flex w-full items-center justify-between gap-3 rounded-[10px] bg-eden-paper px-4 py-3 text-left text-sm shadow-soft transition-transform active:scale-[0.98]"
           >
             <span>
-              <span className="block text-xs text-eden-mute">
+              <span className="block text-xs text-eden-sage-dim">
                 {pay.bank} · 예금주 {pay.holder}
               </span>
               <strong>{pay.account}</strong>
@@ -82,19 +83,12 @@ export function OrderCompleteBody({ order, onClose, onOrders }: BodyProps) {
               {order.studentDepositNote} ({order.studentName})
             </p>
           ) : null}
-          <p className="mt-3 text-xs text-eden-mute">{pay.note}</p>
+          <p className="mt-3 text-xs text-eden-sage-dim">{pay.note}</p>
         </div>
       )}
-      <InfoRows
-        rows={[
-          // 학부모 주문 is picked up after school, not during shop hours.
-          order.studentName
-            ? { label: '픽업', value: order.pickupLabel, note: `하교할 때 ${order.studentName} 학생이 찾아가요` }
-            : { label: '픽업', value: pickupText(order) },
-          { label: '메뉴', value: itemsText(order) },
-          { label: '주문번호', value: order.id.slice(0, 8) },
-        ]}
-      />
+      <p className="text-xs text-eden-sage-dim">
+        {itemsText(order)} · 주문번호 {order.id.slice(0, 8)}
+      </p>
       <StatusNote />
       <Buttons onClose={onClose} onOrders={onOrders} />
     </div>

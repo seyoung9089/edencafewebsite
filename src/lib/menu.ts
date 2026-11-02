@@ -55,7 +55,6 @@ export function isUnpriced(item: Pick<MenuItem, 'price'>): boolean {
 export async function fetchMenuGroups(): Promise<MenuGroup[]> {
   const { data, error } = await supabase.from('menu_groups').select('name,sort_order,max_qty').order('sort_order')
   if (error) throw error
-  // Kinds keep the order they were added in (휘낭시에 → 쿠키 → … ); there is no order box to edit any more.
   return (data ?? []).map((g) => ({
     name: String(g.name),
     sort_order: Number(g.sort_order) || 0,
@@ -64,8 +63,7 @@ export async function fetchMenuGroups(): Promise<MenuGroup[]> {
 }
 
 export function sortMenu(items: MenuItem[]): MenuItem[] {
-  // No manual order: menus are grouped by kind on the page, and listed by name inside each kind.
-  return [...items].sort((a, b) => a.name.localeCompare(b.name, 'ko'))
+  return [...items].sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name, 'ko'))
 }
 
 export async function fetchMenu(): Promise<MenuItem[]> {

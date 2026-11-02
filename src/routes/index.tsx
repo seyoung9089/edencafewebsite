@@ -143,7 +143,7 @@ function HomePage() {
           </div>
           <div className="flex items-end justify-between gap-4">
             <span className="text-[0.95rem] opacity-90">픽업 2일 전 밤 11시 59분까지 주문</span>
-            <span className={`${go} border-eden-point bg-eden-point text-eden-ink`} aria-hidden><ArrowRight size={20} /></span>
+            <span className={`${go} border-white`} aria-hidden><ArrowRight size={20} /></span>
           </div>
         </Link>
         <Link to="/parents" className={`${pane} bg-eden-pane text-eden-pane-ink`}>
@@ -157,7 +157,7 @@ function HomePage() {
           </div>
           <div className="flex items-end justify-between gap-4">
             <span className="text-[0.95rem] opacity-90">그 주 수요일 밤 11시 59분까지 주문</span>
-            <span className={`${go} border-eden-point bg-eden-point text-eden-ink`} aria-hidden><ArrowRight size={20} /></span>
+            <span className={`${go} border-eden-pane-ink`} aria-hidden><ArrowRight size={20} /></span>
           </div>
         </Link>
       </section>
@@ -262,7 +262,7 @@ function HomePage() {
           <Bell size={17} strokeWidth={1.7} /> 주문을 마치면 입금할 계좌와 금액이 바로 나와요.
         </p>
         <div className="flex flex-wrap gap-3">
-          <Link to="/order" className="btn point">
+          <Link to="/order" className="btn ivory">
             주문하러 가기 <ArrowRight size={18} />
           </Link>
           <Link to="/guide" className="btn ghost">

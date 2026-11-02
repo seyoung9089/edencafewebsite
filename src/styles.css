@@ -58,8 +58,6 @@
   --eden-ok: 154 45% 34%;        /* #2F7D5B */
   --eden-warn: 36 71% 42%;       /* #B8791F */
   --eden-line: 35 18% 81%;       /* #D8D0C5 */
-  --eden-point: 37 78% 58%;      /* #E6A443, warm crust colour for the main "order" buttons */
-  --eden-point-d: 34 72% 50%;    /* #DB8F2D, hover */
 }
 
 .dark {
@@ -160,8 +158,6 @@
   --color-eden-pane-ink: hsl(var(--eden-pane-ink));
   --color-eden-green: hsl(var(--eden-green));
   --color-eden-ok: hsl(var(--eden-ok));
-  --color-eden-point: hsl(var(--eden-point));
-  --color-eden-point-d: hsl(var(--eden-point-d));
   --color-eden-warn: hsl(var(--eden-warn));
   --color-eden-line: hsl(var(--eden-line));
 }
@@ -242,8 +238,6 @@ h1, h2, h3, .font-display {
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .btn.ivory { background: hsl(var(--eden-paper)); color: hsl(var(--eden-ink)); }
 .btn.ivory:hover { background: hsl(var(--eden-paper-dim)); }
-.btn.point { background: hsl(var(--eden-point)); color: hsl(var(--eden-ink)); box-shadow: 0 6px 18px -8px rgba(27,20,16,.55); }
-.btn.point:hover { background: hsl(var(--eden-point-d)); }
 .btn.ghost { background: transparent; color: inherit; border: 1px solid currentColor; }
 .btn.ghost:hover { background: transparent; opacity: 0.7; }
 

@@ -33,7 +33,7 @@ export function HeroSection() {
           <em className="font-normal not-italic">고른 날</em> 찾아가세요.
         </h1>
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Link to="/order" className="btn point">
+          <Link to="/order" className="btn">
             마을 픽업 주문 <ArrowRight size={18} />
           </Link>
           <Link to="/parents" className="btn ivory">

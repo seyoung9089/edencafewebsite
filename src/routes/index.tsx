@@ -3,7 +3,7 @@ import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { HeroSection } from '@/components/hero-section'
 import { Reveal } from '@/components/reveal'
-import { useSiteContent, useContentValue, HOME_NEWS_KEYS } from '@/lib/site-content'
+import { useSiteContent, useContentValue, HOME_NEWS_KEYS, filledNewsKeys } from '@/lib/site-content'
 import { fetchMenu, isSoldOut } from '@/lib/menu'
 import { pageMeta } from '@/lib/seo'
 import { usePickupDates, pickupDayOf, type PickupDay } from '@/lib/pickup'
@@ -271,8 +271,8 @@ function HomePage() {
         </div>
       </section>
 
-      {/* News */}
-      <section id="news" className="pad pb-[90px] pt-[70px]">
+      {/* News (hidden until staff write one) */}
+      {filledNewsKeys(content, HOME_NEWS_KEYS).length > 0 && <section id="news" className="pad pb-[90px] pt-[70px]">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="eyebrow">NEWS</p>
@@ -283,7 +283,7 @@ function HomePage() {
           </Link>
         </div>
         <div className="border-t-2 border-eden-ink">
-          {HOME_NEWS_KEYS.map((key, i) => (
+          {filledNewsKeys(content, HOME_NEWS_KEYS).map((key, i) => (
             <Reveal key={key} delay={i * 80} className="border-b border-eden-line">
               <NewsLink tag={cv(`news.${key}.tag`)} newsKey={key} className="group flex flex-wrap items-center gap-x-4 gap-y-1 py-5">
                 <span className="rounded-full border border-eden-accent px-3 py-0.5 text-[0.8rem] font-bold text-eden-accent">{cv(`news.${key}.tag`)}</span>
@@ -293,7 +293,7 @@ function HomePage() {
             </Reveal>
           ))}
         </div>
-      </section>
+      </section>}
 
       {/* About teaser */}
       <section className="pad bg-eden-ink py-[80px] text-eden-paper">

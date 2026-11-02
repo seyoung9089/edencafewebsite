@@ -18,6 +18,7 @@ function NewsDetailPage() {
   const content = useSiteContent()
   const cv = (key: string) => useContentValue(content, key)
   const body = cv(`news.${id}.body`).trim()
+  const title = cv(`news.${id}.title`).trim()
 
   return (
     <div className="min-h-screen bg-eden-paper text-eden-ink">
@@ -28,6 +29,7 @@ function NewsDetailPage() {
             <ChevronLeft size={16} />
             새소식 목록으로
           </Link>
+          {!title ? <p className="text-[15px] text-eden-mute">삭제되었거나 아직 올라오지 않은 소식입니다.</p> : <>
           <div className="mb-4 flex items-center gap-3">
             <span className="rounded-full bg-eden-paper-dim px-3 py-1 text-xs font-semibold text-eden-ink">{cv(`news.${id}.tag`)}</span>
             <span className="text-sm text-eden-mute">{cv(`news.${id}.date`)}</span>
@@ -38,6 +40,7 @@ function NewsDetailPage() {
           ) : (
             <p className="text-[15px] text-eden-mute">자세한 내용은 준비 중이에요.</p>
           )}
+          </>}
         </div>
       </article>
       <SiteFooter />

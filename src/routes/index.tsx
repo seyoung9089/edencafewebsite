@@ -6,8 +6,7 @@ import { Reveal } from '@/components/reveal'
 import { useSiteContent, useContentValue, HOME_NEWS_KEYS } from '@/lib/site-content'
 import { fetchMenu, isSoldOut } from '@/lib/menu'
 import { pageMeta } from '@/lib/seo'
-import { usePickupDates } from '@/lib/pickup'
-import { Slider } from '@/components/slider'
+import { usePickupDates, pickupDayOf, type PickupDay } from '@/lib/pickup'
 import { ArrowRight, CalendarDays, Clock, Info, School, Store, Bell } from 'lucide-react'
 
 // Warm stand-ins for menu photos that haven't been uploaded yet.
@@ -23,7 +22,15 @@ const SLIDE_TONES = [
 // Most AI crawlers (and many that read via a browsing tool) fetch pages
 // without executing JavaScript, so anything that only exists behind a
 // client-side useQuery would be invisible to them.
-type HomeMenuItem = { name: string; price: number; category: string; soldOut?: boolean; image?: string | null; description?: string }
+type HomeMenuItem = {
+  name: string
+  price: number
+  category: string
+  soldOut?: boolean
+  image?: string | null
+  description?: string
+  saleDays?: PickupDay[]
+}
 
 export const Route = createFileRoute('/')({
   component: HomePage,
@@ -39,6 +46,7 @@ export const Route = createFileRoute('/')({
           soldOut: isSoldOut(i),
           image: i.image_url,
           description: i.description,
+          saleDays: i.sale_days,
         })),
       }
     } catch {
@@ -90,6 +98,20 @@ function StructuredData({ menuItems }: { menuItems: HomeMenuItem[] }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
 }
 
+/**
+ * 오늘의 메뉴: three breads on today's menu (금요일 menu on Fridays, 월~목
+ * menu otherwise), priced and not sold out, photos first. The pick moves
+ * along by one every day so the same three don't sit there all week.
+ */
+function pickTodayMenu(items: HomeMenuItem[], todayIso: string | null): HomeMenuItem[] {
+  const day: PickupDay = (todayIso && pickupDayOf(todayIso)) || 'weekday'
+  const ok = items.filter((m) => m.category === 'bakery' && !m.soldOut && m.price > 0 && (m.saleDays ?? []).includes(day))
+  const withPhoto = ok.filter((m) => m.image)
+  const shift = todayIso ? Math.floor(Date.parse(`${todayIso}T00:00:00Z`) / 86_400_000) : 0
+  const rotate = (list: HomeMenuItem[]) => (list.length ? list.map((_, i) => list[(i + shift) % list.length]) : list)
+  return [...rotate(withPhoto), ...ok.filter((m) => !m.image)].slice(0, 3)
+}
+
 function HomePage() {
   const { menuItems } = Route.useLoaderData()
   const content = useSiteContent()
@@ -97,20 +119,7 @@ function HomePage() {
   const calendar = usePickupDates()
   const pickupTime = cv('pickup.time')
 
-  // Breads with a photo first, then the rest, six at most.
-  const bakery = menuItems.filter((m) => m.category === 'bakery' && !m.soldOut && m.price > 0)
-  const showcase = [...bakery.filter((m) => m.image), ...bakery.filter((m) => !m.image)].slice(0, 6)
-  const slides = showcase.map((m, i) => (
-    <div
-      className="relative flex aspect-[4/3] min-h-[240px] items-end bg-cover bg-center sm:aspect-[21/9]"
-      style={{ backgroundImage: m.image ? `url("${m.image}")` : SLIDE_TONES[i % SLIDE_TONES.length] }}
-    >
-      <div className="flex w-full flex-col bg-[linear-gradient(0deg,rgba(27,20,16,.65),transparent)] px-6 py-5 text-white">
-        <b className="font-serif text-[clamp(1.25rem,1.9vw,1.6rem)] font-normal">{m.name}</b>
-        <span className="text-[0.95rem] opacity-90">{m.description || `${m.price.toLocaleString('ko-KR')}원`}</span>
-      </div>
-    </div>
-  ))
+  const todayMenu = pickTodayMenu(menuItems, calendar?.todayIso ?? null)
 
   const pane = 'flex min-h-[260px] flex-col justify-between gap-8 px-[clamp(20px,5.5vw,96px)] py-[clamp(28px,4vw,56px)] transition-[filter] duration-300 hover:brightness-[.93]'
   const go = 'grid h-12 w-12 flex-none place-items-center rounded-full border'
@@ -134,7 +143,7 @@ function HomePage() {
           </div>
           <div className="flex items-end justify-between gap-4">
             <span className="text-[0.95rem] opacity-90">픽업 2일 전 밤 11시 59분까지 주문</span>
-            <span className={`${go} border-white`} aria-hidden><ArrowRight size={20} /></span>
+            <span className={`${go} border-eden-point bg-eden-point text-eden-ink`} aria-hidden><ArrowRight size={20} /></span>
           </div>
         </Link>
         <Link to="/parents" className={`${pane} bg-eden-pane text-eden-pane-ink`}>
@@ -148,7 +157,7 @@ function HomePage() {
           </div>
           <div className="flex items-end justify-between gap-4">
             <span className="text-[0.95rem] opacity-90">그 주 수요일 밤 11시 59분까지 주문</span>
-            <span className={`${go} border-eden-pane-ink`} aria-hidden><ArrowRight size={20} /></span>
+            <span className={`${go} border-eden-point bg-eden-point text-eden-ink`} aria-hidden><ArrowRight size={20} /></span>
           </div>
         </Link>
       </section>
@@ -165,14 +174,40 @@ function HomePage() {
         </span>
       </Link>
 
-      {/* The breads */}
-      {slides.length ? (
-        <section className="pad bg-eden-paper-dim pb-20 pt-[70px]">
-          <p className="eyebrow">THE BREAD</p>
-          <h2 className="mb-7 mt-3 text-[clamp(1.4rem,2.1vw,1.9rem)]">{cv('menuHome.title')}</h2>
-          <Slider slides={slides} label="이든카페 빵" />
-          <p className="mt-5 flex items-center gap-1.5 text-[0.9rem] text-eden-mute">
-            <Info size={15} strokeWidth={1.7} /> 날짜마다 메뉴가 달라요. 주문 화면에서 날짜를 고르면 그날 메뉴가 나와요.
+      {/* 오늘의 메뉴: three big photos, name and price underneath */}
+      {todayMenu.length ? (
+        <section className="pad bg-eden-paper pb-20 pt-[70px]">
+          <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow">THE BREAD</p>
+              <h2 className="mt-3 text-[clamp(1.6rem,2.4vw,2.1rem)]">{cv('menuHome.title') || '오늘의 메뉴'}</h2>
+            </div>
+            <Link to="/order" className="inline-flex items-center gap-1 rounded-full border border-eden-ink/25 px-4 py-2 text-[0.95rem] font-medium hover:border-eden-ink">
+              메뉴 전체 보기 <ArrowRight size={15} />
+            </Link>
+          </div>
+          <div className="grid gap-8 sm:grid-cols-3 sm:gap-6">
+            {todayMenu.map((m, i) => (
+              <Link key={m.name} to="/order" className="group block">
+                <div
+                  className="relative aspect-[4/3] overflow-hidden rounded-[3px] bg-eden-paper-dim"
+                  style={m.image ? undefined : { background: SLIDE_TONES[i % SLIDE_TONES.length] }}
+                >
+                  {m.image ? (
+                    <>
+                      {/* Same frame, but the whole photo shows instead of a zoomed-in crop: a soft blurred copy fills any gap. */}
+                      <img src={m.image} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-110 object-cover opacity-70 blur-2xl" />
+                      <img src={m.image} alt={m.name} loading="lazy" className="relative h-full w-full object-contain transition-transform duration-500 group-hover:scale-[1.03]" />
+                    </>
+                  ) : null}
+                </div>
+                <p className="mt-4 font-serif text-[1.2rem] leading-snug group-hover:text-eden-accent">{m.name}</p>
+                <p className="mt-1 text-[1.05rem] font-bold">{m.price.toLocaleString('ko-KR')}원</p>
+              </Link>
+            ))}
+          </div>
+          <p className="mt-6 flex items-center gap-1.5 text-[0.95rem] text-eden-mute">
+            <Info size={15} strokeWidth={1.7} /> 찾아가실 날짜마다 메뉴가 다릅니다. 주문 화면에서 날짜를 고르시면 그날 메뉴를 보실 수 있습니다.
           </p>
         </section>
       ) : null}
@@ -227,7 +262,7 @@ function HomePage() {
           <Bell size={17} strokeWidth={1.7} /> 주문을 마치면 입금할 계좌와 금액이 바로 나와요.
         </p>
         <div className="flex flex-wrap gap-3">
-          <Link to="/order" className="btn ivory">
+          <Link to="/order" className="btn point">
             주문하러 가기 <ArrowRight size={18} />
           </Link>
           <Link to="/guide" className="btn ghost">
